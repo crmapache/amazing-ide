@@ -1,0 +1,38 @@
+{
+  "name": "amazing-ide",
+  "private": true,
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@11.5.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @amazing-ide/desktop dev",
+    "build": "pnpm --filter @amazing-ide/desktop build",
+    "dist": "pnpm --filter @amazing-ide/desktop dist",
+    "dist:local": "pnpm --filter @amazing-ide/desktop dist:local",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "lint": "eslint .",
+    "lint:styles": "stylelint \"**/*.{css,scss}\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "pnpm typecheck && pnpm lint && pnpm lint:styles && pnpm test && pnpm format:check"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.12.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-import-resolver-typescript": "4.4.5",
+    "eslint-plugin-boundaries": "7.2.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.13.0",
+    "prettier": "3.9.10",
+    "prettier-plugin-auto-sort-imports": "3.0.0",
+    "stylelint": "17.16.0",
+    "stylelint-config-standard-scss": "17.0.0",
+    "stylelint-declaration-strict-value": "1.12.1",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.2"
+  }
+}

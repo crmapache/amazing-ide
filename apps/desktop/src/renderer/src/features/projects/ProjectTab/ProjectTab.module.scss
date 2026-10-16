@@ -1,0 +1,58 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+.projectTab {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  min-width: 120px;
+  border-right: var(--border-width) solid var(--color-border);
+  background-color: var(--color-bg-app);
+  transition: background-color var(--duration-normal) var(--easing-standard);
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--color-bg-chrome);
+    }
+  }
+}
+
+.active {
+  background-color: var(--color-bg-hover);
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--color-bg-hover);
+    }
+  }
+}
+
+.label {
+  @include button-reset;
+  @include truncate;
+
+  flex: 1;
+  height: 100%;
+  padding: 0 var(--space-8);
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-sm);
+  text-align: center;
+
+  .active & {
+    color: var(--color-fg);
+  }
+}
+
+// Крестик виден на активной вкладке и при наведении - иначе полоса рябит.
+.close {
+  position: absolute;
+  right: var(--space-1-5);
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--easing-standard);
+
+  .active &,
+  .projectTab:hover &,
+  &:focus-within {
+    opacity: 1;
+  }
+}

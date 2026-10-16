@@ -1,0 +1,17 @@
+.workbench {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.editor {
+  flex: 1;
+  min-width: 0;
+  background-color: var(--color-bg-editor);
+}

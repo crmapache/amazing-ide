@@ -1,0 +1,56 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Отступ строки: базовый плюс шаг на каждый уровень. --depth приходит из JS.
+@mixin indent($extra: 0px) {
+  padding-left: calc(var(--space-2) + var(--depth, 0) * var(--space-3) + #{$extra});
+}
+
+.row {
+  @include button-reset;
+  @include interactive-surface;
+  @include indent; // после button-reset: тот обнуляет padding
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  height: var(--size-control-sm);
+  padding-right: var(--space-2);
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-md);
+  text-align: left;
+}
+
+.selected {
+  background-color: var(--color-bg-selected);
+  color: var(--color-fg);
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.expanded {
+  transform: rotate(90deg);
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.name {
+  @include truncate;
+}
+
+.note {
+  height: var(--size-control-sm);
+
+  // Текст встаёт под имя файла: отступ строки плюс шеврон и иконка.
+  @include indent(var(--space-8));
+
+  color: var(--color-fg-disabled);
+  font-size: var(--font-size-sm);
+  line-height: var(--size-control-sm);
+}

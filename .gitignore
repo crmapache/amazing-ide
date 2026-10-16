@@ -1,0 +1,19 @@
+node_modules/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+.DS_Store
+
+# Локальные настройки Claude Code и IDE - личные, у каждого свои.
+.claude/settings.local.json
+.idea/workspace.xml
+.idea/shelf/
+
+# Ключ подписи. Приватная часть сертификата, которым подписывается то, что
+# запускается у людей, в git не попадает никогда (см. docs/code-signing.md).
+*.p12
+*.pem
+
+# Скриншоты и снимки, которые оставляет проверка окна через CDP.
+.screenshots/

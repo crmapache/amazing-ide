@@ -1,0 +1,142 @@
+/*
+ * Токены дизайн-системы. Единственное место в проекте, где живут сырые значения:
+ * цвета, размеры, шрифты, длительности. Всё остальное ссылается сюда через var(--...),
+ * это держит stylelint (stylelint.config.mjs в корне).
+ *
+ * Два слоя. Палитра (--palette-*) - сырые цвета, наружу её не используют. Роли
+ * (--color-*) - то, что берут компоненты: «фон панели», а не «серый 900». Тема
+ * меняет палитру и роли, компоненты при этом не трогаются.
+ *
+ * Сейчас это заглушка: одна тёмная тема и минимальный набор под каркас окна.
+ * Дизайн-систему разрабатываем отдельно, см. packages/ui/README.md.
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* Палитра */
+  --palette-gray-950: #111;
+  --palette-gray-900: #161616;
+  --palette-gray-850: #1c1c1c;
+  --palette-gray-800: #222;
+  --palette-gray-750: #2a2a2a;
+  --palette-gray-700: #333;
+  --palette-gray-500: #6b6b6b;
+  --palette-gray-400: #8c8c8c;
+  --palette-gray-200: #cfcfcf;
+  --palette-gray-100: #e6e6e6;
+  --palette-blue-500: #3d7bfd;
+  --palette-blue-400: #5b8ffd;
+  --palette-red-400: #f16d6d;
+  --palette-violet-500: #8b5cf6;
+  --palette-teal-500: #14b8a6;
+  --palette-orange-500: #f97316;
+  --palette-pink-500: #ec4899;
+  --palette-green-500: #22c55e;
+
+  /* Роли: фоны */
+  --color-bg-app: var(--palette-gray-950);
+  --color-bg-chrome: var(--palette-gray-900);
+  --color-bg-panel: var(--palette-gray-850);
+  --color-bg-editor: var(--palette-gray-800);
+  --color-bg-overlay: var(--palette-gray-750);
+  --color-bg-hover: var(--palette-gray-750);
+  --color-bg-active: var(--palette-gray-700);
+  --color-bg-selected: var(--palette-gray-700);
+
+  /* Роли: текст и иконки */
+  --color-fg: var(--palette-gray-100);
+  --color-fg-muted: var(--palette-gray-200);
+  --color-fg-subtle: var(--palette-gray-400);
+  --color-fg-disabled: var(--palette-gray-500);
+
+  /* Роли: акцент и состояния */
+  --color-accent: var(--palette-blue-500);
+  --color-accent-hover: var(--palette-blue-400);
+  --color-accent-fg: var(--palette-gray-100);
+  --color-danger: var(--palette-red-400);
+
+  /* Роли: значки проектов. Цвет выбирается по имени проекта, чтобы проект был узнаваем
+     в шапке так же, как в WebStorm. */
+  --color-avatar-0: var(--palette-blue-500);
+  --color-avatar-1: var(--palette-violet-500);
+  --color-avatar-2: var(--palette-teal-500);
+  --color-avatar-3: var(--palette-orange-500);
+  --color-avatar-4: var(--palette-pink-500);
+  --color-avatar-5: var(--palette-green-500);
+  --color-avatar-fg: var(--palette-gray-100);
+
+  /* Роли: линии */
+  --color-border: var(--palette-gray-750);
+  --color-border-strong: var(--palette-gray-700);
+  --color-focus: var(--palette-blue-400);
+
+  /* Шрифты. Интерфейс - системный: это родной вид на маке и ноль байт на загрузку.
+     Код - JetBrains Mono, едет внутри приложения (fonts.css). */
+  --font-ui: system-ui, -apple-system, 'SF Pro Text', sans-serif;
+  --font-code: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', monospace;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-md: 13px;
+  --font-size-lg: 15px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.45;
+
+  /* Отступы: шаг 4px */
+  --space-0-5: 2px;
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Радиусы и линии */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --border-width: 1px;
+  --focus-ring-width: 2px;
+
+  /* Размеры зон окна и контролов */
+  --size-title-bar: 40px;
+  --size-tab-bar: 32px;
+  --size-activity-bar: 40px;
+  --size-status-bar: 24px;
+  --size-control-sm: 22px;
+  --size-control-md: 28px;
+  --size-icon-sm: 14px;
+  --size-icon-md: 16px;
+  --size-avatar-sm: 20px;
+  --size-menu-item: 30px;
+
+  /* Ширина всплывающих панелей: меню проекта, меню ветки */
+  --size-popover-md: 360px;
+  --size-popover-lg: 440px;
+  --size-dialog: 420px;
+  --size-resize-handle: 6px;
+
+  /* Место под «светофор» macOS вместе с отступом до первой кнопки шапки: окно без
+     рамки рисует кнопки поверх шапки, а в macOS 26 они крупнее прежних. */
+  --size-traffic-lights: 92px;
+
+  /* Слои */
+  --z-sticky: 1;
+  --z-resize-handle: 10;
+  --z-toast: 100;
+
+  /* Затемнение под модальным диалогом */
+  --color-backdrop: rgb(0 0 0 / 45%);
+
+  /* Тени */
+  --shadow-overlay: 0 8px 24px rgb(0 0 0 / 45%);
+
+  /* Движение */
+  --duration-fast: 120ms;
+  --duration-normal: 160ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+}

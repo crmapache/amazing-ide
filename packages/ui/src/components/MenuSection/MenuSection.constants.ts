@@ -1,0 +1,3 @@
+export const SECTION_CHEVRON_SIZE = 14
+
+export const SECTION_CHEVRON_STROKE_WIDTH = 2

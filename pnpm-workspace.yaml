@@ -1,0 +1,27 @@
+packages:
+  - apps/*
+  - packages/*
+
+# pnpm не запускает postinstall зависимостей без явного разрешения.
+# Разрешаем только тем, кому сборка действительно нужна.
+#
+# Electron здесь нет намеренно: с 43-й версии он не качает бинарник на установке,
+# а electron-vite и electron-builder без бинарника падают. Его ставит postinstall
+# самого apps/desktop (scripts/install-electron.mjs).
+allowBuilds:
+  esbuild: true # нативный бинарник сборщика, без него не собирается ничего
+  electron-winstaller: false # Windows пока не собираем
+  unrs-resolver: true # нативный резолвер eslint-import-resolver-typescript
+  '@parcel/watcher': false # вотчер sass для CLI-режима, сборка через Vite его не использует
+
+# Свежие версии, которые pnpm по умолчанию придержал бы как слишком новые. Взяты
+# осознанно при создании проекта - это последние стабильные на тот момент.
+minimumReleaseAgeExclude:
+  - '@tanstack/query-core@5.104.3'
+  - '@tanstack/react-query@5.104.3'
+  - '@vitest/mocker@5.0.5'
+  - '@vitest/spy@5.0.5'
+  - i18next@26.4.6
+  - react-i18next@17.0.18
+  - sass@1.105.2
+  - vitest@5.0.5

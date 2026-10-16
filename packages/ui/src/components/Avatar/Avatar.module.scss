@@ -1,0 +1,37 @@
+.avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-avatar-sm);
+  height: var(--size-avatar-sm);
+  border-radius: var(--radius-sm);
+  color: var(--color-avatar-fg);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+.tone0 {
+  background-color: var(--color-avatar-0);
+}
+
+.tone1 {
+  background-color: var(--color-avatar-1);
+}
+
+.tone2 {
+  background-color: var(--color-avatar-2);
+}
+
+.tone3 {
+  background-color: var(--color-avatar-3);
+}
+
+.tone4 {
+  background-color: var(--color-avatar-4);
+}
+
+.tone5 {
+  background-color: var(--color-avatar-5);
+}

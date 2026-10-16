@@ -1,0 +1,35 @@
+{
+  "name": "@amazing-ide/ui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Дизайн-система Amazing IDE: токены, база и примитивы. Пока заглушка.",
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    "./tokens.css": "./src/styles/tokens.css",
+    "./base.css": "./src/styles/base.css",
+    "./mixins": "./src/styles/_mixins.scss",
+    "./*.types": "./src/components/*/*.types.ts",
+    "./*.hooks": "./src/components/*/*.hooks.ts",
+    "./*": "./src/components/*/*.tsx"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@fontsource-variable/jetbrains-mono": "5.3.0",
+    "clsx": "2.1.1",
+    "lucide-react": "1.57.0"
+  },
+  "peerDependencies": {
+    "react": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "react": "19.3.1",
+    "typescript": "6.0.3",
+    "vitest": "5.0.5"
+  }
+}

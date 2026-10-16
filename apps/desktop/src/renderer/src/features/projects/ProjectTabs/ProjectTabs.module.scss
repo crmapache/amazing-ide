@@ -1,0 +1,7 @@
+.projectTabs {
+  display: flex;
+  flex-shrink: 0;
+  height: var(--size-tab-bar);
+  border-bottom: var(--border-width) solid var(--color-border);
+  background-color: var(--color-bg-app);
+}

@@ -1,0 +1,24 @@
+.popover {
+  // Стили браузера для popover - по центру экрана с рамкой. Сбрасываем и ставим под
+  // кнопку, которая панель открыла (она же неявный якорь для position-area).
+  inset: auto;
+  margin: var(--space-1) 0 0;
+  padding: var(--space-1-5);
+  overflow: auto;
+  position-area: block-end span-inline-end;
+  position-try-fallbacks: flip-inline, flip-block;
+  max-height: 80vh;
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-overlay);
+  box-shadow: var(--shadow-overlay);
+  color: var(--color-fg);
+}
+
+.md {
+  width: var(--size-popover-md);
+}
+
+.lg {
+  width: var(--size-popover-lg);
+}

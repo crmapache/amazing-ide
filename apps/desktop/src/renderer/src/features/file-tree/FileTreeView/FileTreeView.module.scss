@@ -1,0 +1,23 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+.fileTreeView {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  @include truncate;
+
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.tree {
+  flex: 1;
+  padding-bottom: var(--space-4);
+  overflow: auto;
+}

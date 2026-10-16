@@ -1,0 +1,36 @@
+@use '../../styles/mixins' as *;
+
+.menuSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+}
+
+.title {
+  padding: var(--space-1-5) var(--space-2) var(--space-0-5);
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.toggle {
+  @include button-reset;
+  @include interactive-surface;
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  color: var(--color-fg-muted);
+  text-align: left;
+}
+
+.chevron {
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.collapsed {
+  transform: rotate(-90deg);
+}

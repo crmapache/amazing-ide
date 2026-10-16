@@ -1,0 +1,127 @@
+{
+  "common": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "notBuiltYet": "not built yet"
+  },
+  "projects": {
+    "open": "Open project",
+    "close": "Close {{name}}",
+    "tabsLabel": "Open projects",
+    "openEllipsis": "Open Project…",
+    "noProject": "No project",
+    "switcherLabel": "Switch project",
+    "menuLabel": "Projects",
+    "newProject": "New Project…",
+    "cloneRepository": "Clone Repository…",
+    "openProjects": "Open Projects",
+    "recentProjects": "Recent Projects"
+  },
+  "sideViews": {
+    "label": "Side panel views",
+    "files": "Files",
+    "search": "Search",
+    "resize": "Resize side panel"
+  },
+  "providerViews": {
+    "label": "LLM providers",
+    "claudeCode": "Claude Code",
+    "resize": "Resize LLM panel"
+  },
+  "fileTree": {
+    "noProjectTitle": "No project open",
+    "noProjectText": "Open a folder to see its files here.",
+    "emptyFolder": "Empty folder",
+    "readError": "Could not read this folder"
+  },
+  "search": {
+    "title": "Search",
+    "stub": "Search across the project is not built yet."
+  },
+  "editor": {
+    "noProjectTitle": "Open a project to start",
+    "noProjectText": "Pick a folder - it opens as a tab at the top.",
+    "noFileTitle": "No file selected",
+    "noFileText": "Choose a file in the tree on the left.",
+    "stub": "The editor is not built yet. This area will show the selected file."
+  },
+  "claudeCode": {
+    "title": "Claude Code",
+    "stub": "The Claude Code GUI will live here."
+  },
+  "statusBar": {
+    "version": "v{{version}}"
+  },
+  "updates": {
+    "availableTitle": "Version {{version}} is available",
+    "availableText": "Install it now - the app restarts by itself.",
+    "manualText": "Download it from the releases page and replace the app.",
+    "install": "Update",
+    "download": "Download",
+    "later": "Later",
+    "downloadingTitle": "Downloading {{version}}…",
+    "downloadingText": "{{percent}}%",
+    "installingTitle": "Installing {{version}}…",
+    "installingText": "The app will restart in a moment.",
+    "failedTitle": "Update to {{version}} failed",
+    "retry": "Try again",
+    "failureReason": {
+      "download": "The download did not finish. Check the connection and try again.",
+      "integrity": "The downloaded file does not match the release.",
+      "signature": "The new version is not signed like this one, so it was not installed.",
+      "install": "The new version could not be put in place."
+    },
+    "manualReason": {
+      "development": "Updates install only in the packaged app.",
+      "not-installed": "Move the app to Applications to update it in place.",
+      "read-only-location": "No permission to replace the app in its folder.",
+      "unsigned-build": "This build is not signed, so the update cannot be verified."
+    }
+  },
+  "titleBar": {
+    "search": "Search",
+    "settingsSoon": "Settings (not built yet)"
+  },
+  "git": {
+    "switcherLabel": "Switch branch",
+    "detached": "Detached at {{commit}}",
+    "switchFailed": "Could not switch to {{branch}}",
+    "menuLabel": "Branches and actions",
+    "search": "Search for branches and actions",
+    "updateProject": "Update Project…",
+    "commit": "Commit…",
+    "push": "Push…",
+    "newBranch": "New Branch…",
+    "checkoutRevision": "Checkout Tag or Revision…",
+    "local": "Local",
+    "remote": "Remote",
+    "nothingFound": "Nothing found",
+    "updated": "Project updated",
+    "updateFailed": "Could not update the project",
+    "newBranchTitle": "New Branch",
+    "newBranchName": "Branch name",
+    "newBranchPlaceholder": "feature/my-change",
+    "create": "Create",
+    "checkoutRevisionTitle": "Checkout Tag or Revision",
+    "revision": "Tag, branch or commit",
+    "revisionPlaceholder": "v1.2.0 or a1b2c3d",
+    "checkout": "Checkout",
+    "pushTitle": "Push",
+    "pushAction": "Push",
+    "pushing": "Pushing…",
+    "pushCommits_one": "Push {{count}} commit from {{branch}} to {{upstream}}.",
+    "pushCommits_other": "Push {{count}} commits from {{branch}} to {{upstream}}.",
+    "pushPublish": "Publish {{branch}} to {{remote}}. It will track the new remote branch.",
+    "pushNoRemote": "This repository has no remote to push to.",
+    "pushNotOnBranch": "Push works only on a branch, not on a detached commit."
+  },
+  "clone": {
+    "title": "Clone Repository",
+    "url": "Repository URL",
+    "urlPlaceholder": "git@github.com:owner/repo.git",
+    "folder": "Clone into folder",
+    "browse": "Browse…",
+    "clone": "Clone",
+    "cloning": "Cloning…"
+  }
+}

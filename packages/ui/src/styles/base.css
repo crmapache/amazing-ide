@@ -1,0 +1,54 @@
+/*
+ * Глобальная база окна: сброс, шрифт, поведение корня. Подключается один раз
+ * в точке входа рендерера, после tokens.css.
+ */
+
+@import '@fontsource-variable/jetbrains-mono/index.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  background: var(--color-bg-app);
+  color: var(--color-fg);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-normal);
+  -webkit-font-smoothing: antialiased;
+
+  /* Хром IDE не выделяется мышью, как в нативных приложениях. Там, где текст
+     выделять нужно (редактор, ответы LLM), выделение включает сам компонент. */
+  user-select: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+/* Шапка окна - область, за которую окно таскают. Всё, на что можно нажать, из неё
+   исключается здесь, один раз, а не в каждом компоненте. */
+button,
+a,
+input,
+select,
+textarea,
+[role='tab'] {
+  -webkit-app-region: no-drag;
+}
+
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: calc(var(--focus-ring-width) * -1);
+}

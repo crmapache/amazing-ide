@@ -1,0 +1,27 @@
+.handle {
+  position: absolute;
+  z-index: var(--z-resize-handle);
+  top: 0;
+  bottom: 0;
+  width: var(--size-resize-handle);
+  cursor: col-resize;
+  transition: background-color var(--duration-normal) var(--easing-standard);
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--color-border-strong);
+    }
+  }
+
+  &:active {
+    background-color: var(--color-accent);
+  }
+}
+
+.start {
+  left: calc(var(--size-resize-handle) / -2);
+}
+
+.end {
+  right: calc(var(--size-resize-handle) / -2);
+}

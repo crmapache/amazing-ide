@@ -1,0 +1,20 @@
+import type {
+  EventChannel,
+  EventPayload,
+  InvokeChannel,
+  InvokeRequest,
+  InvokeResponse,
+} from './contract'
+
+/**
+ * То, что preload выставляет окну в window.ide. Окно напрямую им не пользуется -
+ * только через lib/ipc.ts, где поверх этого типизированные обёртки.
+ */
+export type IdeBridge = {
+  invoke: <C extends InvokeChannel>(
+    channel: C,
+    request: InvokeRequest<C>,
+  ) => Promise<InvokeResponse<C>>
+  /** Подписка на событие. Возвращает функцию отписки - её обязательно звать. */
+  on: <E extends EventChannel>(event: E, listener: (payload: EventPayload<E>) => void) => () => void
+}

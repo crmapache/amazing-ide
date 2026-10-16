@@ -1,0 +1,31 @@
+@use '../../styles/mixins' as *;
+
+.iconButton {
+  @include button-reset;
+  @include interactive-surface;
+
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  color: var(--color-fg-subtle);
+
+  &:disabled {
+    color: var(--color-fg-disabled);
+  }
+}
+
+.sm {
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+}
+
+.md {
+  width: var(--size-control-md);
+  height: var(--size-control-md);
+}
+
+.active {
+  color: var(--color-fg);
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!--
+    App Sandbox нет и не будет: IDE читает и пишет проекты, на которые её навели,
+    и запускает процессы (терминал, git, CLI провайдеров LLM). Раздача - своим dmg,
+    не через Mac App Store (см. docs/code-signing.md).
+
+    V8 компилирует JavaScript в рантайме, и hardened runtime без этих двух записей
+    его глушит. Сейчас hardened runtime выключен (нотаризовать нечем), но записи
+    переживут его возврат вместе с Developer ID.
+  -->
+  <key>com.apple.security.cs.allow-jit</key>
+  <true/>
+  <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+  <true/>
+</dict>
+</plist>

@@ -1,0 +1,72 @@
+@use '../../styles/mixins' as *;
+
+.menuItem {
+  @include button-reset;
+  @include interactive-surface;
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--size-menu-item);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  color: var(--color-fg);
+  text-align: left;
+
+  &:focus-visible {
+    outline: none;
+    background-color: var(--color-bg-active);
+  }
+
+  &:disabled {
+    color: var(--color-fg-disabled);
+  }
+}
+
+.current {
+  background-color: var(--color-bg-selected);
+}
+
+.visual {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-fg-subtle);
+
+  .menuItem:disabled & {
+    color: var(--color-fg-disabled);
+  }
+}
+
+// Пустое место под иконку: подписи пунктов без иконки стоят ровно с остальными.
+.placeholder {
+  width: var(--size-icon-md);
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.label {
+  @include truncate;
+
+  font-size: var(--font-size-md);
+}
+
+.description {
+  @include truncate;
+
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-sm);
+}
+
+.hint {
+  flex-shrink: 0;
+  color: var(--color-fg-disabled);
+  font-size: var(--font-size-sm);
+}

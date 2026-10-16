@@ -1,0 +1,79 @@
+.textField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.label {
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-sm);
+}
+
+// Видна только скринридеру.
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.box {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--size-control-md);
+  padding: 0 var(--space-2);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-app);
+  transition: border-color var(--duration-normal) var(--easing-standard);
+
+  @media (hover: hover) {
+    &:hover:not(:focus-within) {
+      border-color: var(--color-fg-disabled);
+    }
+  }
+
+  &:focus-within {
+    border-color: var(--color-focus);
+  }
+}
+
+.invalid,
+.invalid:focus-within {
+  border-color: var(--color-danger);
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-fg);
+  font: inherit;
+  font-size: var(--font-size-md);
+  user-select: text;
+
+  &::placeholder {
+    color: var(--color-fg-disabled);
+  }
+
+  // Рамку фокуса рисует .box, у самого поля она лишняя.
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.error {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}

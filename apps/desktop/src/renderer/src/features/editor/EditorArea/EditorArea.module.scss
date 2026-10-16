@@ -1,0 +1,18 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+.editorArea {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.fileHeader {
+  @include truncate;
+
+  flex-shrink: 0;
+  padding: var(--space-1-5) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+  color: var(--color-fg-muted);
+  font-family: var(--font-code);
+  font-size: var(--font-size-sm);
+}

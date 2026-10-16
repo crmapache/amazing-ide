@@ -1,0 +1,27 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+.titleBar {
+  @include window-drag-region;
+
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  height: var(--size-title-bar);
+  padding: 0 var(--space-2) 0 var(--size-traffic-lights);
+  border-bottom: var(--border-width) solid var(--color-border);
+  background-color: var(--color-bg-chrome);
+}
+
+.start,
+.end {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.end {
+  flex-shrink: 0;
+}

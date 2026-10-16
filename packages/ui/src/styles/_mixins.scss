@@ -1,0 +1,44 @@
+// Общие SCSS-миксины дизайн-системы. Только структура и поведение - значения
+// всегда из токенов (tokens.css).
+
+@mixin button-reset {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+@mixin truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+// Прозрачный интерактивный элемент: hover и active на одном свойстве фона.
+// hover обёрнут в @media (hover: hover), active идёт после него - иначе при
+// зажатой кнопке hover перекроет active.
+@mixin interactive-surface($hover: var(--color-bg-hover), $active: var(--color-bg-active)) {
+  cursor: pointer;
+  transition: background-color var(--duration-normal) var(--easing-standard);
+
+  @media (hover: hover) {
+    &:not(:disabled):hover {
+      background-color: $hover;
+    }
+  }
+
+  &:not(:disabled):active {
+    background-color: $active;
+    transition-duration: var(--duration-fast);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+// Участок окна, за который его можно таскать (окно без системной рамки).
+@mixin window-drag-region {
+  -webkit-app-region: drag;
+}

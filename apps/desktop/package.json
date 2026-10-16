@@ -1,0 +1,50 @@
+{
+  "name": "@amazing-ide/desktop",
+  "productName": "Amazing IDE",
+  "version": "0.1.0",
+  "private": true,
+  "author": "crmapache",
+  "description": "Лёгкая IDE для macOS: проекты, файлы, редактор и GUI провайдеров LLM",
+  "main": "./out/main/index.js",
+  "amazingIde": {
+    "releasesRepo": "crmapache/amazing-ide-releases"
+  },
+  "scripts": {
+    "postinstall": "node scripts/install-electron.mjs",
+    "dev": "electron-vite dev --watch",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "test": "vitest run",
+    "dist": "pnpm run build && AMAZING_IDE_SIGN=required electron-builder --mac --arm64 --publish never",
+    "dist:local": "pnpm run build && electron-builder --mac --arm64 --publish never",
+    "cdp": "node scripts/cdp.mjs",
+    "update:e2e": "bash scripts/update-e2e.sh"
+  },
+  "dependencies": {
+    "semver": "7.8.5"
+  },
+  "devDependencies": {
+    "@amazing-ide/ui": "workspace:*",
+    "@tanstack/react-query": "5.104.3",
+    "@types/node": "24.13.3",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/semver": "7.8.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "clsx": "2.1.1",
+    "electron": "44.7.2",
+    "electron-builder": "26.15.3",
+    "electron-vite": "6.0.0",
+    "i18next": "26.4.6",
+    "lucide-react": "1.57.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-i18next": "17.0.18",
+    "sass": "1.105.2",
+    "typescript": "6.0.3",
+    "vite": "8.3.4",
+    "vitest": "5.0.5",
+    "zustand": "5.0.15"
+  }
+}
