@@ -5,6 +5,7 @@ import type { BrowserWindow } from 'electron'
 
 import { readDirectory } from '../fs/directory-reader'
 import { cloneRepository } from '../git/git-clone'
+import { readResourceUsage } from '../usage/resource-usage'
 import { pickFolder, createNewProject, pickAndOpenProject } from '../workspace/project-dialogs'
 import type { WorkspaceService } from '../workspace/workspace-service'
 import type { InvokeHandlers } from './handle'
@@ -17,6 +18,7 @@ export type HandlerContext = {
 
 type WorkspaceChannels =
   | 'app:getInfo'
+  | 'app:getResourceUsage'
   | 'dialog:pickFolder'
   | 'workspace:get'
   | 'workspace:openProject'
@@ -51,6 +53,7 @@ export const createWorkspaceHandlers = (
       homeDir: homedir(),
       documentsDir: app.getPath('documents'),
     }),
+    'app:getResourceUsage': () => readResourceUsage(),
 
     'dialog:pickFolder': ({ defaultPath }) => {
       assertString(defaultPath, 'defaultPath')

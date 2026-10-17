@@ -1,4 +1,4 @@
-import type { AppInfo } from '../app-info'
+import type { AppInfo, ResourceUsage } from '../app-info'
 import type { DirectoryEntry } from '../fs'
 import type {
   GitHead,
@@ -27,6 +27,11 @@ type ProjectRequest = { projectId: string }
 /** Запрос-ответ: окно спрашивает, главный процесс отвечает. */
 export type InvokeContract = {
   'app:getInfo': { request: void; response: AppInfo }
+  /**
+   * Процессор и память всех процессов IDE. Процессор - среднее с прошлого запроса,
+   * поэтому окно спрашивает по таймеру, а не ждёт события.
+   */
+  'app:getResourceUsage': { request: void; response: ResourceUsage }
 
   /** Системный выбор папки. Отмена - null. */
   'dialog:pickFolder': { request: { defaultPath: string }; response: string | null }
@@ -103,6 +108,7 @@ export type EventPayload<E extends EventChannel> = EventContract[E]
  */
 export const INVOKE_CHANNELS = Object.keys({
   'app:getInfo': true,
+  'app:getResourceUsage': true,
   'dialog:pickFolder': true,
   'workspace:get': true,
   'workspace:openProject': true,

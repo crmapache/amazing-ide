@@ -1,11 +1,15 @@
 import { useTranslation } from 'react-i18next'
 
+import { ResourceUsage } from '../ResourceUsage/ResourceUsage'
 import { useAppInfo } from '../../../state/app-info.queries'
 import { useSelectedFile } from '../../../state/selection.store'
 import { useActiveProject } from '../../../state/workspace.queries'
 import styles from './StatusBar.module.scss'
 
-/** Зона 4: строка состояния. Слева - путь открытого файла, справа - версия IDE. */
+/**
+ * Зона 4: строка состояния. Слева - путь открытого файла, справа - процессор и память
+ * IDE и её версия.
+ */
 export const StatusBar = () => {
   const { t } = useTranslation()
   const project = useActiveProject()
@@ -16,6 +20,7 @@ export const StatusBar = () => {
   return (
     <footer className={styles.statusBar}>
       <span className={styles.path}>{path}</span>
+      <ResourceUsage />
       {appInfo && (
         <span className={styles.version}>
           {t('statusBar.version', { version: appInfo.version })}

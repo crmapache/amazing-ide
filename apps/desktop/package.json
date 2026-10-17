@@ -22,6 +22,7 @@
     "update:e2e": "bash scripts/update-e2e.sh"
   },
   "dependencies": {
+    "koffi": "3.3.3",
     "semver": "7.8.5"
   },
   "devDependencies": {

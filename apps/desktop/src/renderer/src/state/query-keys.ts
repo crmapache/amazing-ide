@@ -4,6 +4,7 @@
  */
 export const QUERY_KEYS = {
   appInfo: ['app', 'info'],
+  resourceUsage: ['app', 'resource-usage'],
   workspace: ['workspace'],
   updateStatus: ['updates', 'status'],
   directory: (projectId: string, relativePath: string) => [

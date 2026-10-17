@@ -45,7 +45,15 @@
     "stub": "The Claude Code GUI will live here."
   },
   "statusBar": {
-    "version": "v{{version}}"
+    "version": "v{{version}}",
+    "cpu": "CPU",
+    "cpuValue": "{{value}}%",
+    "memory": "RAM",
+    "memoryValue": {
+      "mb": "{{value}} MB",
+      "gb": "{{value}} GB"
+    },
+    "usageHint": "Used by Amazing IDE, all its processes, as in Activity Monitor. CPU 100% is one full core."
   },
   "updates": {
     "availableTitle": "Version {{version}} is available",

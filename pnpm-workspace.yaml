@@ -13,6 +13,9 @@ allowBuilds:
   electron-winstaller: false # Windows пока не собираем
   unrs-resolver: true # нативный резолвер eslint-import-resolver-typescript
   '@parcel/watcher': false # вотчер sass для CLI-режима, сборка через Vite его не использует
+  # FFI главного процесса. Готовый бинарник приходит пакетом @koromix/koffi-darwin-arm64,
+  # а скрипт установки лишь перепроверяет его и без него собирал бы из исходников CMake.
+  koffi: false
 
 # Свежие версии, которые pnpm по умолчанию придержал бы как слишком новые. Взяты
 # осознанно при создании проекта - это последние стабильные на тот момент.
