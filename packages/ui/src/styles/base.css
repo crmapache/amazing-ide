@@ -1,5 +1,5 @@
 /*
- * Глобальная база окна: сброс, шрифт, поведение корня. Подключается один раз
+ * Глобальная база окна: сброс, шрифт, фон, поведение корня. Подключается один раз
  * в точке входа рендерера, после tokens.css.
  */
 
@@ -20,11 +20,17 @@ body,
 
 body {
   overflow: hidden;
-  background: var(--color-bg-app);
+
+  /* Фон окна лежит под всеми панелями: они полупрозрачные, и сквозь них
+     проступает едва заметное пятно света сверху (ADR 0006). */
+  background-color: var(--color-bg-app);
+  background-image: var(--gradient-backdrop);
+  background-attachment: fixed;
   color: var(--color-fg);
   font-family: var(--font-ui);
   font-size: var(--font-size-md);
   line-height: var(--line-height-normal);
+  font-synthesis: none;
   -webkit-font-smoothing: antialiased;
 
   /* Хром IDE не выделяется мышью, как в нативных приложениях. Там, где текст
@@ -37,8 +43,20 @@ button {
   color: inherit;
 }
 
-/* Шапка окна - область, за которую окно таскают. Всё, на что можно нажать, из неё
-   исключается здесь, один раз, а не в каждом компоненте. */
+::selection {
+  background-color: var(--color-selection);
+}
+
+/* Тонкие полупрозрачные полосы прокрутки: на стекле системные серые выглядят
+   чужими. */
+* {
+  scrollbar-color: var(--color-scrollbar) transparent;
+  scrollbar-width: thin;
+}
+
+/* Страховка: если интерактивный элемент всё же окажется в области перетаскивания
+   окна, нажатия до него дойдут. Сами области ставят только на пустые места
+   (миксин window-drag-region): кнопка внутри такой области на macOS дрожит. */
 button,
 a,
 input,

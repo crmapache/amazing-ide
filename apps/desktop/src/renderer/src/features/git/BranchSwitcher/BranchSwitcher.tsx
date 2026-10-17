@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { GitBranch } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
@@ -6,15 +6,15 @@ import { DropdownButton } from '@amazing-ide/ui/DropdownButton'
 import { Popover } from '@amazing-ide/ui/Popover'
 import { usePopover } from '@amazing-ide/ui/Popover.hooks'
 
+import { useGitActionRunner } from '../git-actions.hooks'
+import { useGitDialogsStore } from '../git-dialogs.store'
 import { useGitHead, useGitActions } from '../git.queries'
 import { BranchMenu } from '../BranchMenu/BranchMenu'
-import type { BranchMenuAction } from '../BranchMenu/BranchMenu.types'
 import { GitInputDialog } from '../GitInputDialog/GitInputDialog'
 import { PushDialog } from '../PushDialog/PushDialog'
 import { useActiveProject } from '../../../state/workspace.queries'
 import { BRANCH_ICON_SIZE, BRANCH_ICON_STROKE_WIDTH } from './BranchSwitcher.constants'
 import styles from './BranchSwitcher.module.scss'
-import type { GitDialogKind } from './BranchSwitcher.types'
 
 type BranchSwitcherBodyProps = { projectId: string }
 
@@ -34,17 +34,16 @@ const BranchSwitcherBody = ({ projectId }: BranchSwitcherBodyProps) => {
   const { data: head } = useGitHead(projectId)
   const git = useGitActions(projectId)
   const popover = usePopover()
-  const [dialog, setDialog] = useState<GitDialogKind | null>(null)
+  const dialog = useGitDialogsStore((state) => state.dialog)
+  const { run: runAction } = useGitActionRunner(projectId)
+  const closeDialog = useGitDialogsStore((state) => state.closeDialog)
+
+  // Диалог принадлежит проекту: сменили проект - открытый диалог прошлого закрывается.
+  useEffect(() => closeDialog, [closeDialog])
 
   if (!head) return null
 
   const label = head.kind === 'branch' ? head.name : t('git.detached', { commit: head.commit })
-  const closeDialog = () => setDialog(null)
-
-  const handleAction = (action: BranchMenuAction) => {
-    if (action === 'update') void git.update()
-    else setDialog(action)
-  }
 
   const icon = (
     <GitBranch
@@ -70,7 +69,7 @@ const BranchSwitcherBody = ({ projectId }: BranchSwitcherBodyProps) => {
             projectId={projectId}
             head={head}
             onSwitch={(branch, kind) => void git.switchTo(branch, kind)}
-            onAction={handleAction}
+            onAction={runAction}
           />
         )}
       </Popover>

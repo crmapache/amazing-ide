@@ -1,17 +1,37 @@
+@use '@amazing-ide/ui/mixins' as *;
+
 .workbench {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
-.body {
+// Под шапкой всё окно - листы на чёрной раме с одним зазором между ними (ADR 0006):
+// вкладки, полосы иконок, панели, редактор, строка состояния.
+.sheets {
   display: flex;
   flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 0;
+  padding: 0 var(--space-2) var(--space-2);
+}
+
+// В зазор между листами попадают ручки изменения ширины. Относительное
+// позиционирование - для витрины дизайн-системы, она ложится поверх панелей.
+.body {
+  position: relative;
+  display: flex;
+  flex: 1;
+  gap: var(--space-2);
   min-height: 0;
 }
 
+// Редактор - самый плотный лист: код читается на ровном фоне, стекла тут нет.
 .editor {
+  @include window-sheet(var(--color-surface-editor));
+
   flex: 1;
   min-width: 0;
-  background-color: var(--color-bg-editor);
+  overflow: hidden;
 }

@@ -1,89 +1,158 @@
 /*
  * Токены дизайн-системы. Единственное место в проекте, где живут сырые значения:
- * цвета, размеры, шрифты, длительности. Всё остальное ссылается сюда через var(--...),
- * это держит stylelint (stylelint.config.mjs в корне).
+ * цвета, размеры, шрифты, длительности. Всё остальное ссылается сюда через
+ * var(--...), это держит stylelint (stylelint.config.mjs в корне).
  *
  * Два слоя. Палитра (--palette-*) - сырые цвета, наружу её не используют. Роли
- * (--color-*) - то, что берут компоненты: «фон панели», а не «серый 900». Тема
- * меняет палитру и роли, компоненты при этом не трогаются.
+ * (--color-*, --shadow-*) - то, что берут компоненты: «фон панели», а не «графит
+ * 800». Тема меняет палитру и роли, компоненты при этом не трогаются.
  *
- * Сейчас это заглушка: одна тёмная тема и минимальный набор под каркас окна.
- * Дизайн-систему разрабатываем отдельно, см. packages/ui/README.md.
+ * Стиль - плоское тёмное стекло (ADR 0006): чёрная рама окна, графитовые
+ * полупрозрачные панели со скруглением и тонкой рамкой, оранжевый акцент и
+ * сигнал внимания, зелёный - «в порядке», мятный - справка. Объёма нет: ни бликов,
+ * ни теней у кнопок и полей. Тень есть только у всплывающих слоёв.
  */
 
 :root {
   color-scheme: dark;
 
-  /* Палитра */
-  --palette-gray-950: #111;
-  --palette-gray-900: #161616;
-  --palette-gray-850: #1c1c1c;
-  --palette-gray-800: #222;
-  --palette-gray-750: #2a2a2a;
-  --palette-gray-700: #333;
-  --palette-gray-500: #6b6b6b;
-  --palette-gray-400: #8c8c8c;
-  --palette-gray-200: #cfcfcf;
-  --palette-gray-100: #e6e6e6;
-  --palette-blue-500: #3d7bfd;
-  --palette-blue-400: #5b8ffd;
-  --palette-red-400: #f16d6d;
-  --palette-violet-500: #8b5cf6;
-  --palette-teal-500: #14b8a6;
-  --palette-orange-500: #f97316;
-  --palette-pink-500: #ec4899;
-  --palette-green-500: #22c55e;
+  /* Палитра: графит. Холодный нейтральный, с лёгкой синевой */
+  --palette-graphite-1000: #040405;
+  --palette-graphite-950: #09090b;
+  --palette-graphite-900: #111214;
+  --palette-graphite-850: #18191c;
+  --palette-graphite-800: #1e1f23;
+  --palette-graphite-750: #26272b;
+  --palette-graphite-700: #2e2f34;
+  --palette-graphite-650: #37383d;
+  --palette-graphite-600: #414247;
+  --palette-graphite-500: #5c5e64;
+  --palette-graphite-400: #86888e;
+  --palette-graphite-300: #abadb2;
+  --palette-graphite-200: #d0d1d4;
+  --palette-graphite-100: #ececee;
+  --palette-graphite-50: #fafafa;
 
-  /* Роли: фоны */
-  --color-bg-app: var(--palette-gray-950);
-  --color-bg-chrome: var(--palette-gray-900);
-  --color-bg-panel: var(--palette-gray-850);
-  --color-bg-editor: var(--palette-gray-800);
-  --color-bg-overlay: var(--palette-gray-750);
-  --color-bg-hover: var(--palette-gray-750);
-  --color-bg-active: var(--palette-gray-700);
-  --color-bg-selected: var(--palette-gray-700);
+  /* Палитра: оранжевый - акцент и сигнал внимания */
+  --palette-orange-200: #ffb48a;
+  --palette-orange-300: #ff8a52;
+  --palette-orange-400: #f26a2e;
+  --palette-orange-500: #d9561f;
+
+  /* Палитра: остальные тона */
+  --palette-lime-300: #8fd36a;
+  --palette-lime-400: #86b137;
+  --palette-mint-300: #95d3c0;
+  --palette-mint-400: #6fc2ab;
+  --palette-red-300: #f26b72;
+  --palette-red-400: #e5414b;
+  --palette-amber-300: #f2bd52;
+  --palette-amber-400: #e5a83b;
+  --palette-steel-400: #6f9bd1;
+  --palette-violet-400: #a48ad8;
+
+  /* Роли: фон окна. Почти чёрный, с едва заметным светлым пятном сверху - чтобы
+     полупрозрачные панели не висели в пустоте. */
+  --color-bg-app: var(--palette-graphite-1000);
+  --gradient-backdrop:
+    radial-gradient(1200px 700px at 50% -20%, rgb(255 255 255 / 4%), transparent 70%),
+    radial-gradient(900px 600px at 0% 110%, rgb(242 106 46 / 5%), transparent 70%),
+    linear-gradient(180deg, var(--palette-graphite-950), var(--palette-graphite-1000));
+
+  /* Роли: поверхности. Рама окна (шапка и зазоры между листами) - чёрная, листы
+     (панели, вкладки, полосы иконок, строка состояния) - графитовое стекло,
+     редактор - плотный ровный фон для кода. */
+  --color-surface-chrome: var(--palette-graphite-1000);
+  --color-surface-panel: rgb(30 31 35 / 86%);
+  --color-surface-editor: rgb(17 18 20 / 96%);
+  --color-surface-overlay: rgb(30 31 35 / 92%);
+  --color-surface-raised: var(--palette-graphite-750);
+  --color-surface-raised-hover: var(--palette-graphite-700);
+  --color-surface-sunken: var(--palette-graphite-900);
+
+  /* Роли: интерактив. Слои поверх поверхности: одна и та же подсветка работает и на
+     панели, и на всплывающем окне. Выбранное - заливкой, а не свечением. */
+  --color-bg-hover: rgb(255 255 255 / 5%);
+  --color-bg-active: rgb(255 255 255 / 9%);
+  --color-bg-selected: rgb(255 255 255 / 10%);
+
+  /* Те же слои для чёрной рамы окна (шапка): 5% белого поверх чёрного почти не
+     видно. Рама подставляет их вместо обычных - миксин chrome-surface. */
+  --color-chrome-hover: rgb(255 255 255 / 9%);
+  --color-chrome-active: rgb(255 255 255 / 13%);
+  --color-chrome-selected: rgb(255 255 255 / 14%);
 
   /* Роли: текст и иконки */
-  --color-fg: var(--palette-gray-100);
-  --color-fg-muted: var(--palette-gray-200);
-  --color-fg-subtle: var(--palette-gray-400);
-  --color-fg-disabled: var(--palette-gray-500);
+  --color-fg-strong: var(--palette-graphite-50);
+  --color-fg: var(--palette-graphite-100);
+  --color-fg-muted: var(--palette-graphite-300);
+  --color-fg-subtle: var(--palette-graphite-400);
+  --color-fg-disabled: var(--palette-graphite-500);
 
-  /* Роли: акцент и состояния */
-  --color-accent: var(--palette-blue-500);
-  --color-accent-hover: var(--palette-blue-400);
-  --color-accent-fg: var(--palette-gray-100);
-  --color-danger: var(--palette-red-400);
+  /* Роли: акцент. Главное действие - тонированное: оранжевый текст и рамка на
+     тёмно-оранжевой подложке, а не сплошная заливка. */
+  --color-accent: var(--palette-orange-400);
+  --color-accent-strong: var(--palette-orange-300);
+  --color-accent-soft: rgb(242 106 46 / 16%);
+  --color-accent-soft-hover: rgb(242 106 46 / 24%);
+  --color-accent-border: rgb(242 106 46 / 50%);
+  --color-fg-accent: var(--palette-orange-300);
 
-  /* Роли: значки проектов. Цвет выбирается по имени проекта, чтобы проект был узнаваем
-     в шапке так же, как в WebStorm. */
-  --color-avatar-0: var(--palette-blue-500);
-  --color-avatar-1: var(--palette-violet-500);
-  --color-avatar-2: var(--palette-teal-500);
-  --color-avatar-3: var(--palette-orange-500);
-  --color-avatar-4: var(--palette-pink-500);
-  --color-avatar-5: var(--palette-green-500);
-  --color-avatar-fg: var(--palette-gray-100);
+  /* Роли: состояния. Подложку плашки тона смешивает сама плашка (tinted-plaque) */
+  --color-success: var(--palette-lime-300);
+  --color-warning: var(--palette-amber-300);
+  --color-danger: var(--palette-red-300);
+  --color-danger-strong: var(--palette-red-400);
+  --color-danger-soft: rgb(229 65 75 / 14%);
+  --color-info: var(--palette-mint-300);
+
+  /* Насколько тон проступает в подложке и рамке плашки (значок, метка): плашка
+     смешивает свой тон с прозрачным через color-mix. */
+  --tint-soft: 16%;
+  --tint-border: 45%;
+
+  /* Роли: значки проектов. Цвет выбирается по имени проекта, чтобы проект был
+     узнаваем в шапке так же, как в WebStorm. Рисуются тонированной плашкой. */
+  --color-avatar-0: var(--palette-orange-400);
+  --color-avatar-1: var(--palette-mint-400);
+  --color-avatar-2: var(--palette-lime-400);
+  --color-avatar-3: var(--palette-steel-400);
+  --color-avatar-4: var(--palette-amber-400);
+  --color-avatar-5: var(--palette-violet-400);
 
   /* Роли: линии */
-  --color-border: var(--palette-gray-750);
-  --color-border-strong: var(--palette-gray-700);
-  --color-focus: var(--palette-blue-400);
+  --color-border: rgb(255 255 255 / 7%);
+  --color-border-strong: rgb(255 255 255 / 12%);
+  --color-focus: var(--palette-orange-300);
 
-  /* Шрифты. Интерфейс - системный: это родной вид на маке и ноль байт на загрузку.
-     Код - JetBrains Mono, едет внутри приложения (fonts.css). */
+  /* Роли: полосы прокрутки и выделение текста */
+  --color-scrollbar: rgb(255 255 255 / 14%);
+  --color-selection: rgb(242 106 46 / 30%);
+
+  /* Затемнение под модальным диалогом */
+  --color-backdrop: rgb(0 0 0 / 55%);
+
+  /* Шрифты. Интерфейс - системный: на маке это SF, родной и без единого байта на
+     загрузку. Код - JetBrains Mono, едет внутри приложения. */
   --font-ui: system-ui, -apple-system, 'SF Pro Text', sans-serif;
   --font-code: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', monospace;
+  --font-size-2xs: 10px;
   --font-size-xs: 11px;
   --font-size-sm: 12px;
   --font-size-md: 13px;
   --font-size-lg: 15px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
   --font-weight-regular: 400;
   --font-weight-medium: 500;
-  --font-weight-bold: 700;
+  --font-weight-semibold: 600;
   --line-height-tight: 1.2;
-  --line-height-normal: 1.45;
+  --line-height-snug: 1.35;
+  --line-height-normal: 1.5;
+
+  /* Подписи разделов и статусов - капсом с разрядкой: «SELECTED», «ACTIVE». */
+  --letter-spacing-caps: 0.06em;
 
   /* Отступы: шаг 4px */
   --space-0-5: 2px;
@@ -92,51 +161,95 @@
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
+  --space-5: 20px;
   --space-6: 24px;
   --space-8: 32px;
+  --space-10: 40px;
 
-  /* Радиусы и линии */
-  --radius-sm: 4px;
-  --radius-md: 6px;
+  /* Радиусы: мягкие. Плашки и метки - xs, контролы и строки - sm/md, панели - lg/xl */
+  --radius-xs: 3px;
+  --radius-sm: 5px;
+  --radius-md: 7px;
   --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-full: 999px;
+
+  /* Линии */
   --border-width: 1px;
   --focus-ring-width: 2px;
 
   /* Размеры зон окна и контролов */
   --size-title-bar: 40px;
-  --size-tab-bar: 32px;
-  --size-activity-bar: 40px;
-  --size-status-bar: 24px;
-  --size-control-sm: 22px;
-  --size-control-md: 28px;
+  --size-tab-bar: 36px;
+  --size-activity-bar: 44px;
+  --size-status-bar: 26px;
+  --size-control-xs: 18px;
+  --size-control-sm: 24px;
+  --size-control-md: 30px;
+  --size-control-lg: 36px;
   --size-icon-sm: 14px;
   --size-icon-md: 16px;
   --size-avatar-sm: 20px;
   --size-menu-item: 30px;
+  --size-tree-row: 26px;
+  --size-status-dot: 6px;
+  --size-progress: 4px;
+  --size-empty-icon: 52px;
 
-  /* Ширина всплывающих панелей: меню проекта, меню ветки */
+  /* Ширина всплывающих панелей и карточек */
   --size-popover-md: 360px;
   --size-popover-lg: 440px;
-  --size-dialog: 420px;
-  --size-resize-handle: 6px;
+  --size-popover-xl: 680px;
+  --size-listbox-max: 440px;
+  --size-dialog: 440px;
+  --size-toast: 340px;
+  --size-tooltip-max: 280px;
+  --size-text-narrow: 300px;
+  --size-resize-handle: 8px;
+  --size-tab-min: 120px;
 
   /* Место под «светофор» macOS вместе с отступом до первой кнопки шапки: окно без
      рамки рисует кнопки поверх шапки, а в macOS 26 они крупнее прежних. */
   --size-traffic-lights: 92px;
 
+  /* Панель без кнопки-якоря (поиск по всему проекту) встаёт сверху по центру окна,
+     как в WebStorm, - отступ от верха окна. */
+  --offset-popover-top: 12vh;
+
   /* Слои */
   --z-sticky: 1;
   --z-resize-handle: 10;
+  --z-overlay: 50;
   --z-toast: 100;
 
-  /* Затемнение под модальным диалогом */
-  --color-backdrop: rgb(0 0 0 / 45%);
+  /* Стекло: размытие того, что под всплывающей панелью. Только у оверлеев - у
+     панелей окна под стеклом ровный фон, размывать там нечего (ADR 0006). */
+  --glass-blur: blur(20px) saturate(140%);
+  --glass-blur-backdrop: blur(2px);
 
-  /* Тени */
-  --shadow-overlay: 0 8px 24px rgb(0 0 0 / 45%);
+  /* Тени - только у всплывающих слоёв: отделяют их от окна. У кнопок, полей и
+     панелей теней нет. */
+  --shadow-overlay: 0 16px 40px rgb(0 0 0 / 55%);
+  --shadow-focus: 0 0 0 3px rgb(242 106 46 / 20%);
+  --shadow-danger: 0 0 0 3px rgb(229 65 75 / 20%);
 
   /* Движение */
   --duration-fast: 120ms;
   --duration-normal: 160ms;
+  --duration-slow: 260ms;
+  --duration-tooltip-delay: 450ms;
   --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --offset-enter: 4px;
+}
+
+/* Кто попросил систему меньше двигать интерфейс - анимации появления выключаются,
+   переходы цвета становятся мгновенными. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+    --offset-enter: 0px;
+  }
 }

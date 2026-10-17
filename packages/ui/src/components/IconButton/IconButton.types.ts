@@ -1,6 +1,8 @@
 import type { ButtonHTMLAttributes } from 'react'
 import type { LucideIcon } from 'lucide-react'
 
+import type { TooltipPlacement } from '../Tooltip/Tooltip.types'
+
 export type IconButtonSize = 'sm' | 'md'
 
 export type IconButtonProps = Omit<
@@ -16,4 +18,6 @@ export type IconButtonProps = Omit<
    * обычная кнопка, без aria-pressed.
    */
   active?: boolean
+  /** Где встаёт подсказка. В боковых полосах - сбоку, чтобы не закрыть соседние кнопки. */
+  tooltipPlacement?: TooltipPlacement | undefined
 }

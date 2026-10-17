@@ -24,6 +24,12 @@ export default defineConfig({
     // Порт закреплён и записан в ~/.claude/ports.md. Без strictPort Vite молча
     // уезжает на соседний порт, и окно грузится не оттуда, откуда ждёшь.
     server: { port: 5315, strictPort: true },
+    // Флаг витрины дизайн-системы - строкой при любой сборке. Без явного значения
+    // import.meta.env.VITE_SHOWCASE остаётся обращением к объекту, условие не
+    // сворачивается при сборке, и код витрины едет в релиз мёртвым грузом.
+    define: {
+      'import.meta.env.VITE_SHOWCASE': JSON.stringify(process.env.VITE_SHOWCASE ?? ''),
+    },
     // electron-vite по умолчанию не сжимает рендерер. Окно грузит бандл с диска, но
     // разбирать JS движку всё равно приходится: меньше код - быстрее первый кадр.
     build: { minify: true },

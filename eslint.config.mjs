@@ -261,6 +261,12 @@ export default defineConfig(
           message: 'Inline <svg> запрещён: иконки из lucide-react.',
         },
         {
+          // Только у элементов разметки: у компонентов (Dialog, Card, Toast) title - свой проп.
+          selector: "JSXOpeningElement[name.name=/^[a-z]/] > JSXAttribute[name.name='title']",
+          message:
+            'Системный title выглядит чужим: подсказка - Tooltip из дизайн-системы (@amazing-ide/ui/Tooltip).',
+        },
+        {
           selector: 'JSXText[value=/\\S/]',
           message: 'Текст интерфейса - только через i18n (t(...)), без строк прямо в JSX.',
         },

@@ -18,6 +18,7 @@ export const TextField = ({
   icon: Icon,
   error,
   type = 'text',
+  ref,
   ...rest
 }: TextFieldProps) => {
   const id = useId()
@@ -40,6 +41,7 @@ export const TextField = ({
           />
         )}
         <input
+          ref={ref}
           id={id}
           type={type}
           value={value}

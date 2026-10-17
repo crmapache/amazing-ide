@@ -1,16 +1,12 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Боковая панель - графитовый лист со скруглением и тонкой рамкой.
 .sidePanel {
+  @include window-sheet;
+
   position: relative;
   flex-shrink: 0;
   min-width: 0;
-  background-color: var(--color-bg-panel);
-}
-
-.start {
-  border-right: var(--border-width) solid var(--color-border);
-}
-
-.end {
-  border-left: var(--border-width) solid var(--color-border);
 }
 
 // Свёрнутая панель остаётся в дереве, чтобы открытые виды не теряли состояние.

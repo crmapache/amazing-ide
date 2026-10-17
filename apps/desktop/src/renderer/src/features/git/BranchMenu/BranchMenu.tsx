@@ -8,11 +8,13 @@ import { MenuSection } from '@amazing-ide/ui/MenuSection'
 import { MenuSeparator } from '@amazing-ide/ui/MenuSeparator'
 import { TextField } from '@amazing-ide/ui/TextField'
 
+import { GIT_BRANCH_ACTIONS, GIT_REPOSITORY_ACTIONS } from '../git-actions.constants'
+import type { GitActionEntry } from '../git-actions.types'
+import { isAvailableAction } from '../git-actions.utils'
 import { useGitBranches } from '../git.queries'
-import { BRANCH_ACTIONS, REPOSITORY_ACTIONS } from './BranchMenu.constants'
 import styles from './BranchMenu.module.scss'
-import type { BranchMenuEntry, BranchMenuProps } from './BranchMenu.types'
-import { filterByQuery, isAvailableAction } from './BranchMenu.utils'
+import type { BranchMenuProps } from './BranchMenu.types'
+import { filterByQuery } from './BranchMenu.utils'
 
 /**
  * Меню ветки, как в WebStorm: поиск по веткам и действиям, действия с репозиторием,
@@ -23,9 +25,9 @@ export const BranchMenu = ({ projectId, head, onSwitch, onAction }: BranchMenuPr
   const { t } = useTranslation()
   const { data: branches } = useGitBranches(projectId)
   const [query, setQuery] = useState('')
-  const label = (entry: BranchMenuEntry) => t(entry.labelKey)
-  const repositoryActions = filterByQuery(REPOSITORY_ACTIONS, query, label)
-  const branchActions = filterByQuery(BRANCH_ACTIONS, query, label)
+  const label = (entry: GitActionEntry) => t(entry.labelKey)
+  const repositoryActions = filterByQuery(GIT_REPOSITORY_ACTIONS, query, label)
+  const branchActions = filterByQuery(GIT_BRANCH_ACTIONS, query, label)
   const local = filterByQuery(branches?.local ?? [], query, (branch) => branch)
   const remote = filterByQuery(branches?.remote ?? [], query, (branch) => branch)
   const isSearching = query.trim() !== ''
@@ -35,7 +37,7 @@ export const BranchMenu = ({ projectId, head, onSwitch, onAction }: BranchMenuPr
     (list) => list.length === 0,
   )
 
-  const renderAction = ({ id, icon, labelKey }: BranchMenuEntry) =>
+  const renderAction = ({ id, icon, labelKey }: GitActionEntry) =>
     isAvailableAction(id) ? (
       <MenuItem key={id} icon={icon} label={t(labelKey)} onSelect={() => onAction(id)} />
     ) : (

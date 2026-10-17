@@ -141,4 +141,26 @@ describe('git', () => {
     expect(await cloneRepository(origin, root)).toMatchObject({ ok: false })
     expect(await cloneRepository('--upload-pack=x', root)).toMatchObject({ ok: false })
   })
+
+  it('pull и checkout, запущенные разом, идут по очереди в порядке вызова', async () => {
+    // Без очереди checkout успевает пройти, пока pull качает, и pull перематывает уже
+    // отсоединённый HEAD: итог - HEAD на новом коммите, а ветка main не обновлена.
+    const racer = join(root, 'racer')
+
+    gitIn(root, 'clone', origin, racer)
+
+    const before = gitIn(racer, 'rev-parse', 'HEAD')
+
+    await commit(repo, 'e.txt', 'four\n')
+    gitIn(repo, 'push')
+
+    const [pulled, checkedOut] = await Promise.all([pull(racer), checkoutRevision(racer, before)])
+
+    expect(pulled.ok).toBe(true)
+    expect(checkedOut.ok).toBe(true)
+    // Сначала pull целиком на ветке main, потом переход на старый коммит.
+    expect(gitIn(racer, 'rev-parse', 'main')).toBe(gitIn(repo, 'rev-parse', 'HEAD'))
+    expect((await readHead(racer))?.kind).toBe('detached')
+    expect(gitIn(racer, 'rev-parse', 'HEAD')).toBe(before)
+  })
 })

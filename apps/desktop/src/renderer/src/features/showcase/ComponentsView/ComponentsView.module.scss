@@ -1,0 +1,45 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+.componentsView {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+}
+
+// Пустое состояние занимает всё место родителя - даём ему место размером с панель.
+.emptyBox {
+  height: var(--size-popover-md);
+  border: var(--border-width) dashed var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+// Ручка видна только при наведении: даём ей край листа, у которого она стоит в окне.
+.resizeBox {
+  position: relative;
+  height: var(--size-control-lg);
+  border: var(--border-width) dashed var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+// Меню вне всплывающей панели: тот же стеклянный лист, только в потоке страницы,
+// чтобы его было видно без клика.
+.menuBox {
+  @include glass-overlay;
+
+  padding: var(--space-1-5);
+  border-radius: var(--radius-xl);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.cardBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}

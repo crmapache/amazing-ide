@@ -1,7 +1,8 @@
+import { useRef, useEffect } from 'react'
 import clsx from 'clsx'
 import { File, Folder, ChevronRight } from 'lucide-react'
 
-import { useIsExpanded, useFileTreeStore } from '../file-tree.store'
+import { useIsExpanded, useRevealSerial, useFileTreeStore } from '../file-tree.store'
 import { useSelectedFile, useSelectionStore } from '../../../state/selection.store'
 import { TREE_ICON_SIZE, TREE_ICON_STROKE_WIDTH } from './FileTreeNode.constants'
 import styles from './FileTreeNode.module.scss'
@@ -20,6 +21,14 @@ export const FileTreeNode = ({ projectId, entry, depth }: FileTreeNodeProps) => 
   const isSelected = useSelectedFile(projectId) === entry.relativePath
   const toggleDirectory = useFileTreeStore((state) => state.toggleDirectory)
   const selectFile = useSelectionStore((state) => state.selectFile)
+  const revealSerial = useRevealSerial(projectId, entry.relativePath)
+  const ref = useRef<HTMLButtonElement>(null)
+
+  // Файл выбрали поиском (и даже тот же самый ещё раз), а строка за краем панели -
+  // прокрутить к ней. Кликнутая строка и так видна, для неё это ничего не делает.
+  useEffect(() => {
+    if (isSelected) ref.current?.scrollIntoView({ block: 'nearest' })
+  }, [isSelected, revealSerial])
 
   const handleClick = () =>
     isDirectory
@@ -29,6 +38,7 @@ export const FileTreeNode = ({ projectId, entry, depth }: FileTreeNodeProps) => 
   return (
     <>
       <button
+        ref={ref}
         type="button"
         aria-expanded={isDirectory ? isExpanded : undefined}
         className={clsx(styles.row, isSelected && styles.selected)}
@@ -46,9 +56,19 @@ export const FileTreeNode = ({ projectId, entry, depth }: FileTreeNodeProps) => 
           aria-hidden
         />
         {isDirectory ? (
-          <Folder size={TREE_ICON_SIZE} strokeWidth={TREE_ICON_STROKE_WIDTH} aria-hidden />
+          <Folder
+            className={styles.folderIcon}
+            size={TREE_ICON_SIZE}
+            strokeWidth={TREE_ICON_STROKE_WIDTH}
+            aria-hidden
+          />
         ) : (
-          <File size={TREE_ICON_SIZE} strokeWidth={TREE_ICON_STROKE_WIDTH} aria-hidden />
+          <File
+            className={styles.fileIcon}
+            size={TREE_ICON_SIZE}
+            strokeWidth={TREE_ICON_STROKE_WIDTH}
+            aria-hidden
+          />
         )}
         <span className={styles.name}>{entry.name}</span>
       </button>

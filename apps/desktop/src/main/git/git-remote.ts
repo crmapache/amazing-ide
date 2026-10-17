@@ -3,6 +3,7 @@ import type { GitPushInfo, GitActionResult } from '@shared/git'
 import { readHead } from './git-head'
 import { parseLines } from './git-output'
 import { git, refuse, gitAction } from './git-runner'
+import { queueGitWrite } from './git-write-queue'
 import { GIT_NETWORK_TIMEOUT_MS } from './git.constants'
 
 const tryOutput = async (rootPath: string, args: string[]) => {
@@ -16,10 +17,10 @@ const tryOutput = async (rootPath: string, args: string[]) => {
 /**
  * Обновить проект: подтянуть изменения текущей ветки только перемоткой вперёд. Если
  * ветки разошлись, git откажет и ничего не тронет - сливать без окна конфликтов IDE
- * не берётся.
+ * не берётся. Пока идёт, остальные записывающие команды проекта ждут (git-write-queue.ts).
  */
 export const pull = (rootPath: string): Promise<GitActionResult> =>
-  gitAction(rootPath, ['pull', '--ff-only'], GIT_NETWORK_TIMEOUT_MS)
+  queueGitWrite(rootPath, () => gitAction(rootPath, ['pull', '--ff-only'], GIT_NETWORK_TIMEOUT_MS))
 
 /** Что сделает push: для окна подтверждения. null - не на ветке. */
 export const readPushInfo = async (rootPath: string): Promise<GitPushInfo | null> => {
@@ -51,16 +52,17 @@ export const readPushInfo = async (rootPath: string): Promise<GitPushInfo | null
  * Отправить текущую ветку. Ветка без upstream публикуется в удалённый репозиторий и
  * начинает его отслеживать. Force push здесь нет и не будет без отдельного решения.
  */
-export const push = async (rootPath: string): Promise<GitActionResult> => {
-  const info = await readPushInfo(rootPath)
+export const push = (rootPath: string): Promise<GitActionResult> =>
+  queueGitWrite(rootPath, async () => {
+    const info = await readPushInfo(rootPath)
 
-  if (!info) return refuse('Push works only on a branch, not on a detached commit.')
-  if (info.upstream) return gitAction(rootPath, ['push'], GIT_NETWORK_TIMEOUT_MS)
-  if (!info.remote) return refuse('This repository has no remote to push to.')
+    if (!info) return refuse('Push works only on a branch, not on a detached commit.')
+    if (info.upstream) return gitAction(rootPath, ['push'], GIT_NETWORK_TIMEOUT_MS)
+    if (!info.remote) return refuse('This repository has no remote to push to.')
 
-  return gitAction(
-    rootPath,
-    ['push', '--set-upstream', info.remote, info.branch],
-    GIT_NETWORK_TIMEOUT_MS,
-  )
-}
+    return gitAction(
+      rootPath,
+      ['push', '--set-upstream', info.remote, info.branch],
+      GIT_NETWORK_TIMEOUT_MS,
+    )
+  })

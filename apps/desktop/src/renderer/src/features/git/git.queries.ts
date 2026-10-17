@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import type { GitBranchKind, GitActionResult } from '@shared/git'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useIsMutating, useQueryClient } from '@tanstack/react-query'
 
 import { invoke } from '../../lib/ipc'
 import { QUERY_KEYS } from '../../state/query-keys'
@@ -37,11 +37,16 @@ export const usePushInfo = (projectId: string, enabled: boolean) =>
     staleTime: 0,
   })
 
-/** Одно действие git: запустить, после - перечитать, что могло поменяться. */
+/**
+ * Одно действие git: запустить, после - перечитать, что могло поменяться. Ключ - у
+ * действия, занятость которого должны видеть все: хук зовут и шапка, и поиск везде,
+ * а у каждого вызова свой экземпляр мутации.
+ */
 const useGitAction = <Input>(
   run: (input: Input) => Promise<GitActionResult>,
   refresh: () => Promise<unknown>,
-) => useMutation({ mutationFn: run, onSettled: refresh })
+  mutationKey?: readonly unknown[],
+) => useMutation({ ...(mutationKey && { mutationKey }), mutationFn: run, onSettled: refresh })
 
 /**
  * Действия git над проектом. После любого - перечитать ветку, ветки и сведения для
@@ -74,7 +79,12 @@ export const useGitActions = (projectId: string) => {
     (revision: string) => invoke('git:checkoutRevision', { projectId, revision }),
     refresh,
   )
-  const pull = useGitAction(() => invoke('git:pull', { projectId }), refresh)
+  const pull = useGitAction(
+    () => invoke('git:pull', { projectId }),
+    refresh,
+    QUERY_KEYS.gitPull(projectId),
+  )
+  const isPulling = useIsMutating({ mutationKey: QUERY_KEYS.gitPull(projectId) }) > 0
   const push = useGitAction(() => invoke('git:push', { projectId }), refresh)
 
   /** Переключение из меню: неудача - в угол окна, успех виден по шапке. */
@@ -85,8 +95,13 @@ export const useGitActions = (projectId: string) => {
       show({ tone: 'danger', title: t('git.switchFailed', { branch }), details: result.details })
   }
 
-  /** Update Project: итог в угол окна в любом случае - в шапке его не видно. */
+  /**
+   * Update Project: итог в угол окна в любом случае - в шапке его не видно. Pull уже
+   * идёт (запущен из меню или из поиска) - второй не начинается.
+   */
   const update = async () => {
+    if (queryClient.isMutating({ mutationKey: QUERY_KEYS.gitPull(projectId) }) > 0) return
+
     const result = await pull.mutateAsync()
 
     show(
@@ -96,5 +111,5 @@ export const useGitActions = (projectId: string) => {
     )
   }
 
-  return { switchTo, update, createBranch, checkoutRevision, push, isBusy: pull.isPending }
+  return { switchTo, update, createBranch, checkoutRevision, push, isBusy: isPulling }
 }

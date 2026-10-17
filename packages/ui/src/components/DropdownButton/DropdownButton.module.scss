@@ -10,15 +10,19 @@
   min-width: 0;
   height: var(--size-control-md);
   padding: 0 var(--space-2);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   color: var(--color-fg);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
+
+  &:disabled {
+    color: var(--color-fg-disabled);
+  }
 }
 
-// Открытый список: кнопка подсвечена, пока он на экране, как в WebStorm.
+// Открытый список: кнопка залита, пока он на экране.
 .dropdownButton[aria-expanded='true'] {
-  background-color: var(--color-bg-active);
+  background-color: var(--color-bg-selected);
 }
 
 .label {
@@ -28,4 +32,9 @@
 .chevron {
   flex-shrink: 0;
   color: var(--color-fg-subtle);
+  transition: rotate var(--duration-normal) var(--easing-standard);
+
+  .dropdownButton[aria-expanded='true'] & {
+    rotate: 180deg;
+  }
 }

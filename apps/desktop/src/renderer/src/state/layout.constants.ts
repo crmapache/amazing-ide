@@ -1,4 +1,8 @@
-import type { PanelSide } from './layout.types'
+import type { PanelSide, SideViewId, ProviderViewId } from './layout.types'
+
+/** Виды, которые есть сейчас. Сохранённый вид не из списка - удалённый, его не открыть. */
+export const SIDE_VIEW_IDS: readonly SideViewId[] = ['files']
+export const PROVIDER_VIEW_IDS: readonly ProviderViewId[] = ['claude-code']
 
 export const PANEL_WIDTH_LIMITS: Record<PanelSide, { min: number; max: number }> = {
   side: { min: 180, max: 640 },

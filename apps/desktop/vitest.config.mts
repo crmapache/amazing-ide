@@ -11,5 +11,8 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts'],
+    // CSS в тестах по умолчанию приходит пустой строкой. Файл токенов нужен целиком:
+    // тест витрины сверяет, что каждый токен показан (showcase.coverage.test.ts).
+    css: { include: [/packages\/ui\/src\/styles\/tokens\.css/] },
   },
 })

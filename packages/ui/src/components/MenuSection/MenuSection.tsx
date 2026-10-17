@@ -7,8 +7,9 @@ import styles from './MenuSection.module.scss'
 import type { MenuSectionProps } from './MenuSection.types'
 
 /**
- * Группа пунктов меню с заголовком: «Open Projects», «Local». Сворачиваемая группа
- * помнит своё состояние, пока открыто меню; во время поиска раскрыта всегда.
+ * Группа пунктов меню или вариантов ListBox с заголовком: «Open Projects», «Files».
+ * Сворачиваемая группа помнит своё состояние, пока открыто меню; во время поиска
+ * раскрыта всегда.
  */
 export const MenuSection = ({
   title,

@@ -1,0 +1,62 @@
+@use '../../styles/mixins' as *;
+
+// Метка состояния. marker - точка цвета состояния и текст, как «On Patrol» в
+// списках референса; soft - тонированная плашка капсом, как «ON PATROL» в шапке.
+// Тон задаёт класс тона через --tone.
+.badge {
+  --tone: var(--color-fg-subtle);
+
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-1-5);
+  height: var(--size-control-xs);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-tight);
+  white-space: nowrap;
+}
+
+.marker {
+  color: var(--color-fg-muted);
+
+  &::before {
+    content: '';
+    width: var(--size-status-dot);
+    height: var(--size-status-dot);
+    border-radius: var(--radius-full);
+    background-color: var(--tone);
+  }
+}
+
+.soft {
+  @include tinted-plaque(var(--tone));
+  @include caps-label;
+
+  padding: 0 var(--space-1-5);
+  border-radius: var(--radius-xs);
+}
+
+.neutral {
+  --tone: var(--color-fg-subtle);
+}
+
+.accent {
+  --tone: var(--color-accent-strong);
+}
+
+.success {
+  --tone: var(--color-success);
+}
+
+.warning {
+  --tone: var(--color-warning);
+}
+
+.danger {
+  --tone: var(--color-danger);
+}
+
+.info {
+  --tone: var(--color-info);
+}

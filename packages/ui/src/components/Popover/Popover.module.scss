@@ -1,18 +1,37 @@
+@use '../../styles/mixins' as *;
+
 .popover {
-  // Стили браузера для popover - по центру экрана с рамкой. Сбрасываем и ставим под
-  // кнопку, которая панель открыла (она же неявный якорь для position-area).
-  inset: auto;
-  margin: var(--space-1) 0 0;
+  @include glass-overlay;
+  @include enter-transition(calc(var(--offset-enter) * -1));
+
   padding: var(--space-1-5);
   overflow: auto;
+  max-height: 80vh;
+  border-radius: var(--radius-xl);
+  color: var(--color-fg);
+}
+
+// Открытая панель - колонка: содержимое с min-height: 0 (список в поиске) ужимается в
+// высоту окна и прокручивается само, а не уводит прокруткой всю панель вместе с полем.
+// Только открытая: иначе display перебил бы display: none закрытой панели.
+.popover:popover-open {
+  display: flex;
+  flex-direction: column;
+}
+
+// Стили браузера для popover - по центру экрана с рамкой. Сбрасываем и ставим под
+// кнопку, которая панель открыла (она же неявный якорь для position-area).
+.anchor {
+  inset: auto;
+  margin: var(--space-1-5) 0 0;
   position-area: block-end span-inline-end;
   position-try-fallbacks: flip-inline, flip-block;
-  max-height: 80vh;
-  border: var(--border-width) solid var(--color-border-strong);
-  border-radius: var(--radius-lg);
-  background-color: var(--color-bg-overlay);
-  box-shadow: var(--shadow-overlay);
-  color: var(--color-fg);
+}
+
+// Без якоря - сверху по центру окна: открыть могли и с клавиатуры, кнопки рядом нет.
+.top {
+  inset: var(--offset-popover-top) 0 auto;
+  margin: 0 auto;
 }
 
 .md {
@@ -21,4 +40,8 @@
 
 .lg {
   width: var(--size-popover-lg);
+}
+
+.xl {
+  width: var(--size-popover-xl);
 }

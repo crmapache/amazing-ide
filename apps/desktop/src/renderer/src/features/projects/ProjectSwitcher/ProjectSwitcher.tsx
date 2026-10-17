@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Avatar } from '@amazing-ide/ui/Avatar'
@@ -6,6 +5,7 @@ import { DropdownButton } from '@amazing-ide/ui/DropdownButton'
 import { Popover } from '@amazing-ide/ui/Popover'
 import { usePopover } from '@amazing-ide/ui/Popover.hooks'
 
+import { useProjectsStore } from '../projects.store'
 import { projectTone, projectInitials } from '../projects.utils'
 import { CloneDialog } from '../CloneDialog/CloneDialog'
 import { ProjectMenu } from '../ProjectMenu/ProjectMenu'
@@ -20,7 +20,8 @@ export const ProjectSwitcher = () => {
   const { t } = useTranslation()
   const project = useActiveProject()
   const popover = usePopover()
-  const [isCloneOpen, setIsCloneOpen] = useState(false)
+  const isCloneOpen = useProjectsStore((state) => state.isCloneOpen)
+  const closeClone = useProjectsStore((state) => state.closeClone)
 
   const avatar = project && (
     <Avatar initials={projectInitials(project.name)} tone={projectTone(project.name)} />
@@ -35,9 +36,9 @@ export const ProjectSwitcher = () => {
         menuLabel={t('projects.switcherLabel')}
       />
       <Popover {...popover.popoverProps} width="lg">
-        {popover.isOpen && <ProjectMenu onClone={() => setIsCloneOpen(true)} />}
+        {popover.isOpen && <ProjectMenu />}
       </Popover>
-      <CloneDialog open={isCloneOpen} onClose={() => setIsCloneOpen(false)} />
+      <CloneDialog open={isCloneOpen} onClose={closeClone} />
     </>
   )
 }

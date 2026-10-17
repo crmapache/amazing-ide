@@ -1,37 +1,44 @@
+@use '../../styles/mixins' as *;
+
+// Значок - тонированная плашка: буквы и рамка цвета тона на его подложке, как метки
+// «UAV» на карте. Без заливки во весь цвет: шапка остаётся спокойной.
 .avatar {
+  --tone: var(--color-avatar-0);
+
+  @include tinted-plaque(var(--tone));
+
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
   width: var(--size-avatar-sm);
   height: var(--size-avatar-sm);
-  border-radius: var(--radius-sm);
-  color: var(--color-avatar-fg);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-xs);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
 }
 
 .tone0 {
-  background-color: var(--color-avatar-0);
+  --tone: var(--color-avatar-0);
 }
 
 .tone1 {
-  background-color: var(--color-avatar-1);
+  --tone: var(--color-avatar-1);
 }
 
 .tone2 {
-  background-color: var(--color-avatar-2);
+  --tone: var(--color-avatar-2);
 }
 
 .tone3 {
-  background-color: var(--color-avatar-3);
+  --tone: var(--color-avatar-3);
 }
 
 .tone4 {
-  background-color: var(--color-avatar-4);
+  --tone: var(--color-avatar-4);
 }
 
 .tone5 {
-  background-color: var(--color-avatar-5);
+  --tone: var(--color-avatar-5);
 }

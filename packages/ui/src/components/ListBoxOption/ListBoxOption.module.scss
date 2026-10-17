@@ -1,0 +1,75 @@
+@use '../../styles/mixins' as *;
+
+// Выделенный вариант залит, как текущий пункт меню. Отдельного hover нет: мышь
+// сама делает вариант выделенным, двух подсветок сразу не бывает.
+.listBoxOption {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--size-menu-item);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  color: var(--color-fg);
+  cursor: pointer;
+}
+
+.active {
+  background-color: var(--color-bg-selected);
+  color: var(--color-fg-strong);
+}
+
+.visual {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-fg-subtle);
+
+  .active & {
+    color: var(--color-fg-strong);
+  }
+}
+
+// Подпись и пояснение делят строку: обрезается сначала пояснение, подпись - последней.
+.text {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.label {
+  @include truncate;
+
+  flex-shrink: 0;
+  max-width: 100%;
+  font-size: var(--font-size-md);
+  white-space: pre;
+}
+
+.code {
+  font-family: var(--font-code);
+  font-size: var(--font-size-sm);
+}
+
+.match {
+  background-color: transparent;
+  color: var(--color-fg-accent);
+  font-weight: var(--font-weight-semibold);
+}
+
+.description {
+  @include truncate;
+
+  min-width: 0;
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+}
+
+.hint {
+  flex-shrink: 0;
+  color: var(--color-fg-disabled);
+  font-size: var(--font-size-xs);
+}

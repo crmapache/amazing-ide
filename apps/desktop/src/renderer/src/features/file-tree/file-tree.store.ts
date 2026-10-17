@@ -1,12 +1,27 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+import { ancestorPaths } from './file-tree.utils'
+
 const FILE_TREE_STORAGE_KEY = 'amazing-ide.file-tree.v1'
+
+/** Последняя просьба показать файл в дереве. Номер растёт на каждую - даже на тот же файл. */
+type RevealRequest = {
+  projectId: string
+  relativePath: string
+  serial: number
+}
 
 type FileTreeStore = {
   /** Раскрытые папки каждого проекта: пути от корня. */
   expandedByProject: Record<string, string[]>
+  revealed: RevealRequest | null
   toggleDirectory: (projectId: string, relativePath: string) => void
+  /**
+   * Показать файл в дереве: раскрыть все папки над ним и попросить строку прокрутиться
+   * к себе. Файл выбрали не в дереве (поиском), а видно его должно быть.
+   */
+  revealPath: (projectId: string, relativePath: string) => void
 }
 
 /** Какие папки раскрыты в дереве. Нужно только дереву, поэтому живёт в его фиче. */
@@ -14,6 +29,7 @@ export const useFileTreeStore = create<FileTreeStore>()(
   persist(
     (set) => ({
       expandedByProject: {},
+      revealed: null,
       toggleDirectory: (projectId, relativePath) =>
         set((state) => {
           const expanded = state.expandedByProject[projectId] ?? []
@@ -23,10 +39,35 @@ export const useFileTreeStore = create<FileTreeStore>()(
 
           return { expandedByProject: { ...state.expandedByProject, [projectId]: next } }
         }),
+      revealPath: (projectId, relativePath) =>
+        set((state) => {
+          const expanded = state.expandedByProject[projectId] ?? []
+          const missing = ancestorPaths(relativePath).filter((path) => !expanded.includes(path))
+
+          return {
+            expandedByProject: {
+              ...state.expandedByProject,
+              [projectId]: [...expanded, ...missing],
+            },
+            revealed: { projectId, relativePath, serial: (state.revealed?.serial ?? 0) + 1 },
+          }
+        }),
     }),
-    { name: FILE_TREE_STORAGE_KEY },
+    // Просьба показать файл - событие этого запуска, переживать перезапуск ей незачем.
+    {
+      name: FILE_TREE_STORAGE_KEY,
+      partialize: ({ expandedByProject }) => ({ expandedByProject }),
+    },
   ),
 )
 
 export const useIsExpanded = (projectId: string, relativePath: string) =>
   useFileTreeStore((state) => state.expandedByProject[projectId]?.includes(relativePath) ?? false)
+
+/** Номер последней просьбы показать именно эту строку; 0 - такой просьбы не было. */
+export const useRevealSerial = (projectId: string, relativePath: string) =>
+  useFileTreeStore((state) =>
+    state.revealed?.projectId === projectId && state.revealed.relativePath === relativePath
+      ? state.revealed.serial
+      : 0,
+  )

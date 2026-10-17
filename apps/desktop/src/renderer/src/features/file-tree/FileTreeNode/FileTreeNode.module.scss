@@ -12,18 +12,20 @@
 
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-1-5);
   width: 100%;
-  height: var(--size-control-sm);
+  height: var(--size-tree-row);
   padding-right: var(--space-2);
+  border-radius: var(--radius-sm);
   color: var(--color-fg-muted);
   font-size: var(--font-size-md);
   text-align: left;
 }
 
+// Выбранный файл - залитая строка, как выбранный пункт в навигации.
 .selected {
   background-color: var(--color-bg-selected);
-  color: var(--color-fg);
+  color: var(--color-fg-strong);
 }
 
 .chevron {
@@ -40,17 +42,31 @@
   visibility: hidden;
 }
 
+.folderIcon {
+  flex-shrink: 0;
+  color: var(--color-fg-muted);
+}
+
+.fileIcon {
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+
+  .selected & {
+    color: var(--color-fg-strong);
+  }
+}
+
 .name {
   @include truncate;
 }
 
 .note {
-  height: var(--size-control-sm);
+  height: var(--size-tree-row);
 
   // Текст встаёт под имя файла: отступ строки плюс шеврон и иконка.
   @include indent(var(--space-8));
 
   color: var(--color-fg-disabled);
   font-size: var(--font-size-sm);
-  line-height: var(--size-control-sm);
+  line-height: var(--size-tree-row);
 }

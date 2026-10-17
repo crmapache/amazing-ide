@@ -20,7 +20,6 @@
   "sideViews": {
     "label": "Side panel views",
     "files": "Files",
-    "search": "Search",
     "resize": "Resize side panel"
   },
   "providerViews": {
@@ -33,10 +32,6 @@
     "noProjectText": "Open a folder to see its files here.",
     "emptyFolder": "Empty folder",
     "readError": "Could not read this folder"
-  },
-  "search": {
-    "title": "Search",
-    "stub": "Search across the project is not built yet."
   },
   "editor": {
     "noProjectTitle": "Open a project to start",
@@ -79,7 +74,6 @@
     }
   },
   "titleBar": {
-    "search": "Search",
     "settingsSoon": "Settings (not built yet)"
   },
   "git": {
@@ -123,5 +117,49 @@
     "browse": "Browse…",
     "clone": "Clone",
     "cloning": "Cloning…"
+  },
+  "searchEverywhere": {
+    "open": "Search Everywhere (Double ⇧)",
+    "label": "Search everywhere",
+    "tabsLabel": "Search in",
+    "tabs": {
+      "all": "All",
+      "files": "Files",
+      "actions": "Actions",
+      "text": "Text"
+    },
+    "placeholder": {
+      "all": "Search files and actions",
+      "files": "Search files by name, or folder/name",
+      "actions": "Search actions",
+      "text": "Search text in project files"
+    },
+    "sections": {
+      "file": "Files",
+      "action": "Actions",
+      "text": "Text"
+    },
+    "typeToSearch": {
+      "all": "Type to search files and actions.",
+      "files": "Type part of a file name.",
+      "actions": "Type to search actions.",
+      "text": "Type the text to find in the project."
+    },
+    "noProject": "Open a project to search its files.",
+    "shortQuery_one": "Type at least {{count}} character.",
+    "shortQuery_other": "Type at least {{count}} characters.",
+    "searching": "Searching…",
+    "nothingFound": "Nothing found",
+    "filesTruncated": "This project has too many files: not all of them are searched.",
+    "textTruncated": "Showing the first matches. Type more to narrow them down.",
+    "lineHint": "{{name}}:{{line}}",
+    "actions": {
+      "closeProject": "Close Project {{name}}",
+      "switchProject": "Switch to Project {{name}}",
+      "openRecent": "Open Recent Project {{name}}",
+      "toggleFiles": "Show or Hide Files",
+      "toggleClaudeCode": "Show or Hide Claude Code"
+    },
+    "longQuery": "The text is too long: search takes up to {{count}} characters."
   }
 }

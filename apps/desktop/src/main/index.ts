@@ -9,6 +9,7 @@ import { installApplicationMenu } from './menu'
 import { broadcast } from './ipc/broadcast'
 import { registerInvokeHandlers } from './ipc/handle'
 import { createInvokeHandlers } from './ipc/register-handlers'
+import { SearchService } from './search/search-service'
 import { JsonFile } from './storage/json-file'
 import { UpdateService } from './updates/update-service'
 import { UPDATE_FEED_URL, UPDATE_FEED_OVERRIDE_ENV } from './updates/update.constants'
@@ -52,7 +53,8 @@ const bootstrap = async () => {
     onStatus: (status) => broadcast('updates:status', status),
     quit: () => app.quit(),
   })
-  const services = { workspace, updates, getWindow: () => mainWindow }
+  const search = new SearchService()
+  const services = { workspace, updates, search, getWindow: () => mainWindow }
 
   registerInvokeHandlers(createInvokeHandlers(services), RENDERER_URL)
   installApplicationMenu({ openProject: () => void pickAndOpenProject(services) })

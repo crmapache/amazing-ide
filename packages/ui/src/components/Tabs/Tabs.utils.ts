@@ -1,0 +1,13 @@
+/**
+ * Какая вкладка следующая по клавише. В отличие от меню, ряд вкладок замкнут:
+ * вправо с последней - на первую, как велит паттерн tabs в WAI-ARIA.
+ */
+export const nextTabIndex = (key: string, current: number, count: number): number | null => {
+  if (count === 0) return null
+  if (key === 'Home') return 0
+  if (key === 'End') return count - 1
+  if (key === 'ArrowRight') return (current + 1) % count
+  if (key === 'ArrowLeft') return (current - 1 + count) % count
+
+  return null
+}

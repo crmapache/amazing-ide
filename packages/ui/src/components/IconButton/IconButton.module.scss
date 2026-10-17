@@ -8,8 +8,17 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   color: var(--color-fg-subtle);
+  transition:
+    background-color var(--duration-normal) var(--easing-standard),
+    color var(--duration-normal) var(--easing-standard);
+
+  @media (hover: hover) {
+    &:not(:disabled):hover {
+      color: var(--color-fg);
+    }
+  }
 
   &:disabled {
     color: var(--color-fg-disabled);
@@ -26,6 +35,10 @@
   height: var(--size-control-md);
 }
 
-.active {
-  color: var(--color-fg);
+// Включённый переключатель - серая плашка и белая иконка, как выбранный раздел в
+// навигации.
+.active,
+.active:not(:disabled):hover {
+  background-color: var(--color-bg-selected);
+  color: var(--color-fg-strong);
 }

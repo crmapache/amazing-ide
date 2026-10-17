@@ -5,20 +5,16 @@
   display: flex;
   flex: 1 1 0;
   align-items: center;
-  min-width: 120px;
-  border-right: var(--border-width) solid var(--color-border);
-  background-color: var(--color-bg-app);
-  transition: background-color var(--duration-normal) var(--easing-standard);
+  min-width: var(--size-tab-min);
+  height: var(--size-control-md);
+  border: var(--border-width) solid transparent;
 
-  @media (hover: hover) {
-    &:hover {
-      background-color: var(--color-bg-chrome);
-    }
-  }
-}
-
-.active {
-  background-color: var(--color-bg-hover);
+  // Вкладка стоит в листе полосы почти вплотную: радиус больше обычного, чтобы её
+  // угол шёл параллельно углу листа.
+  border-radius: var(--radius-lg);
+  transition:
+    background-color var(--duration-normal) var(--easing-standard),
+    border-color var(--duration-normal) var(--easing-standard);
 
   @media (hover: hover) {
     &:hover {
@@ -27,26 +23,39 @@
   }
 }
 
+.active,
+.active:hover {
+  border-color: var(--color-border);
+  background-color: var(--color-surface-raised);
+}
+
 .label {
   @include button-reset;
   @include truncate;
 
   flex: 1;
+  min-width: 0;
   height: 100%;
   padding: 0 var(--space-8);
   color: var(--color-fg-subtle);
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   text-align: center;
+  transition: color var(--duration-normal) var(--easing-standard);
+
+  .projectTab:hover & {
+    color: var(--color-fg-muted);
+  }
 
   .active & {
-    color: var(--color-fg);
+    color: var(--color-fg-strong);
   }
 }
 
 // Крестик виден на активной вкладке и при наведении - иначе полоса рябит.
 .close {
   position: absolute;
-  right: var(--space-1-5);
+  right: var(--space-1);
   opacity: 0;
   transition: opacity var(--duration-fast) var(--easing-standard);
 

@@ -1,7 +1,21 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Строка вкладок - лист во всю ширину, вкладки-плашки внутри, выбранная залита
+// графитом. Высота у полосы своя, а не от вкладок: пустая она занимает столько же.
 .projectTabs {
+  @include window-sheet;
+
   display: flex;
   flex-shrink: 0;
   height: var(--size-tab-bar);
-  border-bottom: var(--border-width) solid var(--color-border);
-  background-color: var(--color-bg-app);
+  padding: var(--space-0-5);
+}
+
+// tablist без вкладок - ошибка доступности, поэтому он отдельный и только с вкладками.
+.tabList {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-0-5);
+  min-width: 0;
 }

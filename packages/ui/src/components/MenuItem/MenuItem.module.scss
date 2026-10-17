@@ -24,8 +24,10 @@
   }
 }
 
+// Текущий выбор - залитая строка, как выбранный раздел в навигации.
 .current {
   background-color: var(--color-bg-selected);
+  color: var(--color-fg-strong);
 }
 
 .visual {
@@ -34,6 +36,10 @@
   align-items: center;
   justify-content: center;
   color: var(--color-fg-subtle);
+
+  .current & {
+    color: var(--color-fg-strong);
+  }
 
   .menuItem:disabled & {
     color: var(--color-fg-disabled);
@@ -62,11 +68,11 @@
   @include truncate;
 
   color: var(--color-fg-subtle);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
 }
 
 .hint {
   flex-shrink: 0;
   color: var(--color-fg-disabled);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
 }

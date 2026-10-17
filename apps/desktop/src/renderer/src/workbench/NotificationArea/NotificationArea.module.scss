@@ -1,8 +1,9 @@
+// Над строкой состояния: она - лист с зазором до края окна, его тоже надо учесть.
 .notificationArea {
   position: fixed;
   z-index: var(--z-toast);
   right: var(--space-4);
-  bottom: calc(var(--size-status-bar) + var(--space-4));
+  bottom: calc(var(--size-status-bar) + var(--space-2) + var(--space-4));
   display: flex;
   flex-direction: column;
   align-items: flex-end;

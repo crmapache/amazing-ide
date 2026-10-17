@@ -56,6 +56,7 @@ export const UpdateNotice = () => {
       <Toast
         title={t('updates.downloadingTitle', { version: status.version })}
         description={t('updates.downloadingText', { percent: Math.round(status.progress * 100) })}
+        progress={status.progress}
       />
     )
   }

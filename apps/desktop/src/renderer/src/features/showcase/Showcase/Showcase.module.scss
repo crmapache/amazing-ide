@@ -1,0 +1,56 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Витрина закрывает панели и редактор, но не шапку и строку состояния: окно
+// остаётся узнаваемым, а образцы лежат на том же фоне, что и панели.
+.showcase {
+  position: absolute;
+  z-index: var(--z-overlay);
+  inset: 0;
+  overflow: auto;
+  background-color: var(--color-bg-app);
+  background-image: var(--gradient-backdrop);
+  background-attachment: fixed;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  max-width: calc(var(--size-popover-lg) * 3);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-10);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.title {
+  margin: 0;
+  color: var(--color-fg-strong);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-sm);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}

@@ -38,7 +38,76 @@
   }
 }
 
-// Участок окна, за который его можно таскать (окно без системной рамки).
+// Участок окна, за который его можно таскать (окно без системной рамки). Только
+// пустое место - отдельный элемент-распорка, а не родитель кнопок: кнопка внутри
+// области перетаскивания на macOS теряет hover на каждом втором движении мыши и
+// дрожит (замер настоящей мышью: половина кадров без hover). Нажатие по участку
+// система забирает себе, и до страницы оно не доходит. Поэтому, пока открыта
+// всплывающая панель, участок окно не таскает: клик по нему - клик мимо панели, и
+// браузер должен его увидеть, чтобы панель закрылась.
 @mixin window-drag-region {
   -webkit-app-region: drag;
+
+  :root:has([popover='auto']:popover-open) & {
+    -webkit-app-region: no-drag;
+  }
+}
+
+// Чёрная рама окна (шапка): фон рамы и подсветка кнопок посветлее обычной - иначе
+// hover и открытый список на чёрном почти не видны. Кнопки внутри берут обычные роли
+// и ничего про раму не знают.
+@mixin chrome-surface {
+  --color-bg-hover: var(--color-chrome-hover);
+  --color-bg-active: var(--color-chrome-active);
+  --color-bg-selected: var(--color-chrome-selected);
+
+  background-color: var(--color-surface-chrome);
+}
+
+// Лист на чёрной раме окна: скруглённая зона с тонкой рамкой, без тени. Из таких
+// листов собрано всё окно под шапкой; зазор между ними задаёт раскладка, а не лист.
+@mixin window-sheet($surface: var(--color-surface-panel)) {
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background-color: $surface;
+}
+
+// Стеклянный лист поверх содержимого: всплывающая панель, диалог, уведомление,
+// подсказка. Размывает то, что под ним, и отделяется тенью - единственное место в
+// системе, где тень есть.
+@mixin glass-overlay {
+  border: var(--border-width) solid var(--color-border-strong);
+  background-color: var(--color-surface-overlay);
+  box-shadow: var(--shadow-overlay);
+  backdrop-filter: var(--glass-blur);
+}
+
+// Тонированная плашка: текст и тонкая рамка цвета тона на его же полупрозрачной
+// подложке - как статусы «ACTIVE», «EN ROUTE». $tone - токен роли или локальная
+// переменная тона, объявленная в том же файле.
+@mixin tinted-plaque($tone) {
+  border: var(--border-width) solid color-mix(in srgb, #{$tone} var(--tint-border), transparent);
+  background-color: color-mix(in srgb, #{$tone} var(--tint-soft), transparent);
+  color: $tone;
+}
+
+// Подпись раздела или статуса капсом с разрядкой: «SELECTED», «RECENT».
+@mixin caps-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+}
+
+// Появление всплывающего слоя: прозрачность и короткий сдвиг. Только появление:
+// закрываться панель должна мгновенно, иначе клик мимо ощущается вязким.
+@mixin enter-transition($offset-y: var(--offset-enter)) {
+  transition:
+    opacity var(--duration-normal) var(--easing-out),
+    translate var(--duration-normal) var(--easing-out);
+
+  @starting-style {
+    opacity: 0;
+    translate: 0 $offset-y;
+  }
 }

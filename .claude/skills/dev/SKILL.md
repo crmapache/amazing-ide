@@ -37,7 +37,37 @@ CDP не нажмёт, поэтому так). Скрипт ждёт, пока �
 node apps/desktop/scripts/cdp.mjs screenshot .screenshots/<что-проверяю>.png   # потом Read этого файла
 node apps/desktop/scripts/cdp.mjs eval "<выражение в странице>"
 node apps/desktop/scripts/cdp.mjs click '<css-селектор>'
+node apps/desktop/scripts/cdp.mjs click-at <x> <y>     # клик мимо, в пустое место
+node apps/desktop/scripts/cdp.mjs hover '<css-селектор>'
+node apps/desktop/scripts/cdp.mjs type 'текст'          # в элемент с фокусом
+node apps/desktop/scripts/cdp.mjs key ArrowDown          # Enter, Tab, Escape, Shift...
+node apps/desktop/scripts/cdp.mjs key KeyF meta+shift    # сочетание, буква - по клавише
 ```
+
+Клик - настоящее нажатие мыши, как у человека: панель закрывается кликом мимо, hover
+и фокус срабатывают. Но системную обработку окна он обходит: нажатие по шапке, за
+которую таскают окно, через CDP дойдёт до страницы, а у человека его забирает macOS.
+Поведение кликов по шапке CDP не проверяет - только правила в стилях
+(`getComputedStyle(...).webkitAppRegion`).
+
+### Настоящая мышь macOS
+
+Для того, что решает система (hover и клики у областей перетаскивания, «клик мимо» по
+шапке, перетаскивание окна), - `real-mouse.swift`. Он на пару секунд поднимает копию
+вперёд, ведёт системный курсор и возвращает курсор и прежнее приложение на место.
+Работает только с копией агента. Человек в этот момент видит, как двигается курсор, -
+предупреди его одной строкой.
+
+```
+swift apps/desktop/scripts/real-mouse.swift move 1300,20 1440,20   # печатает «время-мс x y»
+swift apps/desktop/scripts/real-mouse.swift click 160,20 800,20
+swift apps/desktop/scripts/real-mouse.swift drag 800,20 900,20     # печатает сдвиг окна
+```
+
+Что видела страница, смотри журналом: до прогона повесь через `eval` запись событий с
+`Date.now()` (pointerover/out, toggle панелей, `:hover` по кадрам), после - забери его
+и сверь со временем шагов. Состояние после прогона не показательно: скрипт отдаёт фокус
+обратно, и открытые панели закрываются по уходу фокуса.
 
 Опорные селекторы: иконки зон 2 и 3 - `nav button[aria-label="Files"]` и подобные
 (подпись = перевод из `locales/en.json`), переключатели в шапке -
@@ -46,6 +76,10 @@ node apps/desktop/scripts/cdp.mjs click '<css-селектор>'
 прямо из страницы: `window.ide.invoke('workspace:get')`.
 
 Скриншот через CDP - это содержимое окна: «светофора» macOS на нём нет.
+
+Витрина дизайн-системы (все токены и компоненты) в копии есть:
+`button[aria-label="Design system"]` в шапке, вкладки витрины - `[role=tab]` с
+текстом «Foundations» и «Components». Прокрутка - у `[role=region]`.
 
 Меню проекта и ветки - панели в странице: их можно открыть кликом по
 `button[aria-haspopup=menu]`, искать и снимать. Системные - только диалоги выбора

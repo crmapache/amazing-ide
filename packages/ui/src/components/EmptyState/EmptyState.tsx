@@ -9,12 +9,13 @@ import type { EmptyStateProps } from './EmptyState.types'
 export const EmptyState = ({ title, description, icon: Icon, action }: EmptyStateProps) => (
   <div className={styles.emptyState}>
     {Icon && (
-      <Icon
-        className={styles.icon}
-        size={EMPTY_STATE_ICON_SIZE}
-        strokeWidth={EMPTY_STATE_ICON_STROKE_WIDTH}
-        aria-hidden
-      />
+      <span className={styles.tile}>
+        <Icon
+          size={EMPTY_STATE_ICON_SIZE}
+          strokeWidth={EMPTY_STATE_ICON_STROKE_WIDTH}
+          aria-hidden
+        />
+      </span>
     )}
     <div className={styles.title}>{title}</div>
     {description && <div className={styles.description}>{description}</div>}

@@ -1,0 +1,58 @@
+@use '../../styles/mixins' as *;
+
+// Плитка внутри панели: блок настроек, сводка, ответ инструмента. Чуть светлее
+// панели, плоская, с тонкой рамкой.
+.card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-raised);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) 0;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  min-width: 0;
+}
+
+// Заголовок капсом, как заголовки разделов референса: «PLATFORM HEALTH».
+.title {
+  @include truncate;
+  @include caps-label;
+
+  color: var(--color-fg-muted);
+  line-height: var(--size-control-sm);
+}
+
+.description {
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-sm);
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.divider {
+  margin: var(--space-3) var(--space-4) 0;
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.body {
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  color: var(--color-fg-muted);
+}

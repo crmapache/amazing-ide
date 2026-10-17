@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { IconButton } from '@amazing-ide/ui/IconButton'
+import { Tooltip } from '@amazing-ide/ui/Tooltip'
 
 import { MIDDLE_MOUSE_BUTTON } from './ProjectTab.constants'
 import styles from './ProjectTab.module.scss'
@@ -26,16 +27,17 @@ export const ProjectTab = ({ project, isActive, onActivate, onClose }: ProjectTa
 
   return (
     <div className={clsx(styles.projectTab, isActive && styles.active)}>
-      <button
-        type="button"
-        role="tab"
-        aria-selected={isActive}
-        title={project.rootPath}
-        className={styles.label}
-        onClick={handleActivate}
-        onAuxClick={handleAuxClick}>
-        {project.name}
-      </button>
+      <Tooltip label={project.rootPath} stretch>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={isActive}
+          className={styles.label}
+          onClick={handleActivate}
+          onAuxClick={handleAuxClick}>
+          {project.name}
+        </button>
+      </Tooltip>
       <span className={styles.close}>
         <IconButton
           icon={X}

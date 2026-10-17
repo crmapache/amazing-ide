@@ -28,7 +28,7 @@ export const SidePanel = <ViewId extends string>({
 
   return (
     <aside
-      className={clsx(styles.sidePanel, styles[placement], !isOpen && styles.closed)}
+      className={clsx(styles.sidePanel, !isOpen && styles.closed)}
       // eslint-disable-next-line no-restricted-syntax -- ширину задаёт перетаскивание
       style={{ width }}>
       {views

@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes } from 'react'
+import type { Ref, InputHTMLAttributes } from 'react'
 import type { LucideIcon } from 'lucide-react'
 
 export type TextFieldProps = Omit<
@@ -14,4 +14,6 @@ export type TextFieldProps = Omit<
   icon?: LucideIcon | undefined
   /** Что не так с введённым. Показывается под полем красным. */
   error?: string | undefined
+  /** Само поле ввода: вернуть в него фокус после клика по соседней кнопке. */
+  ref?: Ref<HTMLInputElement> | undefined
 }

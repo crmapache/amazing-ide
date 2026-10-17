@@ -5,7 +5,7 @@ import { join, posix } from 'node:path'
 import type { DirectoryEntry, DirectoryEntryKind } from '@shared/fs'
 
 import { HIDDEN_ENTRY_NAMES } from './directory-reader.constants'
-import { resolveInsideRoot } from './project-paths'
+import { toWindowPath, resolveInsideRoot } from './project-paths'
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
 
@@ -31,6 +31,9 @@ const resolveKind = async (dirent: Dirent, absolutePath: string): Promise<Direct
 /**
  * Содержимое одного каталога проекта, без вложенных: дерево раскрывается по
  * одному уровню, и большой проект не читается целиком ради первой отрисовки.
+ * Имена и пути - в NFC, как и у поиска (toWindowPath): иначе дерево не раскрылось
+ * бы до файла, найденного поиском. Читается каталог по пути как есть: APFS находит
+ * NFD-папку и по NFC-пути.
  */
 export const readDirectory = async (
   rootPath: string,
@@ -46,8 +49,8 @@ export const readDirectory = async (
   const visible = dirents.filter((dirent) => !HIDDEN_ENTRY_NAMES.has(dirent.name))
   const entries = await Promise.all(
     visible.map(async (dirent) => ({
-      name: dirent.name,
-      relativePath: posix.join(relativePath, dirent.name),
+      name: toWindowPath(dirent.name),
+      relativePath: toWindowPath(posix.join(relativePath, dirent.name)),
       kind: await resolveKind(dirent, join(absolute, dirent.name)),
       isSymlink: dirent.isSymbolicLink(),
     })),

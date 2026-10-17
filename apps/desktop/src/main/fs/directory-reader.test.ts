@@ -48,3 +48,29 @@ describe('readDirectory', () => {
     await expect(readDirectory(root, '..')).rejects.toThrow('за пределы проекта')
   })
 })
+
+describe('readDirectory: имена в NFD', () => {
+  let root = ''
+
+  beforeAll(async () => {
+    // Так пишет имена Finder: «й» - это «и» и отдельный знак U+0306.
+    root = await mkdtemp(join(tmpdir(), 'amazing-ide-tree-nfd-'))
+    await mkdir(join(root, 'й'))
+    await writeFile(join(root, 'й', 'файл.txt'), '')
+  })
+
+  afterAll(() => rm(root, { recursive: true, force: true }))
+
+  it('имя и путь - в NFC, как у поиска', async () => {
+    const [folder] = await readDirectory(root, '')
+
+    expect(folder).toMatchObject({ name: 'й', relativePath: 'й', kind: 'directory' })
+    expect(folder?.name).not.toBe('й')
+  })
+
+  it('NFD-папка раскрывается по NFC-пути из окна', async () => {
+    expect(await readDirectory(root, 'й')).toEqual([
+      { name: 'файл.txt', relativePath: 'й/файл.txt', kind: 'file', isSymlink: false },
+    ])
+  })
+})

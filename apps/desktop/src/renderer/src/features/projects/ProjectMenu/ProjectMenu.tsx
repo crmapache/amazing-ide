@@ -1,4 +1,3 @@
-import { Plus, GitFork, FolderOpen } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Avatar } from '@amazing-ide/ui/Avatar'
@@ -7,10 +6,11 @@ import { MenuItem } from '@amazing-ide/ui/MenuItem'
 import { MenuSection } from '@amazing-ide/ui/MenuSection'
 import { MenuSeparator } from '@amazing-ide/ui/MenuSeparator'
 
+import { PROJECT_ACTIONS } from '../project-actions.constants'
+import { useProjectActionRunner } from '../project-actions.hooks'
 import { displayPath, projectTone, projectInitials } from '../projects.utils'
 import { useAppInfo } from '../../../state/app-info.queries'
 import { useWorkspace, useWorkspaceActions } from '../../../state/workspace.queries'
-import type { ProjectMenuProps } from './ProjectMenu.types'
 
 const projectAvatar = (name: string) => (
   <Avatar initials={projectInitials(name)} tone={projectTone(name)} />
@@ -20,19 +20,20 @@ const projectAvatar = (name: string) => (
  * Меню проекта, как в WebStorm: создать, открыть, клонировать; открытые проекты (с
  * путём, текущий подсвечен) и недавние - закрытые раньше.
  */
-export const ProjectMenu = ({ onClone }: ProjectMenuProps) => {
+export const ProjectMenu = () => {
   const { t } = useTranslation()
   const { data: workspace } = useWorkspace()
   const { data: appInfo } = useAppInfo()
-  const { newProject, openProject, openRecentProject, activateProject } = useWorkspaceActions()
+  const { openRecentProject, activateProject } = useWorkspaceActions()
+  const runAction = useProjectActionRunner()
   const projects = workspace?.projects ?? []
   const recentProjects = workspace?.recentProjects ?? []
 
   return (
     <Menu label={t('projects.menuLabel')} autoFocus>
-      <MenuItem icon={Plus} label={t('projects.newProject')} onSelect={newProject} />
-      <MenuItem icon={FolderOpen} label={t('projects.openEllipsis')} onSelect={openProject} />
-      <MenuItem icon={GitFork} label={t('projects.cloneRepository')} onSelect={onClone} />
+      {PROJECT_ACTIONS.map(({ id, icon, labelKey }) => (
+        <MenuItem key={id} icon={icon} label={t(labelKey)} onSelect={() => runAction(id)} />
+      ))}
 
       {projects.length > 0 && <MenuSeparator />}
       {projects.length > 0 && (

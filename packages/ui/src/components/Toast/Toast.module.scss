@@ -1,18 +1,43 @@
+@use '../../styles/mixins' as *;
+
 .toast {
+  @include glass-overlay;
+  @include enter-transition;
+
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  width: 320px;
-  padding: var(--space-3);
-  border: var(--border-width) solid var(--color-border-strong);
+  width: var(--size-toast);
+  padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
-  background-color: var(--color-bg-overlay);
-  box-shadow: var(--shadow-overlay);
 }
 
+// Точка тона перед заголовком, как отметки в журнале событий: оранжевая у
+// обычного уведомления, красная у ошибки.
 .title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-fg-strong);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-tight);
+
+  &::before {
+    content: '';
+    flex-shrink: 0;
+    width: var(--size-status-dot);
+    height: var(--size-status-dot);
+    border-radius: var(--radius-full);
+    background-color: var(--color-accent);
+  }
+}
+
+.danger {
+  border-color: var(--color-danger-soft);
+
+  .title::before {
+    background-color: var(--color-danger-strong);
+  }
 }
 
 .description {
@@ -23,12 +48,12 @@
   white-space: pre-line;
 }
 
+.progress {
+  margin-top: var(--space-1-5);
+}
+
 .actions {
   display: flex;
   gap: var(--space-2);
   margin-top: var(--space-2);
-}
-
-.danger .title {
-  color: var(--color-danger);
 }

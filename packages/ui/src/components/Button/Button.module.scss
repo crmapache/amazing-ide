@@ -1,5 +1,6 @@
 @use '../../styles/mixins' as *;
 
+// Кнопки плоские: заливка или тонировка без бликов и теней.
 .button {
   @include button-reset;
 
@@ -7,14 +8,18 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-1-5);
-  border-radius: var(--radius-md);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-sm);
   font-weight: var(--font-weight-medium);
   white-space: nowrap;
   transition:
     background-color var(--duration-normal) var(--easing-standard),
-    filter var(--duration-normal) var(--easing-standard);
+    border-color var(--duration-normal) var(--easing-standard),
+    color var(--duration-normal) var(--easing-standard);
 
   &:disabled {
+    border-color: var(--color-border);
+    background-color: transparent;
     color: var(--color-fg-disabled);
     cursor: not-allowed;
   }
@@ -32,13 +37,22 @@
   font-size: var(--font-size-md);
 }
 
-.primary {
-  background-color: var(--color-accent);
-  color: var(--color-accent-fg);
+.icon {
+  flex-shrink: 0;
 }
 
+// Главное действие - тонированное: оранжевый текст и рамка на тёмно-оранжевой
+// подложке. Сплошная оранжевая заливка кричала бы с каждого тоста.
+.primary {
+  border-color: var(--color-accent-border);
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+}
+
+// Рядом с главным: серая плашка.
 .secondary {
-  background-color: var(--color-bg-hover);
+  border-color: var(--color-border);
+  background-color: var(--color-surface-raised);
   color: var(--color-fg);
 }
 
@@ -49,21 +63,26 @@
 
 @media (hover: hover) {
   .primary:not(:disabled):hover {
-    filter: brightness(1.08);
+    background-color: var(--color-accent-soft-hover);
   }
 
-  .secondary:not(:disabled):hover,
+  .secondary:not(:disabled):hover {
+    background-color: var(--color-surface-raised-hover);
+  }
+
   .ghost:not(:disabled):hover {
-    background-color: var(--color-bg-active);
+    background-color: var(--color-bg-hover);
+    color: var(--color-fg);
   }
 }
 
 .primary:not(:disabled):active {
-  filter: brightness(1.16);
+  background-color: var(--color-accent-soft);
+  transition-duration: var(--duration-fast);
 }
 
 .secondary:not(:disabled):active,
 .ghost:not(:disabled):active {
-  background-color: var(--color-bg-selected);
-  filter: brightness(1.1);
+  background-color: var(--color-bg-active);
+  transition-duration: var(--duration-fast);
 }

@@ -1,0 +1,20 @@
+.showcaseSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.title {
+  margin: 0;
+  color: var(--color-fg-strong);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--size-popover-md), 1fr));
+  align-items: start;
+  gap: var(--space-4);
+}

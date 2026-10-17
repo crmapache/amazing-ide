@@ -1,3 +1,5 @@
+// Сама ручка шире линии, чтобы в неё было легко попасть; видна только тонкая
+// черта по центру: при наведении светлая, при перетаскивании и фокусе оранжевая.
 .handle {
   position: absolute;
   z-index: var(--z-resize-handle);
@@ -5,16 +7,33 @@
   bottom: 0;
   width: var(--size-resize-handle);
   cursor: col-resize;
-  transition: background-color var(--duration-normal) var(--easing-standard);
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: var(--focus-ring-width);
+    border-radius: var(--radius-full);
+    translate: -50% 0;
+    transition: background-color var(--duration-normal) var(--easing-standard);
+  }
 
   @media (hover: hover) {
-    &:hover {
+    &:hover::after {
       background-color: var(--color-border-strong);
     }
   }
 
-  &:active {
+  &:active::after,
+  &:focus-visible::after {
     background-color: var(--color-accent);
+  }
+
+  // Фокус показывает сама черта, рамка поверх неё лишняя.
+  &:focus-visible {
+    outline: none;
   }
 }
 

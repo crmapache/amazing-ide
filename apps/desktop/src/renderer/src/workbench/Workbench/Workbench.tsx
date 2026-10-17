@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ActivityBar } from '../ActivityBar/ActivityBar'
@@ -5,6 +6,7 @@ import { NotificationArea } from '../NotificationArea/NotificationArea'
 import { SidePanel } from '../SidePanel/SidePanel'
 import { TitleBar } from '../TitleBar/TitleBar'
 import { PROVIDER_VIEWS } from '../views/provider-views'
+import { ShowcaseLayer } from '../views/showcase-view'
 import { SIDE_VIEWS } from '../views/side-views'
 import { useLayoutStore } from '../../state/layout.store'
 import { EditorArea } from '../../features/editor/EditorArea/EditorArea'
@@ -31,51 +33,59 @@ export const Workbench = () => {
   return (
     <div className={styles.workbench}>
       <TitleBar />
-      <ProjectTabs />
+      <div className={styles.sheets}>
+        <ProjectTabs />
 
-      <div className={styles.body}>
-        <ActivityBar
-          edge="start"
-          label={t('sideViews.label')}
-          views={SIDE_VIEWS}
-          activeViewId={side.activeViewId}
-          isPanelOpen={side.isOpen}
-          onSelect={selectSideView}
-        />
-        <SidePanel
-          placement="start"
-          views={SIDE_VIEWS}
-          activeViewId={side.activeViewId}
-          isOpen={side.isOpen}
-          width={side.width}
-          resizeLabel={t('sideViews.resize')}
-          onResize={(delta) => resizePanel('side', delta)}
-        />
+        <div className={styles.body}>
+          <ActivityBar
+            edge="start"
+            label={t('sideViews.label')}
+            views={SIDE_VIEWS}
+            activeViewId={side.activeViewId}
+            isPanelOpen={side.isOpen}
+            onSelect={selectSideView}
+          />
+          <SidePanel
+            placement="start"
+            views={SIDE_VIEWS}
+            activeViewId={side.activeViewId}
+            isOpen={side.isOpen}
+            width={side.width}
+            resizeLabel={t('sideViews.resize')}
+            onResize={(delta) => resizePanel('side', delta)}
+          />
 
-        <main className={styles.editor}>
-          <EditorArea />
-        </main>
+          <main className={styles.editor}>
+            <EditorArea />
+          </main>
 
-        <SidePanel
-          placement="end"
-          views={PROVIDER_VIEWS}
-          activeViewId={provider.activeViewId}
-          isOpen={provider.isOpen}
-          width={provider.width}
-          resizeLabel={t('providerViews.resize')}
-          onResize={(delta) => resizePanel('provider', delta)}
-        />
-        <ActivityBar
-          edge="end"
-          label={t('providerViews.label')}
-          views={PROVIDER_VIEWS}
-          activeViewId={provider.activeViewId}
-          isPanelOpen={provider.isOpen}
-          onSelect={selectProviderView}
-        />
+          <SidePanel
+            placement="end"
+            views={PROVIDER_VIEWS}
+            activeViewId={provider.activeViewId}
+            isOpen={provider.isOpen}
+            width={provider.width}
+            resizeLabel={t('providerViews.resize')}
+            onResize={(delta) => resizePanel('provider', delta)}
+          />
+          <ActivityBar
+            edge="end"
+            label={t('providerViews.label')}
+            views={PROVIDER_VIEWS}
+            activeViewId={provider.activeViewId}
+            isPanelOpen={provider.isOpen}
+            onSelect={selectProviderView}
+          />
+
+          {ShowcaseLayer && (
+            <Suspense fallback={null}>
+              <ShowcaseLayer />
+            </Suspense>
+          )}
+        </div>
+
+        <StatusBar />
       </div>
-
-      <StatusBar />
 
       <NotificationArea>
         <UpdateNotice />

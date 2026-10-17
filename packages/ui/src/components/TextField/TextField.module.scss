@@ -1,7 +1,7 @@
 .textField {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-1-5);
 }
 
 .label {
@@ -19,6 +19,8 @@
   white-space: nowrap;
 }
 
+// Поле - тёмная плоская подложка с тонкой рамкой. В фокусе - оранжевая рамка и
+// мягкое кольцо вокруг.
 .box {
   display: flex;
   align-items: center;
@@ -26,9 +28,11 @@
   height: var(--size-control-md);
   padding: 0 var(--space-2);
   border: var(--border-width) solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  background-color: var(--color-bg-app);
-  transition: border-color var(--duration-normal) var(--easing-standard);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-sunken);
+  transition:
+    border-color var(--duration-normal) var(--easing-standard),
+    box-shadow var(--duration-normal) var(--easing-standard);
 
   @media (hover: hover) {
     &:hover:not(:focus-within) {
@@ -37,13 +41,15 @@
   }
 
   &:focus-within {
-    border-color: var(--color-focus);
+    border-color: var(--color-accent-border);
+    box-shadow: var(--shadow-focus);
   }
 }
 
 .invalid,
 .invalid:focus-within {
   border-color: var(--color-danger);
+  box-shadow: var(--shadow-danger);
 }
 
 .icon {
@@ -75,5 +81,5 @@
 
 .error {
   color: var(--color-danger);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
 }

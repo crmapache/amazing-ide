@@ -1,10 +1,12 @@
 // Поле поиска стоит на месте, пока список под ним прокручивается. Отрицательные
-// отступы закрывают внутренний отступ панели, чтобы пункты не просвечивали сверху.
+// отступы закрывают внутренний отступ панели, чтобы пункты не просвечивали сверху;
+// под полем то же стекло, что у панели, - прокрученные пункты под ним размываются.
 .search {
   position: sticky;
   z-index: var(--z-sticky);
   top: calc(var(--space-1-5) * -1);
   margin: calc(var(--space-1-5) * -1) calc(var(--space-1-5) * -1) 0;
   padding: var(--space-1-5);
-  background-color: var(--color-bg-overlay);
+  background-color: var(--color-surface-overlay);
+  backdrop-filter: var(--glass-blur);
 }

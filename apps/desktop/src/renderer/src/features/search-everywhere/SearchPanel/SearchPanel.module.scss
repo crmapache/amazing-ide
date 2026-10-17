@@ -1,0 +1,14 @@
+// Вкладки, поле и список - одной колонкой; прокручивается только список.
+.searchPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 0;
+  padding: var(--space-1);
+}
+
+.status {
+  padding: var(--space-1) var(--space-2);
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-sm);
+}

@@ -6,11 +6,12 @@
   gap: var(--space-0-5);
 }
 
+// Заголовок группы - мелкая подпись капсом, как заголовки разделов в референсе.
 .title {
-  padding: var(--space-1-5) var(--space-2) var(--space-0-5);
+  @include caps-label;
+
+  padding: var(--space-2) var(--space-2) var(--space-1);
   color: var(--color-fg-subtle);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
 }
 
 .toggle {
@@ -21,10 +22,14 @@
   align-items: center;
   gap: var(--space-1);
   width: 100%;
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-md);
-  color: var(--color-fg-muted);
+  border-radius: var(--radius-sm);
   text-align: left;
+
+  @media (hover: hover) {
+    &:hover {
+      color: var(--color-fg-muted);
+    }
+  }
 }
 
 .chevron {

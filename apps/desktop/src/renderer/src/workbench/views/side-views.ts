@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { Files, Search } from 'lucide-react'
+import { Files } from 'lucide-react'
 
 import type { SideViewId } from '../../state/layout.types'
 import type { ViewDescriptor } from './views.types'
@@ -17,16 +17,6 @@ export const SIDE_VIEWS: readonly ViewDescriptor<SideViewId>[] = [
     Component: lazy(() =>
       import('../../features/file-tree/FileTreeView/FileTreeView').then((module) => ({
         default: module.FileTreeView,
-      })),
-    ),
-  },
-  {
-    id: 'search',
-    icon: Search,
-    labelKey: 'sideViews.search',
-    Component: lazy(() =>
-      import('../../features/search/SearchView/SearchView').then((module) => ({
-        default: module.SearchView,
       })),
     ),
   },

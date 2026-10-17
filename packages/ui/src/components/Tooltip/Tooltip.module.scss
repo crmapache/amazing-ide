@@ -1,0 +1,52 @@
+@use '../../styles/mixins' as *;
+
+// Обёртка не должна менять раскладку: размер у неё ровно как у содержимого.
+.anchor {
+  display: inline-flex;
+  min-width: 0;
+}
+
+.stretch {
+  flex: 1;
+  align-self: stretch;
+}
+
+.tooltip {
+  @include glass-overlay;
+
+  // Стили браузера для popover - по центру экрана с рамкой. Сбрасываем.
+  inset: auto;
+  margin: var(--space-1-5);
+  padding: var(--space-1) var(--space-2);
+  overflow: visible;
+  max-width: var(--size-tooltip-max);
+  border-radius: var(--radius-sm);
+  color: var(--color-fg);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-snug);
+  pointer-events: none;
+  position-try-fallbacks: flip-block, flip-inline;
+
+  // Появляется с задержкой, исчезает сразу: проскочивший мимо курсор её не зажжёт.
+  transition: opacity var(--duration-fast) var(--easing-standard) var(--duration-tooltip-delay);
+
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+.top {
+  position-area: block-start;
+}
+
+.bottom {
+  position-area: block-end;
+}
+
+.start {
+  position-area: inline-start;
+}
+
+.end {
+  position-area: inline-end;
+}

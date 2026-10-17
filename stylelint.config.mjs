@@ -38,7 +38,7 @@ const TOKEN_ONLY_PROPERTIES = [
 
 export default {
   extends: ['stylelint-config-standard-scss'],
-  plugins: ['stylelint-declaration-strict-value'],
+  plugins: ['stylelint-declaration-strict-value', 'stylelint-value-no-unknown-custom-properties'],
   ignoreFiles: ['**/node_modules/**', '**/out/**', '**/dist/**'],
   rules: {
     // CSS Modules: классы читаются из JS как styles.fooBar, поэтому camelCase.
@@ -46,13 +46,42 @@ export default {
       '^[a-z][a-zA-Z0-9]*$',
       { message: 'Класс CSS Modules - camelCase (styles.fooBar)' },
     ],
+    // Ссылка на токен, которого нет в tokens.css, браузер молча превращает в «ничего»:
+    // переименовали токен - стиль пропал без единой ошибки. Ловим на линтере.
+    // Переменные из JS (--depth) пишутся с запасным значением и сюда не попадают.
+    'csstools/value-no-unknown-custom-properties': [
+      true,
+      { importFrom: ['packages/ui/src/styles/tokens.css'] },
+    ],
     'color-no-hex': true,
     'color-named': 'never',
-    'function-disallowed-list': ['rgb', 'rgba', 'hsl', 'hsla', 'hwb', 'lab', 'lch', 'oklch'],
+    // Сырые цвета - только в tokens.css. Градиенты и drop-shadow - тоже: стиль плоский
+    // (ADR 0006), и если они понадобились компоненту - это решение о стиле, а не мелочь.
+    'function-disallowed-list': [
+      ['rgb', 'rgba', 'hsl', 'hsla', 'hwb', 'lab', 'lch', 'oklch'],
+      ['linear-gradient', 'radial-gradient', 'conic-gradient'],
+      ['repeating-linear-gradient', 'repeating-radial-gradient', 'drop-shadow'],
+    ].flat(),
     'declaration-property-value-disallowed-list': {
       transition: ['/\\ball\\b/'],
       'transition-property': ['all'],
     },
+    // Объёма нет (ADR 0006): тени у текста запрещены вовсе, а box-shadow - только у
+    // всплывающего слоя и как кольцо фокуса. Градиент как фон - только подложка окна.
+    'property-disallowed-list': [
+      ['text-shadow'],
+      { message: 'Тени у текста нет: стиль плоский (ADR 0006)' },
+    ],
+    'declaration-property-value-allowed-list': [
+      {
+        'box-shadow': ['none', '/^var\\(--shadow-(overlay|focus|danger)\\)$/'],
+        'background-image': ['none', '/^var\\(--gradient-backdrop\\)$/'],
+      },
+      {
+        message:
+          'Объёма нет (ADR 0006): тень - только у всплывающего слоя и кольцо фокуса, градиент - только подложка окна',
+      },
+    ],
     'scale-unlimited/declaration-strict-value': [
       TOKEN_ONLY_PROPERTIES,
       {
@@ -73,6 +102,14 @@ export default {
     ],
   },
   overrides: [
+    {
+      // Витрина показывает тени образцами: значение образца - из имени токена
+      // (var(--sample, none)), поэтому список разрешённых теней к ней не применим.
+      files: ['apps/desktop/src/renderer/src/features/showcase/**'],
+      rules: {
+        'declaration-property-value-allowed-list': null,
+      },
+    },
     {
       // Здесь токены и объявляются: сырые значения тут на своём месте.
       files: ['packages/ui/src/styles/tokens.css'],

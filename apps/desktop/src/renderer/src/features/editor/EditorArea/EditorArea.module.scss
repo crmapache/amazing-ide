@@ -6,13 +6,23 @@
   height: 100%;
 }
 
+// Шапка с путём: папка приглушена, имя файла яркое, снизу тонкая линия.
 .fileHeader {
   @include truncate;
 
   flex-shrink: 0;
-  padding: var(--space-1-5) var(--space-3);
-  border-bottom: var(--border-width) solid var(--color-border);
-  color: var(--color-fg-muted);
+  padding: var(--space-2) var(--space-4);
+  color: var(--color-fg-subtle);
   font-family: var(--font-code);
   font-size: var(--font-size-sm);
+}
+
+.fileName {
+  color: var(--color-fg-strong);
+}
+
+.divider {
+  flex-shrink: 0;
+  margin: 0 var(--space-4);
+  border-top: var(--border-width) solid var(--color-border);
 }

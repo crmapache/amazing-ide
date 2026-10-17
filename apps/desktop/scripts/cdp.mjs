@@ -12,7 +12,17 @@ import { dirname, resolve } from 'node:path'
  * Команды:
  *   node scripts/cdp.mjs screenshot [файл.png]     снимок окна (по умолчанию .screenshots/window.png)
  *   node scripts/cdp.mjs eval "<выражение>"        результат выражения в странице, JSON
- *   node scripts/cdp.mjs click "<css-селектор>"    клик по элементу
+ *   node scripts/cdp.mjs click "<css-селектор>"    клик мышью в центр элемента
+ *   node scripts/cdp.mjs click-at <x> <y>          клик мышью в точку окна (CSS-пиксели)
+ *   node scripts/cdp.mjs hover "<css-селектор>"    навести мышь на центр элемента
+ *   node scripts/cdp.mjs type "<текст>"            напечатать текст в элемент с фокусом
+ *   node scripts/cdp.mjs key <клавиша> [meta+shift] нажать и отпустить: Enter, ArrowDown,
+ *                                                  Shift, KeyF (по физической клавише)
+ *
+ * Клик - настоящее нажатие мыши (Input.dispatchMouseEvent), а не element.click(): так
+ * срабатывает всё, что срабатывает у человека, - закрытие панели по клику мимо, hover,
+ * фокус. Невидимый элемент кликнуть нельзя, как и человеку. Но систему он обходит:
+ * нажатие по шапке, за которую таскают окно, тут дойдёт до страницы, а у человека нет.
  */
 
 const port = process.env.AMAZING_IDE_CDP_PORT ?? '5316'
@@ -73,6 +83,50 @@ const evaluate = async (send, expression) => {
   return result.value
 }
 
+const clickAt = async (send, x, y) => {
+  const point = { x, y, button: 'left', clickCount: 1 }
+
+  await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y })
+  await send('Input.dispatchMouseEvent', { ...point, type: 'mousePressed', buttons: 1 })
+  await send('Input.dispatchMouseEvent', { ...point, type: 'mouseReleased', buttons: 0 })
+}
+
+/** Клавиши, которым нужен код Windows: без него браузер не делает действие по умолчанию. */
+const KEY_CODES = {
+  Enter: 13,
+  Tab: 9,
+  Escape: 27,
+  ArrowLeft: 37,
+  ArrowUp: 38,
+  ArrowRight: 39,
+  ArrowDown: 40,
+  Shift: 16,
+}
+
+const MODIFIER_BITS = { alt: 1, ctrl: 2, meta: 4, shift: 8 }
+
+/** Нажать и отпустить клавишу. KeyF - буква по физической клавише, как event.code. */
+const pressKey = async (send, name, modifierList = '') => {
+  const modifiers = modifierList
+    .split('+')
+    .filter(Boolean)
+    .reduce((bits, modifier) => bits | (MODIFIER_BITS[modifier] ?? 0), 0)
+  const isLetter = /^Key[A-Z]$/.test(name)
+  const key = isLetter ? name.slice(3).toLowerCase() : name
+  const code = name === 'Shift' ? 'ShiftLeft' : name
+  const virtual = isLetter ? name.charCodeAt(3) : KEY_CODES[name]
+  const event = {
+    key,
+    code,
+    modifiers,
+    windowsVirtualKeyCode: virtual,
+    nativeVirtualKeyCode: virtual,
+  }
+
+  await send('Input.dispatchKeyEvent', { ...event, type: 'rawKeyDown' })
+  await send('Input.dispatchKeyEvent', { ...event, type: 'keyUp' })
+}
+
 const { send, close } = await connect()
 
 try {
@@ -85,17 +139,43 @@ try {
     console.log(file)
   } else if (command === 'eval') {
     console.log(JSON.stringify(await evaluate(send, argument), null, 2))
-  } else if (command === 'click') {
+  } else if (command === 'click' || command === 'hover') {
     const selector = JSON.stringify(argument)
-    const clicked = await evaluate(
+    const center = await evaluate(
       send,
-      `(() => { const el = document.querySelector(${selector}); el?.click(); return Boolean(el) })()`,
+      `(() => {
+        const el = document.querySelector(${selector})
+        if (!el) return 'missing'
+        el.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+        const { x, y, width, height } = el.getBoundingClientRect()
+        return width && height ? { x: x + width / 2, y: y + height / 2 } : 'hidden'
+      })()`,
     )
 
-    if (!clicked) throw new Error(`Не нашёл элемент ${argument}`)
+    if (center === 'missing') throw new Error(`Не нашёл элемент ${argument}`)
+    if (center === 'hidden') throw new Error(`Элемент ${argument} не виден`)
+    if (command === 'hover') {
+      await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: center.x, y: center.y })
+    } else {
+      await clickAt(send, center.x, center.y)
+    }
+    console.log('ok')
+  } else if (command === 'type') {
+    await send('Input.insertText', { text: argument ?? '' })
+    console.log('ok')
+  } else if (command === 'key') {
+    await pressKey(send, argument ?? '', process.argv[4])
+    console.log('ok')
+  } else if (command === 'click-at') {
+    const [x, y] = process.argv.slice(3).map(Number)
+
+    if (!Number.isFinite(x) || !Number.isFinite(y)) throw new Error('Нужны две координаты: x y')
+    await clickAt(send, x, y)
     console.log('ok')
   } else {
-    console.error('Команды: screenshot [файл] | eval "<выражение>" | click "<селектор>"')
+    console.error(
+      'Команды: screenshot | eval | click | click-at | hover | type | key - описание в начале файла',
+    )
     process.exitCode = 1
   }
 } finally {

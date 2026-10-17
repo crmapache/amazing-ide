@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@amazing-ide/ui/Button'
 import { EmptyState } from '@amazing-ide/ui/EmptyState'
 
+import { splitPath } from '../../../lib/path.utils'
 import { useSelectedFile } from '../../../state/selection.store'
 import { useActiveProject, useWorkspaceActions } from '../../../state/workspace.queries'
 import styles from './EditorArea.module.scss'
@@ -43,10 +44,16 @@ export const EditorArea = () => {
     )
   }
 
+  const { folder, name } = splitPath(selectedFile)
+
   return (
     <div className={styles.editorArea}>
-      <div className={styles.fileHeader}>{selectedFile}</div>
-      <EmptyState icon={FileCode} title={selectedFile} description={t('editor.stub')} />
+      <div className={styles.fileHeader}>
+        {folder && `${folder}/`}
+        <span className={styles.fileName}>{name}</span>
+      </div>
+      <div className={styles.divider} />
+      <EmptyState icon={FileCode} title={name} description={t('editor.stub')} />
     </div>
   )
 }

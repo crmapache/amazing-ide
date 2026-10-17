@@ -1,0 +1,130 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Образцы берут токен из своей переменной --sample (её ставит tokenSample), с
+// запасным значением: без переменной образец просто пустой.
+
+.foundationsView {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+}
+
+.swatches {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.swatch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.chip {
+  flex-shrink: 0;
+  width: var(--size-control-lg);
+  height: var(--size-control-md);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--sample, transparent);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  @include truncate;
+
+  color: var(--color-fg);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+}
+
+.value {
+  @include truncate;
+
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+}
+
+.scale {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.scaleItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.space {
+  width: var(--sample, 0);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  background-color: var(--color-accent);
+}
+
+.radius,
+.shadow {
+  width: var(--size-empty-icon);
+  height: var(--size-empty-icon);
+  border: var(--border-width) solid var(--color-border-strong);
+  background-color: var(--color-surface-raised);
+}
+
+.radius {
+  border-radius: var(--sample, 0);
+}
+
+.shadow {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sample, none);
+}
+
+.typeRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.typeName {
+  flex-shrink: 0;
+  width: var(--size-popover-md);
+}
+
+.typeSample {
+  @include truncate;
+
+  color: var(--color-fg-strong);
+  font-size: var(--sample, inherit);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-tight);
+}
+
+.weightSample {
+  @include truncate;
+
+  color: var(--color-fg-strong);
+  font-size: var(--font-size-xl);
+  font-weight: var(--sample, inherit);
+}
+
+.codeSample {
+  color: var(--color-fg-accent);
+  font-family: var(--font-code);
+  font-size: var(--font-size-md);
+  user-select: text;
+}

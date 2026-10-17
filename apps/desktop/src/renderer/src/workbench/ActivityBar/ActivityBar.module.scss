@@ -1,18 +1,15 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Полоса иконок - узкий лист рядом с листом панели. Сверху иконку отделяет тот же
+// зазор, что и по бокам. Активный вид отмечает сама кнопка - залитой плашкой.
 .activityBar {
+  @include window-sheet;
+
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   align-items: center;
   gap: var(--space-1);
   width: var(--size-activity-bar);
-  padding: var(--space-2) 0;
-  background-color: var(--color-bg-chrome);
-}
-
-.start {
-  border-right: var(--border-width) solid var(--color-border);
-}
-
-.end {
-  border-left: var(--border-width) solid var(--color-border);
+  padding: var(--space-1-5) 0;
 }

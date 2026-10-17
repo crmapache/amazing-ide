@@ -1,17 +1,33 @@
 @use '@amazing-ide/ui/mixins' as *;
 
+// Сама шапка окно не таскает - только пустые места в ней (см. window-drag-region).
 .titleBar {
-  @include window-drag-region;
+  @include chrome-surface;
 
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
   height: var(--size-title-bar);
-  padding: 0 var(--space-2) 0 var(--size-traffic-lights);
-  border-bottom: var(--border-width) solid var(--color-border);
-  background-color: var(--color-bg-chrome);
+  padding-right: var(--space-2);
+}
+
+// Место под «светофор» macOS: кнопки рисует система, а за пустоту вокруг них окно
+// таскают, как за обычный заголовок.
+.trafficLights {
+  @include window-drag-region;
+
+  flex-shrink: 0;
+  align-self: stretch;
+  width: var(--size-traffic-lights);
+}
+
+// Пустое место между группами кнопок - главная ручка окна.
+.dragSpace {
+  @include window-drag-region;
+
+  flex: 1;
+  align-self: stretch;
+  min-width: var(--space-4);
 }
 
 .start,

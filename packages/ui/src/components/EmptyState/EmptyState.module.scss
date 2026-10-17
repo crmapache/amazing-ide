@@ -3,24 +3,36 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-1-5);
+  gap: var(--space-1);
   height: 100%;
   padding: var(--space-6);
   text-align: center;
 }
 
-.icon {
-  margin-bottom: var(--space-1);
-  color: var(--color-fg-subtle);
+// Иконка на серой плитке: главный якорь пустой зоны, оранжевая - единственное
+// цветное пятно на экране.
+.tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-empty-icon);
+  height: var(--size-empty-icon);
+  margin-bottom: var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-raised);
+  color: var(--color-fg-accent);
 }
 
 .title {
-  color: var(--color-fg-muted);
+  color: var(--color-fg-strong);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-snug);
 }
 
 .description {
-  max-width: 280px;
+  max-width: var(--size-text-narrow);
   color: var(--color-fg-subtle);
   font-size: var(--font-size-sm);
 }

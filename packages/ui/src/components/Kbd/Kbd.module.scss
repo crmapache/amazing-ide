@@ -1,0 +1,23 @@
+.kbd {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: var(--space-0-5);
+}
+
+// Клавиша - маленькая плоская серая плашка.
+.key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--size-control-xs);
+  height: var(--size-control-xs);
+  padding: 0 var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-xs);
+  background-color: var(--color-surface-raised-hover);
+  color: var(--color-fg-muted);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+}

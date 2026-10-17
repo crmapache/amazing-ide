@@ -2,19 +2,22 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 import { LAYOUT_STORAGE_KEY, PANEL_WIDTH_LIMITS, DEFAULT_PANEL_WIDTH } from './layout.constants'
-import type { PanelSide, PanelState, SideViewId, ProviderViewId } from './layout.types'
+import type {
+  PanelSide,
+  PanelState,
+  SideViewId,
+  LayoutPanels,
+  ProviderViewId,
+} from './layout.types'
+import { restoreLayout } from './layout.utils'
 
-type LayoutStore = {
-  side: PanelState<SideViewId>
-  provider: PanelState<ProviderViewId>
+type LayoutStore = LayoutPanels & {
   /**
    * Клик по иконке вида. Другой вид - показать его (и открыть панель). Тот же,
    * что уже показан, - свернуть или развернуть панель.
    */
   selectSideView: (viewId: SideViewId) => void
   selectProviderView: (viewId: ProviderViewId) => void
-  /** Показать вид левой панели, открыв её. В отличие от select, никогда не сворачивает. */
-  showSideView: (viewId: SideViewId) => void
   /** Сдвинуть ширину панели на delta пикселей с учётом пределов. */
   resizePanel: (side: PanelSide, delta: number) => void
 }
@@ -40,8 +43,6 @@ export const useLayoutStore = create<LayoutStore>()(
       selectSideView: (viewId) => set((state) => ({ side: select(state.side, viewId) })),
       selectProviderView: (viewId) =>
         set((state) => ({ provider: select(state.provider, viewId) })),
-      showSideView: (viewId) =>
-        set((state) => ({ side: { ...state.side, activeViewId: viewId, isOpen: true } })),
       resizePanel: (side, delta) =>
         set((state) => ({
           [side]: { ...state[side], width: clampWidth(side, state[side].width + delta) },
@@ -50,6 +51,7 @@ export const useLayoutStore = create<LayoutStore>()(
     {
       name: LAYOUT_STORAGE_KEY,
       partialize: ({ side, provider }) => ({ side, provider }),
+      merge: (persisted, current) => ({ ...current, ...restoreLayout(persisted, current) }),
     },
   ),
 )

@@ -25,6 +25,7 @@ export const FileTreeView = () => {
   return (
     <div className={styles.fileTreeView}>
       <div className={styles.header}>{project.name}</div>
+      <div className={styles.divider} />
       <div className={styles.tree}>
         <DirectoryChildren key={project.id} projectId={project.id} relativePath="" depth={0} />
       </div>

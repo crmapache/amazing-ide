@@ -8,6 +8,7 @@ import type {
   GitCloneResult,
   GitActionResult,
 } from '../git'
+import type { ProjectFileList, TextSearchResult } from '../search'
 import type { UpdateStatus } from '../updates'
 import type { WorkspaceState } from '../workspace'
 
@@ -48,6 +49,14 @@ export type InvokeContract = {
     request: ProjectRequest & { relativePath: string }
     response: DirectoryEntry[]
   }
+
+  /** Все файлы проекта для поиска по имени (Search Everywhere). */
+  'search:listFiles': { request: ProjectRequest; response: ProjectFileList }
+  /**
+   * Строки проекта с текстом, без учёта регистра. Новый поиск отменяет предыдущий
+   * незаконченный: ответ отменённого - то, что он успел найти.
+   */
+  'search:findText': { request: ProjectRequest & { query: string }; response: TextSearchResult }
 
   /** Ветка проекта. null - папка не репозиторий git. */
   'git:getHead': { request: ProjectRequest; response: GitHead | null }
@@ -103,6 +112,8 @@ export const INVOKE_CHANNELS = Object.keys({
   'workspace:closeProject': true,
   'workspace:activateProject': true,
   'fs:readDirectory': true,
+  'search:listFiles': true,
+  'search:findText': true,
   'git:getHead': true,
   'git:listBranches': true,
   'git:switchBranch': true,
