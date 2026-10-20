@@ -1,6 +1,6 @@
-import { FileText } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { FileIcon } from '@amazing-ide/ui/FileIcon'
 import { Menu } from '@amazing-ide/ui/Menu'
 import { MenuItem } from '@amazing-ide/ui/MenuItem'
 import { MenuSection } from '@amazing-ide/ui/MenuSection'
@@ -20,7 +20,7 @@ export const PathChoice = ({ path, candidates, onChoose }: PathChoiceProps) => {
         {candidates.map((candidate) => (
           <MenuItem
             key={candidate}
-            icon={FileText}
+            leading={<FileIcon path={candidate} kind="file" />}
             label={candidate}
             onSelect={() => onChoose(candidate)}
           />

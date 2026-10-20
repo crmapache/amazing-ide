@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
+import { FileIcon } from '@amazing-ide/ui/FileIcon'
 import { ListBox } from '@amazing-ide/ui/ListBox'
 import { ListBoxOption } from '@amazing-ide/ui/ListBoxOption'
 
@@ -10,8 +11,8 @@ import { suggestOptionId } from '../Composer.utils'
 
 /**
  * Подсказка над полем (как в ACC): команды с пояснением и группой справа (panel,
- * built-in), значения аргумента, файлы с папкой серым. Фокус остаётся в поле, стрелки
- * двигают выделение, мышь только подсвечивает.
+ * built-in), значения аргумента, файлы и папки - иконкой типа и с папкой серым. Фокус
+ * остаётся в поле, стрелки двигают выделение, мышь только подсвечивает.
  */
 export const SuggestList = ({
   id,
@@ -28,24 +29,33 @@ export const SuggestList = ({
       <ListBox
         id={id}
         label={isFiles ? t('claudeCode.mention.label') : t('claudeCode.slash.label')}>
-        {rows.map((row, index) => (
-          <ListBoxOption
-            key={row.id}
-            id={suggestOptionId(id, index)}
-            label={row.label}
-            highlight={row.highlight}
-            description={row.description}
-            hint={
-              row.group && row.group !== 'project'
-                ? t(`claudeCode.slash.groups.${row.group}`)
-                : undefined
-            }
-            icon={SUGGEST_ICONS[row.kind]}
-            active={index === highlight}
-            onSelect={() => onPick(row)}
-            onActivate={() => onHover(index)}
-          />
-        ))}
+        {rows.map((row, index) => {
+          const { kind } = row
+
+          return (
+            <ListBoxOption
+              key={row.id}
+              id={suggestOptionId(id, index)}
+              label={row.label}
+              highlight={row.highlight}
+              description={row.description}
+              hint={
+                row.group && row.group !== 'project'
+                  ? t(`claudeCode.slash.groups.${row.group}`)
+                  : undefined
+              }
+              icon={kind === 'command' || kind === 'value' ? SUGGEST_ICONS[kind] : undefined}
+              leading={
+                kind === 'file' || kind === 'folder' ? (
+                  <FileIcon path={row.id} kind={kind} />
+                ) : undefined
+              }
+              active={index === highlight}
+              onSelect={() => onPick(row)}
+              onActivate={() => onHover(index)}
+            />
+          )
+        })}
       </ListBox>
     </div>
   )

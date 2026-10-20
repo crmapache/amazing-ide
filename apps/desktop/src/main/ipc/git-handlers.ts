@@ -9,7 +9,8 @@ import type { InvokeHandlers } from './handle'
 import { assertOneOf, assertString } from './validate'
 import { projectRootOf } from './workspace-handlers'
 
-type GitChannels = Extract<keyof InvokeHandlers, `git:${string}`>
+/** Статус git - не здесь: его держит сервис слежения (project-sync-handlers). */
+type GitChannels = Exclude<Extract<keyof InvokeHandlers, `git:${string}`>, 'git:getStatus'>
 
 const BRANCH_KINDS: readonly GitBranchKind[] = ['local', 'remote']
 

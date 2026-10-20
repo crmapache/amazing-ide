@@ -21,6 +21,8 @@ export const QUERY_KEYS = {
   projectFiles: (projectId: string) => ['search', 'files', projectId],
   textSearch: (projectId: string, query: string) => ['search', 'text', projectId, query],
   gitHead: (projectId: string) => ['git', 'head', projectId],
+  /** Статусы файлов по git - цвета имён в дереве; свежие присылает главный процесс. */
+  gitStatus: (projectId: string) => ['git', 'status', projectId],
   gitBranches: (projectId: string) => ['git', 'branches', projectId],
   gitPushInfo: (projectId: string) => ['git', 'push-info', projectId],
   /** PR ветки: другая ветка - другой ключ, ответ gh для старой не подставится. */

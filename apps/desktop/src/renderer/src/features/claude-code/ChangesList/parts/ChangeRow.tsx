@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import { Redo2, Undo2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { FileIcon } from '@amazing-ide/ui/FileIcon'
 import { IconButton } from '@amazing-ide/ui/IconButton'
 import { Tooltip } from '@amazing-ide/ui/Tooltip'
 
@@ -15,9 +16,9 @@ import { splitPath } from '../../../../lib/path.utils'
 import { useOpenFileAction } from '../../../../state/open-file.context'
 
 /**
- * Строка файла хода: папка (теряет начало, а не имя), имя, слова о последнем нажатии,
- * строки плюсом и минусом (у созданного - только плюс, посчитать нечем - «±»). Вся
- * строка открывает файл по полному пути из вызова; справа - откат, та же стрелка
+ * Строка файла хода: иконка типа, папка (теряет начало, а не имя), имя, слова о
+ * последнем нажатии, строки плюсом и минусом (у созданного - только плюс, посчитать
+ * нечем - «±»). Вся строка открывает файл по полному пути из вызова; справа - откат, та же стрелка
  * зеркально возвращает. Откаченная - тише, цифры зачёркнуты.
  */
 export const ChangeRow = ({ change, slot, actionable, press, onToggle }: ChangeRowProps) => {
@@ -39,6 +40,9 @@ export const ChangeRow = ({ change, slot, actionable, press, onToggle }: ChangeR
 
   const content = (
     <>
+      <span className={styles.icon}>
+        <FileIcon path={shown} kind="file" size="sm" />
+      </span>
       <span className={styles.folder}>
         <span className={styles.folderText}>{folder && `${folder}/`}</span>
       </span>

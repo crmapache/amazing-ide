@@ -1,15 +1,12 @@
 import type { LucideIcon } from 'lucide-react'
-import { File, Folder, SquareSlash, CornerDownRight } from 'lucide-react'
+import { SquareSlash, CornerDownRight } from 'lucide-react'
 
 import type { FitStep } from '../composer-fit.utils'
-import type { SuggestRow } from '../suggestions.types'
 
-/** Значок строки подсказки по её виду. */
-export const SUGGEST_ICONS: Record<SuggestRow['kind'], LucideIcon> = {
+/** Значок строки подсказки «/» по её виду. Файлы и папки «@» - иконкой типа (FileIcon). */
+export const SUGGEST_ICONS: Record<'command' | 'value', LucideIcon> = {
   command: SquareSlash,
   value: CornerDownRight,
-  file: File,
-  folder: Folder,
 }
 
 /** Отрезки шкалы контекста: пять по 20% - читается, сколько осталось, без цифры. */

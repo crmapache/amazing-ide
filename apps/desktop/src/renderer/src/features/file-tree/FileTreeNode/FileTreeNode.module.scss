@@ -42,29 +42,37 @@
   visibility: hidden;
 }
 
-.folderIcon {
-  flex-shrink: 0;
-  color: var(--color-fg-muted);
-}
-
-.fileIcon {
-  flex-shrink: 0;
-  color: var(--color-fg-subtle);
-
-  .selected & {
-    color: var(--color-fg-strong);
-  }
-}
-
 .name {
   @include truncate;
+}
+
+// Статус git - цветом имени, как в WebStorm; иконка остаётся цветом типа файла.
+// Выбранная строка цвет статуса не теряет: заливка выбора с ним не спорит.
+.modified {
+  color: var(--color-vcs-modified);
+}
+
+.added {
+  color: var(--color-vcs-added);
+}
+
+.untracked {
+  color: var(--color-vcs-untracked);
+}
+
+.ignored {
+  color: var(--color-vcs-ignored);
+}
+
+.conflict {
+  color: var(--color-vcs-conflict);
 }
 
 .note {
   height: var(--size-tree-row);
 
   // Текст встаёт под имя файла: отступ строки плюс шеврон и иконка.
-  @include indent(var(--space-8));
+  @include indent(var(--space-10));
 
   color: var(--color-fg-disabled);
   font-size: var(--font-size-sm);

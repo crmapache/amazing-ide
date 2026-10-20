@@ -1,8 +1,9 @@
 import type { MouseEvent } from 'react'
 import clsx from 'clsx'
-import { FileX, FileText } from 'lucide-react'
+import { FileX } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { FileIcon } from '@amazing-ide/ui/FileIcon'
 import { Menu } from '@amazing-ide/ui/Menu'
 import { MenuItem } from '@amazing-ide/ui/MenuItem'
 import { Popover } from '@amazing-ide/ui/Popover'
@@ -21,8 +22,9 @@ const keepCaret = (event: MouseEvent) => event.preventDefault()
 /**
  * Открытый файл в ряду под полем (как в ACC): он уходит с сообщением заметкой для
  * модели. Нажатие - меню из трёх пунктов: с каждым сообщением, не с этим (или только с
- * этим, когда отправка выключена) и никогда. Выключенная настройка - перечёркнутый
- * значок без имени: дорога обратно там же, где выключили.
+ * этим, когда отправка выключена) и никогда. Уходит - иконка типа файла; не уходит -
+ * перечёркнутый листок, а при выключенной настройке ещё и без имени: дорога обратно там
+ * же, где выключили.
  */
 export const EditorChip = ({ conversationKey, editor, dropped }: EditorChipProps) => {
   const { t } = useTranslation()
@@ -50,7 +52,7 @@ export const EditorChip = ({ conversationKey, editor, dropped }: EditorChipProps
           aria-label={hint}
           onMouseDown={keepCaret}>
           {goes ? (
-            <FileText size={ROW_ICON_SIZE} strokeWidth={ROW_ICON_STROKE} aria-hidden />
+            <FileIcon path={editor.path} kind="file" size="sm" />
           ) : (
             <FileX size={ROW_ICON_SIZE} strokeWidth={ROW_ICON_STROKE} aria-hidden />
           )}

@@ -3,6 +3,7 @@ import type {
   RingSample,
   BadgeSample,
   AvatarSample,
+  FileIconSample,
   ProgressSample,
 } from './ComponentsView.types'
 
@@ -14,6 +15,44 @@ export const AVATAR_SAMPLES: readonly AvatarSample[] = [
   { tone: 3, initials: 'CC' },
   { tone: 4, initials: 'LG' },
   { tone: 5, initials: 'NS' },
+]
+
+// Имена файлов и папок - данные, а не текст интерфейса. Подобраны так, чтобы были видны
+// все пути выбора иконки: точное имя, длинное расширение, папка над файлом, общая иконка.
+export const FILE_ICON_SAMPLES: readonly FileIconSample[] = [
+  { path: 'src', kind: 'folder' },
+  { path: 'src', kind: 'folder', expanded: true },
+  { path: '.github', kind: 'folder' },
+  { path: 'node_modules', kind: 'folder' },
+  { path: 'misc', kind: 'folder' },
+  { path: 'misc', kind: 'folder', expanded: true },
+  { path: 'App.tsx', kind: 'file' },
+  { path: 'index.ts', kind: 'file' },
+  { path: 'index.test.ts', kind: 'file' },
+  { path: 'main.mjs', kind: 'file' },
+  { path: 'package.json', kind: 'file' },
+  { path: 'tsconfig.json', kind: 'file' },
+  { path: 'styles.module.scss', kind: 'file' },
+  { path: 'README.md', kind: 'file' },
+  { path: 'notes.md', kind: 'file' },
+  { path: '.github/workflows/ci.yml', kind: 'file' },
+  { path: 'pnpm-lock.yaml', kind: 'file' },
+  { path: '.gitignore', kind: 'file' },
+  { path: 'Dockerfile', kind: 'file' },
+  { path: 'main.go', kind: 'file' },
+  { path: 'app.py', kind: 'file' },
+  { path: 'logo.svg', kind: 'file' },
+  { path: 'signing.p12', kind: 'file' },
+  { path: 'notes.zzz', kind: 'file' },
+]
+
+// Мелкие - как в чипах и строках текста ленты Claude Code.
+export const FILE_ICON_SMALL_SAMPLES: readonly string[] = [
+  'src/App.tsx',
+  'package.json',
+  'README.md',
+  'styles.module.scss',
+  'Dockerfile',
 ]
 
 export const BADGE_SAMPLES: readonly BadgeSample[] = [

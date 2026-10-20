@@ -4,13 +4,15 @@ import type { GitBranchKind, GitActionResult } from '@shared/git'
 import { useQuery, useMutation, useIsMutating, useQueryClient } from '@tanstack/react-query'
 
 import { invoke } from '../../lib/ipc'
+import { useIpcEvent } from '../../lib/ipc.hooks'
 import { QUERY_KEYS } from '../../state/query-keys'
 import { useGitNoticeStore } from './git-notice.store'
 import { PULL_REQUEST_STALE_MS } from './git.constants'
 
 /**
- * Ветка проекта. Перечитывается при возврате в окно: ветку часто переключают в
- * терминале, и шапка не должна врать. Слежение за .git придёт с вотчером диска.
+ * Ветка проекта. Ветку часто переключают в терминале, и шапка не должна врать:
+ * перечитывается, когда главный процесс видит изменения в .git (useGitHeadSync), и
+ * на всякий случай при возврате в окно.
  */
 export const useGitHead = (projectId: string | undefined) =>
   useQuery({
@@ -20,6 +22,15 @@ export const useGitHead = (projectId: string | undefined) =>
     staleTime: Infinity,
     refetchOnWindowFocus: 'always',
   })
+
+/** Поменялся .git (переключили ветку, сделали коммит) - перечитать ветку проекта. */
+export const useGitHeadSync = () => {
+  const queryClient = useQueryClient()
+
+  useIpcEvent('fs:changed', ({ projectId, git }) => {
+    if (git) void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.gitHead(projectId) })
+  })
+}
 
 /**
  * PR ветки через gh. Ключ - с веткой: переключили ветку - спрашивается её PR, а не
@@ -63,8 +74,9 @@ const useGitAction = <Input>(
 ) => useMutation({ ...(mutationKey && { mutationKey }), mutationFn: run, onSettled: refresh })
 
 /**
- * Действия git над проектом. После любого - перечитать ветку, ветки и сведения для
- * push, а после тех, что меняют файлы на диске, - и дерево файлов. Итог
+ * Действия git над проектом. После любого - перечитать ветку, ветки, сведения для
+ * push, дерево файлов и статусы git. Слежение за диском сказало бы о том же, но
+ * чуть позже: итог действия человек ждёт сразу. Итог
  * возвращается тому, кто звал: диалоги показывают ошибку у себя.
  */
 export const useGitActions = (projectId: string) => {
@@ -78,6 +90,7 @@ export const useGitActions = (projectId: string) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.gitBranches(projectId) }),
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.gitPushInfo(projectId) }),
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.projectDirectories(projectId) }),
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.gitStatus(projectId) }),
     ])
 
   const switchBranch = useGitAction(

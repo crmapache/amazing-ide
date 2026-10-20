@@ -1,20 +1,33 @@
 import { useState } from 'react'
+import clsx from 'clsx'
 import { History, GitCompare, LayoutDashboard } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Avatar } from '@amazing-ide/ui/Avatar'
 import { Badge } from '@amazing-ide/ui/Badge'
 import { Button } from '@amazing-ide/ui/Button'
+import { FileIcon } from '@amazing-ide/ui/FileIcon'
 import { Kbd } from '@amazing-ide/ui/Kbd'
 import { Tabs } from '@amazing-ide/ui/Tabs'
 
-import { KBD_SAMPLES, BADGE_SAMPLES, AVATAR_SAMPLES } from '../ComponentsView.constants'
+import {
+  KBD_SAMPLES,
+  BADGE_SAMPLES,
+  AVATAR_SAMPLES,
+  FILE_ICON_SAMPLES,
+  FILE_ICON_SMALL_SAMPLES,
+} from '../ComponentsView.constants'
+import styles from '../ComponentsView.module.scss'
 import type { SampleTabId } from '../ComponentsView.types'
 import { ShowcaseSection } from '../../ShowcaseSection/ShowcaseSection'
 import { Specimen } from '../../Specimen/Specimen'
 import { useGrowthFlash } from '../../../../lib/growth-flash.hooks'
+import { splitPath } from '../../../../lib/path.utils'
 
-/** Раздел «Индикаторы»: значки проектов, метки состояния, сочетания клавиш, вкладки. */
+/**
+ * Раздел «Индикаторы»: значки проектов, иконки файлов, метки состояния, сочетания
+ * клавиш, вкладки.
+ */
 export const IndicatorsSection = () => {
   const { t } = useTranslation('showcase')
   const [tab, setTab] = useState<SampleTabId>('overview')
@@ -47,6 +60,24 @@ export const IndicatorsSection = () => {
       <Specimen label={t('specimens.avatars')}>
         {AVATAR_SAMPLES.map(({ tone, initials }) => (
           <Avatar key={tone} tone={tone} initials={initials} />
+        ))}
+      </Specimen>
+
+      <Specimen wide label={t('specimens.fileIcons')}>
+        {FILE_ICON_SAMPLES.map(({ path, kind, expanded }) => (
+          <span key={`${kind}:${path}:${String(expanded)}`} className={styles.fileIconSample}>
+            <FileIcon path={path} kind={kind} expanded={expanded} />
+            {splitPath(path).name}
+          </span>
+        ))}
+      </Specimen>
+
+      <Specimen wide label={t('specimens.fileIconsSmall')}>
+        {FILE_ICON_SMALL_SAMPLES.map((path) => (
+          <span key={path} className={clsx(styles.fileIconSample, styles.small)}>
+            <FileIcon path={path} kind="file" size="sm" />
+            {splitPath(path).name}
+          </span>
         ))}
       </Specimen>
 

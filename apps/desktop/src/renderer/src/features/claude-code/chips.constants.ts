@@ -1,7 +1,11 @@
 import type { LucideIcon } from 'lucide-react'
-import { File, Image, Quote, Folder, FileCode, SquareSlash, ClipboardList } from 'lucide-react'
+import { Image, Quote, SquareSlash, ClipboardList } from 'lucide-react'
 
 import type { ChipKind } from '@shared/claude-draft'
+
+import type { FileIconKind } from '@amazing-ide/ui/FileIcon.types'
+
+import type { PathChipKind } from './draft.types'
 
 /** Длиннее имя на чипе режется посередине, расширение остаётся видно. */
 export const MAX_LABEL_LENGTH = 28
@@ -27,13 +31,20 @@ export const QUOTE_TITLE_CHARS = 400
  */
 export const PASTE_ALWAYS_FOLDS_CHARS = 100_000
 
-/** Значок вида чипа - тот же язык, что у подсказки «@» и дерева файлов. */
-export const CHIP_ICONS: Record<ChipKind, LucideIcon> = {
-  file: File,
+/**
+ * Чипы с путём - иконкой типа файла (FileIcon), как в дереве и подсказке «@»: файл,
+ * кусок файла из редактора, папка.
+ */
+export const CHIP_PATH_KINDS: Record<PathChipKind, FileIconKind> = {
+  file: 'file',
+  ref: 'file',
+  dir: 'folder',
+}
+
+/** Значок чипа без пути: картинка, команда, цитата, вставка. */
+export const CHIP_ICONS: Record<Exclude<ChipKind, PathChipKind>, LucideIcon> = {
   img: Image,
-  dir: Folder,
   cmd: SquareSlash,
-  ref: FileCode,
   quote: Quote,
   paste: ClipboardList,
 }

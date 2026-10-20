@@ -111,6 +111,32 @@ export const COLOR_GROUPS: readonly ColorGroup[] = [
       '--color-syntax-link',
     ],
   },
+  {
+    titleKey: 'groups.fileIcons',
+    tokens: [
+      '--color-file-icon-neutral',
+      '--color-file-icon-muted',
+      '--color-file-icon-blue',
+      '--color-file-icon-cyan',
+      '--color-file-icon-teal',
+      '--color-file-icon-green',
+      '--color-file-icon-yellow',
+      '--color-file-icon-orange',
+      '--color-file-icon-red',
+      '--color-file-icon-violet',
+      '--color-file-icon-pink',
+    ],
+  },
+  {
+    titleKey: 'groups.vcs',
+    tokens: [
+      '--color-vcs-modified',
+      '--color-vcs-added',
+      '--color-vcs-untracked',
+      '--color-vcs-ignored',
+      '--color-vcs-conflict',
+    ],
+  },
 ]
 
 export const FONT_SIZES = [

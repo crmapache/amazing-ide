@@ -4,18 +4,18 @@ import { useTranslation } from 'react-i18next'
 
 import { Tooltip } from '@amazing-ide/ui/Tooltip'
 
-import { CHIP_ICONS } from '../chips.constants'
 import { chipLabel, chipTitle } from '../chips.utils'
 import { PictureHover } from '../PictureHover/PictureHover'
 import styles from './DraftChipView.module.scss'
 import type { DraftChipViewProps } from './DraftChipView.types'
+import { ChipIcon } from './parts/ChipIcon'
 
 /** Нажатие по кнопке чипа не уводит каретку из поля. */
 const keepCaret = (event: MouseEvent) => event.preventDefault()
 
 /**
- * Вложение сообщения плашкой: иконка вида, короткая подпись (имя файла, «Image #3»,
- * начало цитаты) и подсказка - только если подпись что-то скрыла. Одна на поле ввода,
+ * Вложение сообщения плашкой: значок (у файла и папки - иконка типа), короткая подпись
+ * (имя файла, «Image #3», начало цитаты) и подсказка - только если подпись что-то скрыла. Одна на поле ввода,
  * очередь и ленту: чип для человека один, где бы его ни нарисовали. Цвет - по смыслу:
  * ссылки на файлы - справочным тоном, команда - акцентом, текст - нейтральный. У чипа с
  * картинкой подсказки нет: под курсором - сама картинка (как в ACC).
@@ -28,12 +28,11 @@ export const DraftChipView = ({
   onExpand,
 }: DraftChipViewProps) => {
   const { t } = useTranslation()
-  const Icon = CHIP_ICONS[chip.kind]
   const title = chipTitle(chip)
   const label = chipLabel(chip)
   const body = (
     <span className={styles.body}>
-      <Icon className={styles.icon} aria-hidden />
+      <ChipIcon chip={chip} />
       <span className={styles.label}>{label}</span>
     </span>
   )

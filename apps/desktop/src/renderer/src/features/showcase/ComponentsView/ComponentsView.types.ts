@@ -2,6 +2,7 @@ import type { ParseKeys } from 'i18next'
 
 import type { AvatarTone } from '@amazing-ide/ui/Avatar.types'
 import type { BadgeTone } from '@amazing-ide/ui/Badge.types'
+import type { FileIconKind } from '@amazing-ide/ui/FileIcon.types'
 import type { ProgressBarTone } from '@amazing-ide/ui/ProgressBar.types'
 import type { RingMeterTone } from '@amazing-ide/ui/RingMeter.types'
 
@@ -12,6 +13,8 @@ export type AvatarSample = { tone: AvatarTone; initials: string }
 export type BadgeSample = { tone: BadgeTone; labelKey: ParseKeys<'showcase'> }
 
 export type FileSample = { name: string; folder: string }
+
+export type FileIconSample = { path: string; kind: FileIconKind; expanded?: boolean }
 
 export type ProgressSample = { value: number; tone: ProgressBarTone }
 

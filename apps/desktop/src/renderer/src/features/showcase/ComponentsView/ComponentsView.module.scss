@@ -75,3 +75,19 @@
   border: var(--border-width) dashed var(--color-border);
   border-radius: var(--radius-md);
 }
+
+// Иконка файла с именем - как строка дерева, только без отступов строки.
+.fileIconSample {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  margin-right: var(--space-3);
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-md);
+}
+
+.small {
+  gap: var(--space-1);
+  font-family: var(--font-code);
+  font-size: var(--font-size-sm);
+}

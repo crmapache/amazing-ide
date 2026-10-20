@@ -1,6 +1,7 @@
 import { shell } from 'electron'
 
 import type { ClaudeService } from '../claude/claude-service'
+import type { GitStatusService } from '../git/git-status-service'
 import type { SearchService } from '../search/search-service'
 import type { UpdateService } from '../updates/update-service'
 import { RELEASE_PAGE_URL } from '../updates/update.constants'
@@ -15,6 +16,7 @@ import { createComposerHandlers } from './composer-handlers'
 import { createFsHandlers } from './fs-handlers'
 import { createGitHandlers } from './git-handlers'
 import type { InvokeHandlers } from './handle'
+import { createProjectSyncHandlers } from './project-sync-handlers'
 import { createSearchHandlers } from './search-handlers'
 import { createWorkspaceHandlers } from './workspace-handlers'
 import type { HandlerContext } from './workspace-handlers'
@@ -23,6 +25,8 @@ type Services = HandlerContext & {
   updates: UpdateService
   search: SearchService
   claude: ClaudeService
+  /** Статусы git открытых проектов: перечитываются по слежению за диском. */
+  gitStatus: GitStatusService
   /** Поиск по разговорам панели Claude Code - своим модулем, мимо сервиса разговоров. */
   conversationSearch: SearchDesk
 }
@@ -39,6 +43,7 @@ export const createInvokeHandlers = (services: Services): InvokeHandlers => {
     ...createGitHandlers(workspace),
     ...createSearchHandlers(workspace, search),
     ...createFsHandlers(workspace, search),
+    ...createProjectSyncHandlers(workspace, services.gitStatus),
     ...createClaudeHandlers(workspace, claude),
     ...createClaudeToolsHandlers(workspace, claude),
     ...createComposerHandlers(workspace, claude, services.getWindow),

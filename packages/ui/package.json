@@ -16,7 +16,8 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "icons:generate": "node scripts/generate-file-icons.mjs"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "5.3.0",

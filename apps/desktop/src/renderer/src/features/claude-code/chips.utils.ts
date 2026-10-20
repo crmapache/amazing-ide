@@ -1,7 +1,8 @@
-import type { DraftChip } from '@shared/claude-draft'
+import type { ChipKind, DraftChip } from '@shared/claude-draft'
 
 import {
   TITLE_LINES,
+  CHIP_PATH_KINDS,
   MAX_LABEL_LENGTH,
   PASTE_SCAN_CHARS,
   TITLE_LINE_CHARS,
@@ -11,6 +12,7 @@ import {
   QUOTE_PREVIEW_WORDS,
   PASTE_ALWAYS_FOLDS_CHARS,
 } from './chips.constants'
+import type { PathChipKind } from './draft.types'
 
 /**
  * Подписи и подсказки чипов - одно правило для поля, очереди и ленты: чип для человека
@@ -103,3 +105,7 @@ export const chipTitle = (chip: DraftChip): string => {
 export const collapsesPaste = (text: string, minLines: number, drawnLines = 0): boolean =>
   text.length > PASTE_ALWAYS_FOLDS_CHARS ||
   (minLines > 0 && Math.max(pasteLineCount(text), drawnLines) >= minLines)
+
+/** Чип с путём в проекте - рисуется иконкой типа файла, а не значком вида. */
+export const isPathChip = (kind: ChipKind): kind is PathChipKind =>
+  Object.hasOwn(CHIP_PATH_KINDS, kind)

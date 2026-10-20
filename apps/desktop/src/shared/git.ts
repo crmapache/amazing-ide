@@ -37,3 +37,28 @@ export type GitPullRequest = { number: number; url: string; state: GitPullReques
 
 /** Клонирование: получилось - новый набор проектов (клон уже открыт вкладкой). */
 export type GitCloneResult = { ok: true; state: WorkspaceState } | { ok: false; details: string }
+
+/**
+ * Свой статус файла в git - цвет имени в дереве, как в WebStorm: изменён, добавлен в
+ * индекс, не добавлен в git, игнорируется, конфликт слияния. Удалённых в дереве нет.
+ */
+export type GitPathStatus = 'modified' | 'added' | 'untracked' | 'ignored' | 'conflict'
+
+/** Папка, внутри которой есть изменения: conflict - если среди них конфликт. */
+export type GitFolderChange = 'modified' | 'conflict'
+
+/**
+ * Статусы проекта по git. Пути - от корня проекта через «/», в NFC, как в дереве. Папка
+ * целиком новая или игнорируемая - одной записью в folders (корень проекта - пустой
+ * строкой): статус у неё и у всего, что внутри. truncated - записей больше предела или
+ * git не успел: у части строк цвета нет. ignoreCase - репозиторий не различает регистр
+ * (core.ignorecase, обычное дело на macOS): ключи в нижнем регистре, искать - так же,
+ * иначе папка, переименованная только регистром, теряла бы цвета.
+ */
+export type GitStatus = {
+  files: Record<string, GitPathStatus>
+  folders: Record<string, 'untracked' | 'ignored'>
+  changedFolders: Record<string, GitFolderChange>
+  truncated: boolean
+  ignoreCase: boolean
+}

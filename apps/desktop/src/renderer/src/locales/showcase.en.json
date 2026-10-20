@@ -33,7 +33,9 @@
     "weights": "Weights",
     "code": "Code",
     "interaction": "Interaction",
-    "syntax": "Code highlighting"
+    "syntax": "Code highlighting",
+    "fileIcons": "File type icons",
+    "vcs": "Git status"
   },
   "specimens": {
     "buttons": "Buttons",
@@ -41,6 +43,8 @@
     "iconButtons": "Icon buttons",
     "dropdowns": "Dropdown buttons",
     "avatars": "Project badges",
+    "fileIcons": "File icons - by name, extension and parent folder; open folders",
+    "fileIconsSmall": "Small file icons - next to text and in chips",
     "badgeMarkers": "Status markers",
     "badgeSoft": "Soft badges",
     "kbd": "Shortcuts",

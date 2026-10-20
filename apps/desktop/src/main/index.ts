@@ -8,6 +8,8 @@ import { applyAppProfile, PROFILE_DIR_ENV } from './app-profile'
 import { installApplicationMenu } from './menu'
 import { ClaudeService } from './claude/claude-service'
 import type { StoredClaude } from './claude/claude-state'
+import { ProjectWatchers } from './fs/project-watchers'
+import { GitStatusService } from './git/git-status-service'
 import { broadcast } from './ipc/broadcast'
 import { registerInvokeHandlers } from './ipc/handle'
 import { createInvokeHandlers } from './ipc/register-handlers'
@@ -100,14 +102,37 @@ const bootstrap = async () => {
       workspace.getState().projects.map((project) => project.rootPath),
     )
 
+  // Слежение за диском открытых проектов: окну - что перечитать в дереве и что .git
+  // поменялся (ветка), статусу git - повод перечитаться и разослать себя, если стал другим.
+  const gitStatus = new GitStatusService((projectId, status) =>
+    broadcast('git:status', { projectId, status }),
+  )
+  const watchers = new ProjectWatchers((projectId, { directories, renamed, paths, git }) => {
+    if (directories === null || directories.length > 0 || git) {
+      broadcast('fs:changed', { projectId, directories, renamed, git })
+    }
+
+    gitStatus.changed(projectId, { git, paths })
+  })
+  const watchProjects = () => {
+    for (const projectId of watchers.sync(workspace.getState().projects)) {
+      gitStatus.forget(projectId)
+    }
+  }
+
   searchProjects()
-  onWorkspace = searchProjects
+  watchProjects()
+  onWorkspace = () => {
+    searchProjects()
+    watchProjects()
+  }
 
   const services = {
     workspace,
     updates,
     search,
     claude,
+    gitStatus,
     conversationSearch,
     getWindow: () => mainWindow,
   }
@@ -125,6 +150,7 @@ const bootstrap = async () => {
 
     quitting = 'waiting'
     conversationSearch.dispose()
+    watchers.dispose()
     void claude.shutdown().finally(() => {
       quitting = 'ready'
       app.quit()

@@ -4,6 +4,9 @@ import { useAsideSync } from '../../features/claude-code/aside.queries'
 import { useClaudeSync } from '../../features/claude-code/claude.queries'
 import { useClaudeSearchSync } from '../../features/claude-code/search.queries'
 import { useSpellcheckSync } from '../../features/claude-code/spellcheck.hooks'
+import { useDirectorySync } from '../../features/file-tree/file-tree.queries'
+import { useGitStatusSync } from '../../features/file-tree/git-status.queries'
+import { useGitHeadSync } from '../../features/git/git.queries'
 
 /**
  * Подписки на события главного процесса - по одной на всё окно. Отдельный
@@ -17,6 +20,9 @@ export const MainProcessSync = () => {
   useAsideSync()
   useSpellcheckSync()
   useClaudeSearchSync()
+  useDirectorySync()
+  useGitStatusSync()
+  useGitHeadSync()
 
   return null
 }

@@ -165,6 +165,44 @@
   --color-syntax-comment: var(--palette-graphite-400);
   --color-syntax-link: var(--palette-steel-300);
 
+  /* Роли: тона иконок типов файлов (FileIcon). Набор Catppuccin рисует каждую иконку
+     своими именованными цветами, генератор перекладывает их на эти тона, а тона - на
+     нашу палитру: иконки в теме IDE, а не в чужой. Тона идентификационные, как значки
+     проектов: смысла «внимание» или «ошибка» у них нет. Голубого и розового в палитре
+     нет - они смешаны из соседних, чтобы Go, Docker и Sass не сливались с синими и
+     фиолетовыми иконками. */
+  --color-file-icon-neutral: var(--palette-graphite-300);
+  --color-file-icon-muted: var(--palette-graphite-400);
+  --color-file-icon-blue: var(--palette-steel-300);
+  --color-file-icon-cyan: color-mix(in oklab, var(--palette-steel-300), var(--palette-mint-300));
+  --color-file-icon-teal: var(--palette-mint-300);
+  --color-file-icon-green: var(--palette-lime-300);
+  --color-file-icon-yellow: var(--palette-amber-300);
+  --color-file-icon-orange: var(--palette-orange-200);
+  --color-file-icon-red: var(--palette-red-300);
+  --color-file-icon-violet: var(--palette-violet-300);
+  --color-file-icon-pink: color-mix(in oklab, var(--palette-violet-300), var(--palette-red-300));
+
+  /* Роли: статус файла в git - цвет имени в дереве, как в WebStorm (New UI Dark): это
+     язык, который человек уже читает с полувзгляда, поэтому цвета - его, а не наши
+     смыслы. Изменён (и папка, где внутри есть изменения) - синий, добавлен - зелёный,
+     не добавлен в git - лососевый, игнорируется - бурый, конфликт - красный. Лососевого
+     и бурого в палитре нет - они смешаны из неё почти в цвет WebStorm (E88F89 и
+     D69A6B): бурый тянется к жёлтому, чтобы не путаться с лососевым рядом. */
+  --color-vcs-modified: var(--palette-steel-300);
+  --color-vcs-added: var(--palette-lime-300);
+  --color-vcs-untracked: color-mix(
+    in oklab,
+    var(--palette-red-300) 70%,
+    var(--palette-graphite-200)
+  );
+  --color-vcs-ignored: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--palette-amber-300) 40%, var(--palette-orange-300)) 70%,
+    var(--palette-graphite-400)
+  );
+  --color-vcs-conflict: var(--palette-red-300);
+
   /* Роли: линии */
   --color-border: rgb(255 255 255 / 7%);
   --color-border-strong: rgb(255 255 255 / 12%);

@@ -24,3 +24,17 @@ export type PathLocation =
   | { kind: 'outsideFolder'; absolutePath: string }
   | { kind: 'choose'; candidates: string[] }
   | { kind: 'missing' }
+
+/**
+ * Что поменялось на диске проекта за пачку событий слежения. directories - папки, чьё
+ * содержимое перечитать (от корня, корень - пустая строка); renamed - пути, которые
+ * появились, пропали или переименовались: если это папки, всё под ними читалось по
+ * старому месту и тоже перечитывается. directories null - событий так много, что
+ * перечитать проще всё. git - поменялось что-то в .git: ветка, индекс, коммиты.
+ */
+export type ProjectDiskChange = {
+  projectId: string
+  directories: string[] | null
+  renamed: string[]
+  git: boolean
+}

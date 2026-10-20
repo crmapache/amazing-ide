@@ -12,3 +12,5 @@ export type DraftChipViewProps = {
   onRemove?: (() => void) | undefined
   onExpand?: (() => void) | undefined
 }
+
+export type ChipIconProps = { chip: DraftChip }

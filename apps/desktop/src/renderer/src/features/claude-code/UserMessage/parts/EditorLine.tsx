@@ -1,9 +1,9 @@
-import { FileText } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+
+import { FileIcon } from '@amazing-ide/ui/FileIcon'
 
 import styles from '../UserMessage.module.scss'
 import type { EditorLineProps } from '../UserMessage.types'
-import { ROW_ICON_SIZE, ROW_ICON_STROKE } from '../../claude.constants'
 import { PathLink } from '../../PathLink/PathLink'
 
 /**
@@ -24,7 +24,7 @@ export const EditorLine = ({ editor }: EditorLineProps) => {
 
   return (
     <div className={styles.editorLine}>
-      <FileText size={ROW_ICON_SIZE} strokeWidth={ROW_ICON_STROKE} aria-hidden />
+      <FileIcon path={editor.path} kind="file" size="sm" />
       <PathLink
         request={{ path: editor.path, ...place }}
         tone="inherit"

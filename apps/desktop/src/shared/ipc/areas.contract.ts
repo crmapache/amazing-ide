@@ -13,6 +13,8 @@ import type { ClaudeTabsEventContract, ClaudeTabsInvokeContract } from './claude
 import { CLAUDE_TABS_EVENTS, CLAUDE_TABS_CHANNELS } from './claude-tabs.contract'
 import type { FsPathsInvokeContract } from './fs-paths.contract'
 import { FS_PATHS_CHANNELS } from './fs-paths.contract'
+import type { ProjectSyncEventContract, ProjectSyncInvokeContract } from './project-sync.contract'
+import { PROJECT_SYNC_EVENTS, PROJECT_SYNC_CHANNELS } from './project-sync.contract'
 
 /**
  * Части контракта по областям, собранные в одно место: contract.ts берёт их отсюда
@@ -24,11 +26,13 @@ export type AreaInvokeContract = ClaudeTabsInvokeContract &
   ClaudeComposerInvokeContract &
   ClaudePanelInvokeContract &
   ClaudeSearchInvokeContract &
-  FsPathsInvokeContract
+  FsPathsInvokeContract &
+  ProjectSyncInvokeContract
 
 export type AreaEventContract = ClaudeTabsEventContract &
   ClaudePanelEventContract &
-  ClaudeSearchEventContract
+  ClaudeSearchEventContract &
+  ProjectSyncEventContract
 
 /** Каналы областей в рантайме: их разворачивает INVOKE_CHANNELS. */
 export const AREA_CHANNELS = {
@@ -38,6 +42,7 @@ export const AREA_CHANNELS = {
   ...CLAUDE_PANEL_CHANNELS,
   ...CLAUDE_SEARCH_CHANNELS,
   ...FS_PATHS_CHANNELS,
+  ...PROJECT_SYNC_CHANNELS,
 } satisfies Record<keyof AreaInvokeContract, true>
 
 /** События областей: их разворачивает EVENT_CHANNELS. */
@@ -45,4 +50,5 @@ export const AREA_EVENTS = {
   ...CLAUDE_TABS_EVENTS,
   ...CLAUDE_PANEL_EVENTS,
   ...CLAUDE_SEARCH_EVENTS,
+  ...PROJECT_SYNC_EVENTS,
 } satisfies Record<keyof AreaEventContract, true>

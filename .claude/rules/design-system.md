@@ -72,6 +72,10 @@ Hide Design System»).
 
 ## Прочее
 
+- Цветная иконка типа файла или папки (дерево и всё, где файл узнают по типу) -
+  `FileIcon` (набор Catppuccin, ADR 0016), своих картинок под типы не рисовать. Его
+  данные (`file-icon-set.generated.ts`) руками не правят: генератор и
+  `pnpm icons:generate` в `packages/ui`.
 - Пакет не знает про IDE и не содержит текста: строки приходят пропсами.
 - Подключение - по одному: `@amazing-ide/ui/Button`, типы - `@amazing-ide/ui/Button.types`.
   Новый примитив сразу доступен по такому пути (exports в `package.json`),

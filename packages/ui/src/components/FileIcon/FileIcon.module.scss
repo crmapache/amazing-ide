@@ -1,0 +1,15 @@
+// Размеры - как у иконок интерфейса. Линии набора нарисованы ровно на 16 пикселей, на 14
+// они остаются читаемыми рядом с мелким текстом.
+.fileIcon {
+  flex-shrink: 0;
+}
+
+.md {
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+}
+
+.sm {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}

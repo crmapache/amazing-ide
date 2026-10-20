@@ -1,9 +1,12 @@
 import { useRef, useEffect } from 'react'
 import type { DragEvent } from 'react'
 import clsx from 'clsx'
-import { File, Folder, ChevronRight } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
+
+import { FileIcon } from '@amazing-ide/ui/FileIcon'
 
 import { useIsExpanded, useRevealSerial, useFileTreeStore } from '../file-tree.store'
+import { useTreeStatus } from '../git-status.queries'
 import { writeProjectPaths } from '../../../lib/project-drag'
 import { useSelectedFile, useSelectionStore } from '../../../state/selection.store'
 import { TREE_ICON_SIZE, TREE_ICON_STROKE_WIDTH } from './FileTreeNode.constants'
@@ -14,8 +17,8 @@ import { DirectoryChildren } from './parts/DirectoryChildren'
 
 /**
  * Строка дерева: папка раскрывается и сворачивается, файл выбирается и уходит в
- * редактор. Вложенное содержимое папки рисует DirectoryChildren - тот же узел
- * на уровень глубже.
+ * редактор. Иконка - по типу файла, цвет имени - по статусу git, как в WebStorm.
+ * Вложенное содержимое папки рисует DirectoryChildren - тот же узел на уровень глубже.
  */
 export const FileTreeNode = ({ projectId, entry, depth }: FileTreeNodeProps) => {
   const isDirectory = entry.kind === 'directory'
@@ -24,6 +27,7 @@ export const FileTreeNode = ({ projectId, entry, depth }: FileTreeNodeProps) => 
   const toggleDirectory = useFileTreeStore((state) => state.toggleDirectory)
   const selectFile = useSelectionStore((state) => state.selectFile)
   const revealSerial = useRevealSerial(projectId, entry.relativePath)
+  const status = useTreeStatus(projectId, entry.relativePath, isDirectory)
   const ref = useRef<HTMLButtonElement>(null)
 
   // Файл выбрали поиском (и даже тот же самый ещё раз), а строка за краем панели -
@@ -68,22 +72,12 @@ export const FileTreeNode = ({ projectId, entry, depth }: FileTreeNodeProps) => 
           )}
           aria-hidden
         />
-        {isDirectory ? (
-          <Folder
-            className={styles.folderIcon}
-            size={TREE_ICON_SIZE}
-            strokeWidth={TREE_ICON_STROKE_WIDTH}
-            aria-hidden
-          />
-        ) : (
-          <File
-            className={styles.fileIcon}
-            size={TREE_ICON_SIZE}
-            strokeWidth={TREE_ICON_STROKE_WIDTH}
-            aria-hidden
-          />
-        )}
-        <span className={styles.name}>{entry.name}</span>
+        <FileIcon
+          path={entry.relativePath}
+          kind={isDirectory ? 'folder' : 'file'}
+          expanded={isExpanded}
+        />
+        <span className={clsx(styles.name, status && styles[status])}>{entry.name}</span>
       </button>
       {isDirectory && isExpanded && (
         <DirectoryChildren

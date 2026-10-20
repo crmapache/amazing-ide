@@ -1,31 +1,7 @@
-@use '@amazing-ide/ui/mixins' as *;
-
-.fileTreeView {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-// Шапка вида - подпись капсом с линией снизу, как заголовки разделов референса.
-.header {
-  @include truncate;
-  @include caps-label;
-
-  flex-shrink: 0;
-  padding: var(--space-3) var(--space-3) var(--space-2);
-  color: var(--color-fg-subtle);
-}
-
-.divider {
-  flex-shrink: 0;
-  margin: 0 var(--space-3) var(--space-1-5);
-  border-top: var(--border-width) solid var(--color-border);
-}
-
 // Строки стоят с отступом от краёв листа: выбранная - плашка внутри панели, а не
-// полоса от края до края.
+// полоса от края до края. Подписи с именем проекта над деревом нет: оно уже в шапке окна.
 .tree {
-  flex: 1;
-  padding: 0 var(--space-1-5) var(--space-4);
+  height: 100%;
+  padding: var(--space-1-5) var(--space-1-5) var(--space-4);
   overflow: auto;
 }
