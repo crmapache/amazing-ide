@@ -77,6 +77,25 @@ swift apps/desktop/scripts/real-mouse.swift drag 800,20 900,20     # печат�
 
 Скриншот через CDP - это содержимое окна: «светофора» macOS на нём нет.
 
+### Окно целиком и эталон - Graphite
+
+Чего CDP не видит («светофор» и рамку окна, системные диалоги и меню), снимай окном
+копии через Graphite (`mcp__graphite__*`). В списке окон копия и dev человека выглядят
+одинаково (Electron, «Amazing IDE»), поэтому сначала пометь копию заголовком - окно
+Electron берёт его у страницы:
+
+```
+node apps/desktop/scripts/cdp.mjs eval "document.title = 'Amazing IDE agent'"
+```
+
+Потом `list_targets` - окно с этим заголовком, `capture` с `target: "window"` и его
+`windowId`. Только окно, не весь экран: рядом открыты переписка и почта человека.
+
+Эталон для переноса из amazing-claude-code - настоящий плагин в JetBrains у человека,
+а не только песочница `webview/harness.html`: в песочнице заготовленные сценарии, а не
+то, что видит человек. Окно JetBrains снимай так же через Graphite, всё лишнее
+закрывай `redact`.
+
 Витрина дизайн-системы (все токены и компоненты) в копии есть:
 `button[aria-label="Design system"]` в шапке, вкладки витрины - `[role=tab]` с
 текстом «Foundations» и «Components». Прокрутка - у `[role=region]`.
