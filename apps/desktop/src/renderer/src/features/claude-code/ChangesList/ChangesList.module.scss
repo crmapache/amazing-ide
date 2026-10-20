@@ -1,0 +1,155 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Файлы хода - тихий список под ответом, на поверхности кода: это сумма диффов выше, а
+// не реплика.
+.changesList {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--space-2);
+  padding: var(--space-0-5) 0;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-sunken);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// Строка и её кнопка рядом: кнопка вне строки, и нажатие по ней файл не открывает.
+.line {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding-right: var(--space-1);
+}
+
+.row {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  min-width: 0;
+  padding: var(--space-0-5) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--color-fg-muted);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  text-align: left;
+}
+
+.link {
+  @include button-reset;
+  @include interactive-surface;
+
+  @media (hover: hover) {
+    &:hover .name {
+      text-decoration-line: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: var(--space-0-5);
+    }
+  }
+}
+
+// Длинный путь теряет папки с начала, а не имя: ближняя к файлу папка говорит больше
+// корня. Многоточие встаёт в начало коробки, а справа налево это начало пути.
+.folder {
+  @include truncate;
+
+  flex: 0 1 auto;
+  min-width: 0;
+  color: var(--color-fg-subtle);
+  direction: rtl;
+  text-align: left;
+}
+
+// Сам путь внутри - слева направо, иначе слеши по краям поменялись бы местами.
+.folderText {
+  direction: ltr;
+  unicode-bidi: embed;
+}
+
+.name {
+  @include truncate;
+
+  flex: none;
+  max-width: 100%;
+  color: var(--color-fg);
+}
+
+// Слова о нажатии - между именем и цифрами, в одну строку: перенос растил бы строку в
+// миг, когда слова появляются.
+.note {
+  @include truncate;
+
+  flex: 0 1 auto;
+  min-width: 0;
+  padding-left: var(--space-2);
+  color: var(--color-fg-subtle);
+}
+
+.bad {
+  color: var(--color-warning);
+}
+
+// Цифры - у правого края, цифрами одной ширины: счёт строк стоит столбцом.
+.added,
+.uncounted {
+  flex: none;
+  margin-left: auto;
+  padding-left: var(--space-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.added {
+  color: var(--color-success);
+}
+
+.uncounted {
+  color: var(--color-fg-subtle);
+}
+
+.removed {
+  flex: none;
+  padding-left: var(--space-2);
+  color: var(--color-danger);
+  font-variant-numeric: tabular-nums;
+}
+
+// Откаченная - тише, а цифры зачёркнуты: строка остаётся записью того, что ход сделал.
+.reverted {
+  .folder,
+  .name,
+  .added,
+  .removed {
+    color: var(--color-fg-disabled);
+  }
+
+  .added,
+  .removed {
+    text-decoration-line: line-through;
+  }
+}
+
+// Место кнопки у строки без неё: цифры всех строк стоят одним столбцом.
+.slot {
+  flex: none;
+  width: var(--size-control-sm);
+}
+
+// Подвал не меняет высоту, когда кнопки в нём появляются и пропадают.
+.footer {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+  min-height: var(--size-control-sm);
+  padding: var(--space-0-5) var(--space-1) 0;
+}
+
+.spacer {
+  flex: 1;
+}

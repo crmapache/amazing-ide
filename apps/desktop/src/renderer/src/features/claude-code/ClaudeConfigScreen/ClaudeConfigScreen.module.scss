@@ -1,0 +1,78 @@
+.intro {
+  margin: 0;
+  padding: 0 var(--space-1);
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-snug);
+}
+
+.empty {
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-sm);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  min-width: 0;
+  padding: var(--space-1) 0;
+}
+
+.label {
+  color: var(--color-fg);
+  font-size: var(--font-size-md);
+}
+
+.note {
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-snug);
+}
+
+.current {
+  flex-shrink: 0;
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-sm);
+}
+
+// Свободное значение: подпись сверху, поле и «Save» строкой под ней.
+.free {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+}
+
+.freeForm {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.freeField {
+  flex: 1;
+  min-width: 0;
+}
+
+// Отказ CLI под рядом - его собственными словами, красным: настройка не встала.
+.failure {
+  padding: 0 var(--space-2);
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

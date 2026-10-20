@@ -43,3 +43,35 @@
   gap: var(--space-3);
   margin-top: var(--space-3);
 }
+
+// Полоса вкладок как в окне: лист с плашками внутри.
+.tabStrip {
+  display: flex;
+  gap: var(--space-0-5);
+  padding: var(--space-0-5);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-surface-panel);
+}
+
+// Полоса разговоров переносится в несколько рядов - узкая, чтобы перенос был виден.
+.tabStripWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-0-5);
+  max-width: var(--size-popover-lg);
+  padding: var(--space-1-5);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-surface-panel);
+}
+
+// Лист встаёт поверх ближайшего родителя с position: relative - даём ему место панели.
+.sheetBox {
+  position: relative;
+  height: var(--size-popover-lg);
+  padding: var(--space-3);
+  overflow: hidden;
+  border: var(--border-width) dashed var(--color-border);
+  border-radius: var(--radius-md);
+}

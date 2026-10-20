@@ -1,0 +1,123 @@
+// Код - на самой тёмной поверхности окна, как в редакторе: ровный фон, тонкая рамка,
+// никакого объёма. Шапки нет (как в ACC): язык никто не читает, а копия - в углу.
+.codeBlock {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: var(--space-2) 0;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-sunken);
+  overflow: hidden;
+}
+
+// Кнопка копии в углу: появляется по наведению на блок и с клавиатуры, своим фоном
+// закрывает код под собой. После нажатия видна, пока стоит галочка.
+.copy {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  display: flex;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-sunken);
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--easing-standard);
+
+  &:focus-within {
+    opacity: 1;
+  }
+
+  @media (hover: hover) {
+    .codeBlock:hover & {
+      opacity: 1;
+    }
+  }
+}
+
+.copied {
+  opacity: 1;
+}
+
+.pre {
+  margin: 0;
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  overflow: auto;
+  max-height: var(--size-code-max);
+}
+
+.compact {
+  margin: 0;
+
+  .pre {
+    max-height: var(--size-code-compact-max);
+  }
+}
+
+.code {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  color: var(--color-syntax-fg);
+  font-family: var(--font-code);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  white-space: pre;
+  user-select: text;
+}
+
+.line {
+  display: block;
+  min-height: 1lh;
+}
+
+// Роли подсветки: имя класса - имя роли shiki, цвет - токен дизайн-системы.
+.foreground,
+.tokenParameter {
+  color: var(--color-syntax-parameter);
+}
+
+.foreground {
+  color: var(--color-syntax-fg);
+}
+
+.tokenKeyword {
+  color: var(--color-syntax-keyword);
+}
+
+.tokenString {
+  color: var(--color-syntax-string);
+}
+
+.tokenStringExpression {
+  color: var(--color-syntax-string-expression);
+}
+
+.tokenFunction {
+  color: var(--color-syntax-function);
+}
+
+.tokenConstant {
+  color: var(--color-syntax-constant);
+}
+
+.tokenPunctuation {
+  color: var(--color-syntax-punctuation);
+}
+
+.tokenComment {
+  color: var(--color-syntax-comment);
+}
+
+.tokenLink {
+  color: var(--color-syntax-link);
+  text-decoration: underline;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.bold {
+  font-weight: var(--font-weight-semibold);
+}

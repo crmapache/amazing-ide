@@ -2,6 +2,7 @@ import type { GitBranchKind } from '@shared/git'
 
 import { createBranch, listBranches, switchBranch, checkoutRevision } from '../git/git-branches'
 import { readHead } from '../git/git-head'
+import { readPullRequest } from '../git/git-pull-request'
 import { pull, push, readPushInfo } from '../git/git-remote'
 import type { WorkspaceService } from '../workspace/workspace-service'
 import type { InvokeHandlers } from './handle'
@@ -39,5 +40,6 @@ export const createGitHandlers = (
     'git:pull': ({ projectId }) => pull(root(projectId)),
     'git:getPushInfo': ({ projectId }) => readPushInfo(root(projectId)),
     'git:push': ({ projectId }) => push(root(projectId)),
+    'git:getPullRequest': ({ projectId }) => readPullRequest(root(projectId)),
   }
 }

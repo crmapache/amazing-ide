@@ -1,0 +1,54 @@
+@use '../../styles/mixins' as *;
+
+// Сам диалог - прозрачные поля на всё окно: щелчок по ним закрывает просмотр.
+.lightbox {
+  @include enter-transition;
+
+  width: 100vw;
+  max-width: none;
+  height: 100vh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+
+  &[open] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &::backdrop {
+    background-color: var(--color-backdrop);
+    backdrop-filter: var(--glass-blur-backdrop);
+  }
+}
+
+.image {
+  max-width: var(--size-lightbox-max-width);
+  max-height: var(--size-lightbox-max-height);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  object-fit: contain;
+}
+
+.loading {
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-sm);
+}
+
+// Картинки нет и не будет: та же тихая строка на её месте, но цветом сбоя.
+.error {
+  max-width: var(--size-lightbox-max-width);
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+// Ниже заголовка окна: нажатие по его области macOS забирает себе, и крестик там не нажать.
+.close {
+  position: absolute;
+  top: calc(var(--size-title-bar) + var(--space-2));
+  right: var(--space-4);
+}

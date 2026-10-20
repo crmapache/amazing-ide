@@ -1,0 +1,57 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Карточка - Card с тоном accent, варианты - пункты меню с отметкой. Здесь только
+// появление, раскладка и потолок высоты: много вопросов прокручиваются внутри.
+.questionPrompt {
+  @include enter-transition;
+}
+
+.progress {
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.questions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-height: var(--size-dock-max);
+  overflow-y: auto;
+}
+
+.question {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+}
+
+.questionHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pickAny {
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-xs);
+}
+
+.questionText {
+  color: var(--color-fg-strong);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-snug);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.note {
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-xs);
+}

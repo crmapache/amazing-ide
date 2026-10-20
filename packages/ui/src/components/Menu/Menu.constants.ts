@@ -1,5 +1,5 @@
 /** Пункты, между которыми ходят стрелки: доступные пункты меню. */
-export const ITEM_SELECTOR = '[role="menuitem"]:not(:disabled)'
+export const ITEM_SELECTOR = '[role^="menuitem"]:not(:disabled)'
 
 export const NAVIGATION_KEYS: ReadonlySet<string> = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
 

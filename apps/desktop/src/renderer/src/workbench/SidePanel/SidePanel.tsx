@@ -1,9 +1,8 @@
-import { Suspense } from 'react'
 import clsx from 'clsx'
 
 import { ResizeHandle } from '@amazing-ide/ui/ResizeHandle'
 
-import { useVisitedViews } from './SidePanel.hooks'
+import { ViewStack } from '../ViewStack/ViewStack'
 import styles from './SidePanel.module.scss'
 import type { SidePanelProps } from './SidePanel.types'
 
@@ -21,7 +20,6 @@ export const SidePanel = <ViewId extends string>({
   resizeLabel,
   onResize,
 }: SidePanelProps<ViewId>) => {
-  const visited = useVisitedViews(activeViewId, isOpen)
   const handleEdge = placement === 'start' ? 'end' : 'start'
 
   const handleResize = (delta: number) => onResize(placement === 'start' ? delta : -delta)
@@ -29,17 +27,11 @@ export const SidePanel = <ViewId extends string>({
   return (
     <aside
       className={clsx(styles.sidePanel, !isOpen && styles.closed)}
+      // По нему «открыть панель» узнаёт, что фокус уже в правой панели (actions/claude-panel.ts).
+      data-placement={placement}
       // eslint-disable-next-line no-restricted-syntax -- ширину задаёт перетаскивание
       style={{ width }}>
-      {views
-        .filter((view) => visited.has(view.id))
-        .map(({ id, Component }) => (
-          <div key={id} className={styles.view} hidden={id !== activeViewId}>
-            <Suspense fallback={null}>
-              <Component />
-            </Suspense>
-          </div>
-        ))}
+      <ViewStack views={views} activeViewId={activeViewId} isOpen={isOpen} />
       <ResizeHandle edge={handleEdge} label={resizeLabel} onResize={handleResize} />
     </aside>
   )

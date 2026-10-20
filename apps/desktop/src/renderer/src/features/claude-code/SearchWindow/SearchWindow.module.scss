@@ -1,0 +1,446 @@
+@use '@amazing-ide/ui/mixins' as *;
+@include spinning-keyframes;
+
+// Затемнение под окном - только над панелью: окно живёт в ней, как боковое меню.
+.scrim {
+  @include enter-transition(0);
+
+  position: absolute;
+  z-index: var(--z-overlay);
+  inset: 0;
+  background-color: var(--color-backdrop);
+}
+
+// Слой над всей панелью, а не диалог в ней: панель бывает в 350 точек, и диалог внутри
+// был бы той же панелью в рамке. В широкой - окно обычной ширины посередине.
+.window {
+  @include glass-overlay;
+  @include enter-transition;
+
+  position: absolute;
+  z-index: var(--z-overlay);
+  top: var(--space-3);
+  right: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(var(--size-popover-xl), calc(100% - var(--space-3) * 2));
+  height: min(70%, calc(100% - var(--space-3) * 2));
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+}
+
+.head {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-2);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+// В узкой панели вкладки уезжают вбок, а крестик остаётся на месте.
+.tabsBox {
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.fill {
+  flex: 1;
+}
+
+// --- Поле набранного запроса ------------------------------------------------------
+
+.field {
+  @include field-frame;
+
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-1-5);
+  height: var(--size-control-md);
+  margin: var(--space-2) var(--space-3);
+  padding: 0 var(--space-1) 0 var(--space-2);
+  border-radius: var(--radius-md);
+}
+
+.fieldIcon {
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+}
+
+.fieldLive .fieldIcon {
+  color: var(--color-fg-muted);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  color: var(--color-fg);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-md);
+
+  &::placeholder {
+    color: var(--color-fg-disabled);
+  }
+}
+
+.fieldTools {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-0-5);
+}
+
+.spinner {
+  @include spinning;
+
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+}
+
+// --- Описание для модели ----------------------------------------------------------
+
+.ask {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-2) var(--space-3);
+}
+
+.askField {
+  @include field-frame;
+
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+}
+
+// Растёт с набранным от двух строк до шести, дальше прокрутка: ручка размера внутри окна
+// со своей высотой спорила бы с ним за один край.
+.area {
+  flex: 1;
+  min-width: 0;
+  min-height: 2lh;
+  max-height: 6lh;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  color: var(--color-fg);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-normal);
+  resize: none;
+  field-sizing: content;
+
+  &::placeholder {
+    color: var(--color-fg-disabled);
+  }
+}
+
+.askTools {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.askNote {
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+}
+
+.steady {
+  display: inline-grid;
+
+  > * {
+    grid-area: 1 / 1;
+  }
+}
+
+.steadyGhost {
+  visibility: hidden;
+}
+
+// --- Полоса ошибки ------------------------------------------------------------------
+
+.error {
+  @include tinted-plaque(var(--color-danger));
+
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 var(--space-3) var(--space-2);
+  padding: var(--space-0-5) var(--space-0-5) var(--space-0-5) var(--space-2);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+}
+
+.errorLabel {
+  @include caps-label;
+}
+
+.errorText {
+  @include truncate;
+
+  flex: 1;
+  min-width: 0;
+  color: var(--color-fg);
+}
+
+// --- Подвал ---------------------------------------------------------------------------
+
+// Только счёт: плашки клавиш под каждым списком читались мусором, а клавиши работают и так.
+.foot {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: var(--size-control-sm);
+  padding: 0 var(--space-3);
+  border-top: var(--border-width) solid var(--color-border);
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+}
+
+// --- Находки ----------------------------------------------------------------------
+
+.list {
+  flex: 1;
+  min-height: 0;
+  padding: 0 var(--space-2) var(--space-2);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.empty {
+  padding: var(--space-6) var(--space-3);
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+
+  & + & {
+    margin-top: var(--space-3);
+  }
+}
+
+.groupHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-1) var(--space-1) 0;
+}
+
+.groupTitle {
+  @include truncate;
+
+  max-width: 60%;
+  color: var(--color-fg-strong);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.groupMeta {
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+  white-space: nowrap;
+}
+
+.groupRule {
+  flex: 1;
+  height: var(--border-width);
+  background-color: var(--color-border);
+}
+
+.hit {
+  display: flex;
+  align-items: flex-start;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.hitSelected {
+  background-color: var(--color-bg-selected);
+}
+
+// Раскрытая строка - текст для чтения: под указателем не подсвечивается.
+.hitOpen {
+  background-color: var(--color-bg-hover);
+}
+
+.hitBody {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  color: var(--color-fg);
+  text-align: left;
+}
+
+button.hitBody {
+  @include button-reset;
+  @include interactive-surface;
+}
+
+.speaker {
+  @include caps-label;
+
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+}
+
+.speakerYou {
+  color: var(--color-fg-muted);
+}
+
+.hitText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-snug);
+}
+
+.snippet {
+  overflow-wrap: anywhere;
+
+  mark {
+    border-radius: var(--radius-xs);
+    background-color: var(--color-accent-soft-hover);
+    color: var(--color-fg-strong);
+  }
+}
+
+.whole {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  user-select: text;
+}
+
+.hitMeta {
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+}
+
+.reason {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-xs);
+}
+
+.hitActions {
+  display: flex;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+}
+
+// Плашка лежит поверх текста, а не рядом: соседом она сжимала бы кусок под указателем.
+// Она не кнопка - кнопка вся строка.
+.openPill {
+  position: absolute;
+  top: var(--space-1-5);
+  right: var(--space-1-5);
+  display: none;
+  align-items: center;
+  gap: var(--space-1);
+  height: var(--size-control-xs);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-raised-hover);
+  color: var(--color-fg);
+  font-size: var(--font-size-xs);
+}
+
+.hitSelected .openPill {
+  display: inline-flex;
+}
+
+@media (hover: hover) {
+  button.hitBody:hover .openPill {
+    display: inline-flex;
+  }
+}
+
+// --- Прогон модели ----------------------------------------------------------------
+
+.progress {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 0;
+  padding: var(--space-2) var(--space-3);
+}
+
+.progressHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.progressText {
+  flex: 1;
+  color: var(--color-fg);
+  font-size: var(--font-size-sm);
+}
+
+.progressMeta {
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+}
+
+.step {
+  @include truncate;
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+
+.stepNow {
+  color: var(--color-fg-muted);
+}
+
+.stepPast {
+  color: var(--color-fg-disabled);
+}

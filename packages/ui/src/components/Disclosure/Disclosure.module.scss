@@ -1,0 +1,57 @@
+@use '../../styles/mixins' as *;
+
+// Строка-раскрывашка: как строка дерева файлов - без рамки, подсветка по наведению,
+// стрелка поворачивается за то же время, что в дереве и в группах меню.
+.disclosure {
+  @include button-reset;
+  @include interactive-surface;
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  width: 100%;
+  min-width: 0;
+  color: var(--color-fg-muted);
+  text-align: left;
+
+  &:disabled {
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: calc(var(--focus-ring-width) * -1);
+  }
+}
+
+.sm {
+  min-height: var(--size-tree-row);
+  padding: 0 var(--space-1-5);
+  border-radius: var(--radius-sm);
+}
+
+// Шапка карточки - радиус карточки; раскрытая продолжается телом, низ без скругления.
+.md {
+  min-height: var(--size-control-md);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-lg);
+
+  &.expanded {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--color-fg-disabled);
+  transition: transform var(--duration-fast) var(--easing-standard);
+
+  .expanded & {
+    transform: rotate(90deg);
+  }
+}
+
+.hidden {
+  visibility: hidden;
+}

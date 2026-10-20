@@ -1,0 +1,86 @@
+@use '@amazing-ide/ui/mixins' as *;
+@include breathing-keyframes;
+
+// Обёртка чипа не меняет раскладку текста: чип стоит в строке, как стоял.
+.anchor {
+  display: inline;
+  cursor: pointer;
+}
+
+// Слой под курсором - плоское стекло, как у подсказки: то, что курсор приносит и
+// уносит, а не окно для работы. Курсор проходит насквозь: слой стоит над соседями
+// чипа, и пойманный курсор прятал бы его тут же.
+.preview {
+  @include glass-overlay;
+
+  // Стили браузера для popover - по центру экрана с рамкой. Сбрасываем.
+  inset: auto;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: min(var(--size-popover-md), calc(100vw - var(--space-8)));
+  margin: var(--space-1);
+  padding: var(--space-1);
+  overflow: visible;
+  border-radius: var(--radius-md);
+  color: var(--color-fg);
+  pointer-events: none;
+
+  // Над чипом: поле и очередь стоят внизу панели, а в ленте строка под чипом - та, что
+  // читают следующей. От левого края чипа; не влезает - переворачивается.
+  position-area: block-start span-inline-end;
+  position-try-fallbacks: flip-block, flip-inline;
+
+  &:popover-open {
+    display: flex;
+  }
+}
+
+// Насколько позволяет панель, но не больше, чем нужно взгляду; маленькая картинка
+// остаётся своего размера. Подложка видна сквозь прозрачную картинку.
+.image {
+  display: block;
+  max-width: 100%;
+  max-height: min(var(--size-popover-md), 50vh);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-raised);
+}
+
+// Ответ идёт дольше мгновения: рамка дышит, ожидание видно как ожидание.
+.waiting {
+  @include breathing;
+
+  width: calc(var(--size-image-tile) * 2);
+  height: var(--size-image-tile);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-raised);
+}
+
+// Путь выбранной картинки целиком: на чипе он разрезан. Переносится где угодно - в
+// пути пробелов нет.
+.name {
+  padding: 0 var(--space-0-5);
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+  overflow-wrap: anywhere;
+}
+
+.caption {
+  padding: 0 var(--space-0-5);
+  color: var(--color-fg-muted);
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+  white-space: nowrap;
+}
+
+.missing {
+  max-width: var(--size-tooltip-max);
+  padding: 0 var(--space-1);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-snug);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .waiting {
+    animation: none;
+  }
+}

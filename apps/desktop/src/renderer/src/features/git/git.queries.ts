@@ -6,6 +6,7 @@ import { useQuery, useMutation, useIsMutating, useQueryClient } from '@tanstack/
 import { invoke } from '../../lib/ipc'
 import { QUERY_KEYS } from '../../state/query-keys'
 import { useGitNoticeStore } from './git-notice.store'
+import { PULL_REQUEST_STALE_MS } from './git.constants'
 
 /**
  * Ветка проекта. Перечитывается при возврате в окно: ветку часто переключают в
@@ -18,6 +19,19 @@ export const useGitHead = (projectId: string | undefined) =>
     enabled: projectId !== undefined,
     staleTime: Infinity,
     refetchOnWindowFocus: 'always',
+  })
+
+/**
+ * PR ветки через gh. Ключ - с веткой: переключили ветку - спрашивается её PR, а не
+ * показывается чужой. Заново при возврате в окно (PR создают и сливают в браузере),
+ * но не чаще раза в минуту: gh ходит в сеть.
+ */
+export const usePullRequest = (projectId: string, branch: string) =>
+  useQuery({
+    queryKey: QUERY_KEYS.gitPullRequest(projectId, branch),
+    queryFn: () => invoke('git:getPullRequest', { projectId }),
+    staleTime: PULL_REQUEST_STALE_MS,
+    refetchOnWindowFocus: true,
   })
 
 /** Ветки - когда открыто меню ветки, и каждый раз заново. */

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@amazing-ide/ui/Button'
 import { Dialog } from '@amazing-ide/ui/Dialog'
 import { DropdownButton } from '@amazing-ide/ui/DropdownButton'
+import { Lightbox } from '@amazing-ide/ui/Lightbox'
 import { Menu } from '@amazing-ide/ui/Menu'
 import { MenuItem } from '@amazing-ide/ui/MenuItem'
 import { Popover } from '@amazing-ide/ui/Popover'
@@ -13,6 +14,7 @@ import { TextField } from '@amazing-ide/ui/TextField'
 import { Toast } from '@amazing-ide/ui/Toast'
 
 import styles from '../ComponentsView.module.scss'
+import lightboxSample from '../../assets/lightbox-sample.png'
 import { ShowcaseSection } from '../../ShowcaseSection/ShowcaseSection'
 import { Specimen } from '../../Specimen/Specimen'
 
@@ -24,6 +26,8 @@ export const OverlaysSection = () => {
   const { t } = useTranslation('showcase')
   const popover = usePopover()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false)
+  const [isMissingOpen, setIsMissingOpen] = useState(false)
   const [branch, setBranch] = useState('')
 
   const closeDialog = () => setIsDialogOpen(false)
@@ -110,6 +114,32 @@ export const OverlaysSection = () => {
             onChange={setBranch}
           />
         </Dialog>
+      </Specimen>
+
+      <Specimen label={t('specimens.lightbox')}>
+        <Button variant="secondary" onClick={() => setIsLightboxOpen(true)}>
+          {t('samples.openImage')}
+        </Button>
+        <Lightbox
+          open={isLightboxOpen}
+          src={lightboxSample}
+          alt={t('samples.imageAlt')}
+          loadingLabel={t('samples.imageLoading')}
+          closeLabel={t('samples.close')}
+          onClose={() => setIsLightboxOpen(false)}
+        />
+        <Button variant="secondary" onClick={() => setIsMissingOpen(true)}>
+          {t('samples.openMissingImage')}
+        </Button>
+        <Lightbox
+          open={isMissingOpen}
+          src={null}
+          alt={t('samples.imageAlt')}
+          loadingLabel={t('samples.imageLoading')}
+          error={t('samples.imageMissing')}
+          closeLabel={t('samples.close')}
+          onClose={() => setIsMissingOpen(false)}
+        />
       </Specimen>
     </ShowcaseSection>
   )

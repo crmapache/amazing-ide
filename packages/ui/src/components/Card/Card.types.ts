@@ -1,10 +1,24 @@
 import type { ReactNode } from 'react'
+import type { LucideIcon } from 'lucide-react'
+
+/** neutral - сводка, блок настроек, план; accent - ход ждёт человека (вопрос, разрешение). */
+export type CardTone = 'neutral' | 'accent'
+
+/**
+ * md - обычная карточка: шапка, линия под ней, просторное тело. sm - плотная плитка
+ * (сводка цифр): без линии под шапкой, поля меньше - цифра стоит сразу под подписью.
+ */
+export type CardSize = 'md' | 'sm'
 
 export type CardProps = {
   /** Заголовок карточки. Нет - карточка без шапки, просто стеклянный лист. */
   title?: string | undefined
   /** Мелкая строка под заголовком. */
   description?: string | undefined
+  /** Иконка перед заголовком. */
+  icon?: LucideIcon | undefined
+  tone?: CardTone | undefined
+  size?: CardSize | undefined
   /** Справа в шапке: кнопка, метка. */
   actions?: ReactNode | undefined
   children: ReactNode

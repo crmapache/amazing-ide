@@ -20,12 +20,16 @@
 }
 
 // Стили браузера для popover - по центру экрана с рамкой. Сбрасываем и ставим под
-// кнопку, которая панель открыла (она же неявный якорь для position-area).
+// кнопку, которая панель открыла (она же неявный якорь для position-area). Не влезает -
+// влево, вверх, а у кнопки в правом нижнем углу (поле ввода) - вверх и влево разом.
 .anchor {
   inset: auto;
   margin: var(--space-1-5) 0 0;
   position-area: block-end span-inline-end;
-  position-try-fallbacks: flip-inline, flip-block;
+  position-try-fallbacks:
+    flip-inline,
+    flip-block,
+    flip-block flip-inline;
 }
 
 // Без якоря - сверху по центру окна: открыть могли и с клавиатуры, кнопки рядом нет.

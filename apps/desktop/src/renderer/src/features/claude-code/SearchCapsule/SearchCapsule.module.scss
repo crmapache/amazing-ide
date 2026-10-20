@@ -1,0 +1,78 @@
+@use '@amazing-ide/ui/mixins' as *;
+@include spinning-keyframes;
+
+/*
+ * Найденные слова в ленте - подсветка реестра браузера (useSearchPaint), а не обёртки:
+ * разметка карточек не трогается. Браузер даёт подсветке только цвета. Тон - тот же,
+ * что у слов в списке окна; бледная заливка терялась на карточке.
+ */
+::highlight(claude-search) {
+  background-color: var(--color-accent-soft-hover);
+  color: var(--color-fg-strong);
+}
+
+// Вуаль над лентой, пока она идёт к находке: непрозрачная - сквозь полупрозрачную видно,
+// как лента ездит, пока встают страницы. Появляется сразу, гаснет плавно. Стоит после
+// полки закреплённых, поэтому на том же слое она сверху; капсула - ещё выше.
+.veil {
+  position: absolute;
+  z-index: var(--z-sticky);
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  background-color: var(--color-surface-sunken);
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-sm);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-slow) var(--easing-standard);
+}
+
+.veilOn {
+  opacity: 1;
+  pointer-events: auto;
+  transition: none;
+}
+
+.veilRing {
+  @include spinning;
+
+  color: var(--color-fg-subtle);
+}
+
+.capsule {
+  @include glass-overlay;
+
+  position: absolute;
+  z-index: var(--z-sticky);
+  right: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-0-5);
+  margin-top: var(--space-2);
+  padding: var(--space-0-5);
+  border-radius: var(--radius-lg);
+}
+
+.note {
+  padding-right: var(--space-1);
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+}
+
+.rule {
+  align-self: stretch;
+  width: var(--border-width);
+  margin: var(--space-1) var(--space-0-5);
+  background-color: var(--color-border-strong);
+}
+
+.count {
+  padding: 0 var(--space-1);
+  color: var(--color-fg-muted);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}

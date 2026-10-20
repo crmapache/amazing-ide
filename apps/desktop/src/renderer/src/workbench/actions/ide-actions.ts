@@ -1,8 +1,11 @@
-import { X, Files, History, Sparkles, ArrowRightLeft } from 'lucide-react'
+import { X, Files, History, Palette, Sparkles, ArrowRightLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { MAIN_VIEWS } from '../views/main-views'
+import { toggleShowcase } from '../views/showcase-view'
 import { useLayoutStore } from '../../state/layout.store'
 import { useWorkspace, useActiveProject, useWorkspaceActions } from '../../state/workspace.queries'
+import { OPEN_PANEL_KEY } from '../../features/claude-code/panel-keys.constants'
 import {
   GIT_BRANCH_ACTIONS,
   GIT_REPOSITORY_ACTIONS,
@@ -13,6 +16,7 @@ import { useGitHead } from '../../features/git/git.queries'
 import { PROJECT_ACTIONS } from '../../features/projects/project-actions.constants'
 import { useProjectActionRunner } from '../../features/projects/project-actions.hooks'
 import type { SearchAction } from '../../features/search-everywhere/search-everywhere.types'
+import { useClaudePanelToggle } from './claude-panel'
 
 /**
  * Действия IDE для поиска везде. Собраны здесь, а не в поиске: им нужны проекты, git
@@ -30,7 +34,8 @@ export const useIdeActions = (): SearchAction[] => {
   const runProjectAction = useProjectActionRunner()
   const gitRunner = useGitActionRunner(project?.id ?? '')
   const selectSideView = useLayoutStore((state) => state.selectSideView)
-  const selectProviderView = useLayoutStore((state) => state.selectProviderView)
+  const selectMainView = useLayoutStore((state) => state.selectMainView)
+  const toggleClaudePanel = useClaudePanelToggle()
 
   const projectActions: SearchAction[] = PROJECT_ACTIONS.map((entry) => ({
     id: `project.${entry.id}`,
@@ -82,12 +87,33 @@ export const useIdeActions = (): SearchAction[] => {
       icon: Files,
       run: () => selectSideView('files'),
     },
+    // Виды середины берутся из реестра полосы: подпись и иконка не разойдутся.
+    ...MAIN_VIEWS.map((view) => ({
+      id: `view.main.${view.id}`,
+      label: t('searchEverywhere.actions.toggleMainView', { name: t(view.labelKey) }),
+      icon: view.icon,
+      run: () => selectMainView(view.id),
+    })),
     {
       id: 'view.claudeCode',
       label: t('searchEverywhere.actions.toggleClaudeCode'),
       icon: Sparkles,
-      run: () => selectProviderView('claude-code'),
+      // Та же дверь, что у клавиши: показать с клавиатурой в поле или спрятать из панели.
+      shortcut: OPEN_PANEL_KEY.join(''),
+      run: toggleClaudePanel,
     },
+    // Витрина есть только в dev и в копии окна агента, в релизе нет и действия.
+    ...(toggleShowcase
+      ? [
+          {
+            id: 'view.designSystem',
+            label: t('searchEverywhere.actions.toggleDesignSystem'),
+            icon: Palette,
+            keywords: ['showcase', 'tokens', 'components'],
+            run: toggleShowcase,
+          },
+        ]
+      : []),
   ]
 
   const recentActions: SearchAction[] = (workspace?.recentProjects ?? []).map((recent) => ({

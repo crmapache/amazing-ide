@@ -1,0 +1,144 @@
+@use '@amazing-ide/ui/mixins' as *;
+@include breathing-keyframes;
+
+// Вопросы сбоку - тихая плитка над полем, как список задач: подпись капсом, цепочка с
+// прокруткой и подвал. Ждущий ответ дышит, повтор API - жёлтым, неудача - красным.
+.sideQuestion {
+  display: flex;
+  flex-direction: column;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-raised);
+}
+
+.head,
+.foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1-5) var(--space-2) var(--space-1-5) var(--space-3);
+}
+
+.foot {
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.label {
+  @include caps-label;
+
+  color: var(--color-fg-muted);
+}
+
+.unseen,
+.notSaved {
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: var(--size-scroll-compact-max);
+  padding: 0 var(--space-3) var(--space-3);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.hint {
+  margin: 0;
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-snug);
+}
+
+.exchange {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+}
+
+.question {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  color: var(--color-fg-strong);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-snug);
+}
+
+.mark {
+  flex-shrink: 0;
+  margin-top: var(--space-0-5);
+  color: var(--color-fg-subtle);
+}
+
+.questionText {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.answer {
+  padding-left: var(--space-4);
+  color: var(--color-fg);
+  font-size: var(--font-size-sm);
+}
+
+.notice {
+  margin: var(--space-1) 0 0;
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+}
+
+.asking,
+.unanswered {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-left: var(--space-4);
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-sm);
+}
+
+.askingText {
+  flex: 1;
+  min-width: 0;
+}
+
+.pulse {
+  @include breathing;
+
+  flex-shrink: 0;
+  width: var(--size-status-dot);
+  height: var(--size-status-dot);
+  border-radius: var(--radius-full);
+  background-color: var(--color-accent);
+}
+
+.pulseWarning {
+  background-color: var(--color-warning);
+}
+
+.unansweredText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  min-width: 0;
+}
+
+.unansweredBad {
+  color: var(--color-danger);
+}
+
+.detail {
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+  overflow-wrap: anywhere;
+}

@@ -1,0 +1,15 @@
+// Встаёт на место ленты и занимает её место целиком.
+.agentStreamView {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.stream {
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-3);
+  overflow-y: auto;
+}

@@ -48,7 +48,9 @@
   --palette-red-400: #e5414b;
   --palette-amber-300: #f2bd52;
   --palette-amber-400: #e5a83b;
+  --palette-steel-300: #8db4e6;
   --palette-steel-400: #6f9bd1;
+  --palette-violet-300: #bba6eb;
   --palette-violet-400: #a48ad8;
 
   /* Роли: фон окна. Почти чёрный, с едва заметным светлым пятном сверху - чтобы
@@ -106,6 +108,24 @@
   --color-danger-soft: rgb(229 65 75 / 14%);
   --color-info: var(--palette-mint-300);
 
+  /* Роли: ступени шкал - контекст разговора и лимиты подписки: в запасе, быстрее нормы,
+     близко к пределу, предел. Шкала берёт ступень, а не цвет состояния: режим спокойных
+     цветов (Settings → No-stress colors) смешивает все четыре со спокойным тоном, и
+     любая шкала, покрашенная ступенями, успокаивается сама. Ошибка и доплата - не
+     ступени, это то, что случилось: они своего цвета. */
+  --color-gauge-1: var(--palette-lime-300);
+  --color-gauge-2: var(--palette-amber-300);
+  --color-gauge-3: var(--palette-orange-300);
+  --color-gauge-4: var(--palette-red-300);
+
+  /* Куда шкалы тянутся в спокойном режиме: на ступень светлее самого тусклого текста -
+     прибор, который не прочесть, не спокойнее красного, а бесполезен. */
+  --color-gauge-calm: var(--palette-graphite-300);
+
+  /* Доля цвета, что остаётся шкалам: 100% - вся лестница. Меняет окно (ползунок), ставя
+     значение на корень документа вместе с атрибутом data-gauge-calm. */
+  --gauge-vivid: 100%;
+
   /* Насколько тон проступает в подложке и рамке плашки (значок, метка): плашка
      смешивает свой тон с прозрачным через color-mix. */
   --tint-soft: 16%;
@@ -119,6 +139,31 @@
   --color-avatar-3: var(--palette-steel-400);
   --color-avatar-4: var(--palette-amber-400);
   --color-avatar-5: var(--palette-violet-400);
+
+  /* Роли: группы вкладок разговоров (разговор и его форки) - полоска сверху и заливка
+     выбранной. Идентификационные, как значки проектов, но из холодной дуги (мятный,
+     стальной, фиалковый): оранжевый, зелёный, жёлтый и красный на полосе заняты
+     смыслом - точкой состояния и светом позвавшей вкладки. Цвет - по id группы. */
+  --color-tab-group-0: var(--palette-mint-400);
+  --color-tab-group-1: var(--palette-steel-300);
+  --color-tab-group-2: var(--palette-violet-400);
+  --color-tab-group-3: var(--palette-mint-300);
+  --color-tab-group-4: var(--palette-steel-400);
+  --color-tab-group-5: var(--palette-violet-300);
+
+  /* Роли: подсветка кода. Тона из той же палитры, что и интерфейс (ADR 0006, 0009):
+     блоки кода в ответах Claude Code сейчас, тема Monaco потом. Контраст каждого тона
+     на --color-surface-sunken - не ниже 4.5:1, комментарий - курсивом, а не бледностью. */
+  --color-syntax-fg: var(--palette-graphite-100);
+  --color-syntax-keyword: var(--palette-violet-300);
+  --color-syntax-string: var(--palette-lime-300);
+  --color-syntax-string-expression: var(--palette-mint-300);
+  --color-syntax-function: var(--palette-steel-300);
+  --color-syntax-constant: var(--palette-orange-200);
+  --color-syntax-parameter: var(--palette-graphite-200);
+  --color-syntax-punctuation: var(--palette-graphite-300);
+  --color-syntax-comment: var(--palette-graphite-400);
+  --color-syntax-link: var(--palette-steel-300);
 
   /* Роли: линии */
   --color-border: rgb(255 255 255 / 7%);
@@ -182,7 +227,9 @@
   --size-title-bar: 40px;
   --size-tab-bar: 36px;
   --size-activity-bar: 44px;
-  --size-status-bar: 26px;
+
+  /* Строка состояния вровень с полосой вкладок: рама окна сверху и снизу одной толщины. */
+  --size-status-bar: var(--size-tab-bar);
   --size-control-xs: 18px;
   --size-control-sm: 24px;
   --size-control-md: 30px;
@@ -193,6 +240,17 @@
   --size-menu-item: 30px;
   --size-tree-row: 26px;
   --size-status-dot: 6px;
+
+  /* Переключатель настройки: дорожка, ручка и её ход (ширина дорожки минус ручка и поля). */
+  --size-switch-width: 30px;
+  --size-switch-thumb: 12px;
+  --offset-switch-thumb: 12px;
+
+  /* Значение справа от ползунка («70%», «13 pt»): шкала не прыгает, когда цифр меньше. */
+  --size-slider-value: 40px;
+
+  /* Плитка иконки в строке бокового меню: иконка с полями вокруг. */
+  --size-menu-tile: 26px;
   --size-progress: 4px;
   --size-empty-icon: 52px;
 
@@ -202,9 +260,59 @@
   --size-popover-xl: 680px;
   --size-listbox-max: 440px;
   --size-dialog: 440px;
+
+  /* Боковой лист поверх панели (меню Claude Code): узкий, чтобы край панели под ним был
+     виден, но целый экран на каждый пункт. */
+  --size-sheet: 360px;
+
+  /* Оглавление слева от правки (редактор сценария): имя этапа читается в строку-две,
+     а правая часть, где пишут, остаётся главной даже в узкой панели. */
+  --size-outline: 148px;
+
+  /* Картинка в Lightbox вписывается в окно с полями вокруг. */
+  --size-lightbox-max-width: 90vw;
+  --size-lightbox-max-height: 85vh;
   --size-toast: 340px;
   --size-tooltip-max: 280px;
   --size-text-narrow: 300px;
+
+  /* Потолок высоты блока кода: в ответе и в карточке вызова. Длиннее - прокрутка внутри
+     блока, а не простыня на всю ленту. */
+  --size-code-max: 420px;
+  --size-code-compact-max: 260px;
+
+  /* Колонки диффа: номер строки (до пяти цифр) и знак +/-. */
+  --size-diff-gutter: 48px;
+  --size-diff-sign: 16px;
+
+  /* Примерная высота строки ленты разговора вне экрана: браузер не раскладывает её,
+     пока не долистали (content-visibility), и держит место под неё. */
+  --size-feed-row-estimate: 80px;
+
+  /* Вкладка по подписи (разговор) не шире этого: длинное обрезается, полное - в подсказке. */
+  --size-tab-max: 200px;
+
+  /* Полоса разговоров в несколько рядов: ряды раскладываются так, будто вкладка не шире
+     основы, потом длинное имя добирает свободный конец ряда. Уже нижней границы вкладка
+     не сжимается - там и точка, и пара букв, и крестик. */
+  --size-tab-basis: 210px;
+  --size-tab-min-narrow: 72px;
+
+  /* Короткая шкала в строке (контекст разговора): полоса рядом с числом. */
+  --size-meter: 40px;
+
+  /* Плитка картинки в поле ввода и в сообщении: видно, что на ней, и рядом ещё три. */
+  --size-image-tile: 56px;
+
+  /* Поле ввода разговора растёт с текстом до этой доли высоты окна. */
+  --size-composer-max: 40vh;
+
+  /* Потолок коротких прокручиваемых блоков ленты: поручение субагенту, список задач.
+     Отдельно от потолка кода: поменять одно не должно молча менять другое. */
+  --size-scroll-compact-max: 260px;
+
+  /* Потолок карточки над полем ввода (вопрос с вариантами): лента над ней остаётся видна. */
+  --size-dock-max: 45vh;
   --size-resize-handle: 8px;
   --size-tab-min: 120px;
 
@@ -238,9 +346,35 @@
   --duration-normal: 160ms;
   --duration-slow: 260ms;
   --duration-tooltip-delay: 450ms;
+
+  /* Волна проявления ответа модели: каждый символ проступает из размытия. Обе величины
+     читает и код волны - символ «оседает» в текст ровно в конце своей анимации. */
+  --duration-reveal: 340ms;
+  --blur-reveal: 4px;
+
+  /* Прозрачность: приглушённое (отклонённая правка) и нижняя точка «дыхания» подписи
+     и точки «работает». */
+  --opacity-muted: 0.6;
+  --opacity-breathe: 0.4;
+
+  /* Бесконечные движения - знак, что работа идёт: мерцание подписи «думает» и точки
+     «работает», вращение значка загрузки. Медленные, чтобы не дёргали глаз. */
+  --duration-breathe: 1600ms;
+  --duration-spin: 900ms;
+
+  /* Перелив по буквам строки «Claude is thinking» (как в ACC): каждая буква по очереди
+     светлеет и гаснет, волна идёт вдоль строки. Шаг - сдвиг волны от буквы к букве. */
+  --duration-shimmer: 2600ms;
+  --duration-shimmer-step: 45ms;
+
+  /* Вспышка счётчика, который только что вырос от нажатия в другом месте экрана (как в
+     ACC): ответ на нажатие там, где человек и не смотрел бы. Дольше перехода, короче
+     «дыхания»: один раз заметить, а не следить. */
+  --duration-flash: 1200ms;
   --easing-standard: cubic-bezier(0.2, 0, 0, 1);
   --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
   --offset-enter: 4px;
+  --offset-sheet-enter: 24px;
 }
 
 /* Кто попросил систему меньше двигать интерфейс - анимации появления выключаются,
@@ -250,6 +384,44 @@
     --duration-fast: 0ms;
     --duration-normal: 0ms;
     --duration-slow: 0ms;
+    --duration-reveal: 0ms;
+    --blur-reveal: 0px;
+    --duration-breathe: 0ms;
+    --duration-spin: 0ms;
+    --duration-shimmer: 0ms;
+    --duration-shimmer-step: 0ms;
+    --duration-flash: 0ms;
     --offset-enter: 0px;
+    --offset-sheet-enter: 0px;
   }
+}
+
+/* Спокойные шкалы (Settings → No-stress colors): показание остаётся, приговор уходит.
+   Четыре ступени тянутся к спокойному тону на долю --gauge-vivid. Атрибут стоит на
+   корне документа, только когда доля ниже ста (шкалы во всплывающих панелях тоже
+   берут роли оттуда), и на образце экрана настроек - тот перекрашивается под пальцем.
+   Смешение в oklab: светлота идёт по прямой, и на малой доле все четыре ступени
+   читаются одним тоном, а не четырьмя серыми. Запасные 100% - не вежливость: не
+   доехавшая доля сделала бы объявление невалидным, и шкала потеряла бы цвет целиком. */
+[data-gauge-calm] {
+  --color-gauge-1: color-mix(
+    in oklab,
+    var(--palette-lime-300) var(--gauge-vivid, 100%),
+    var(--color-gauge-calm)
+  );
+  --color-gauge-2: color-mix(
+    in oklab,
+    var(--palette-amber-300) var(--gauge-vivid, 100%),
+    var(--color-gauge-calm)
+  );
+  --color-gauge-3: color-mix(
+    in oklab,
+    var(--palette-orange-300) var(--gauge-vivid, 100%),
+    var(--color-gauge-calm)
+  );
+  --color-gauge-4: color-mix(
+    in oklab,
+    var(--palette-red-300) var(--gauge-vivid, 100%),
+    var(--color-gauge-calm)
+  );
 }

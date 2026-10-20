@@ -41,3 +41,34 @@
   background-color: var(--color-surface-raised-hover);
   color: var(--color-fg-strong);
 }
+
+// Счётчик раздела: с нуля и тусклый, с находкой - ярче. Ширина цифр ровная - число
+// растёт, не толкая соседние вкладки на пиксели.
+.count {
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-xs);
+  background-color: var(--color-bg-hover);
+  color: var(--color-fg-disabled);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.countLive {
+  background-color: var(--color-bg-selected);
+  color: var(--color-fg);
+}
+
+// Счётчик вырос от нажатия в другом месте экрана - коротко вспыхивает акцентом и гаснет
+// к своему виду. Без масштаба: плоско, только цвет (ADR 0006).
+.grew {
+  animation: count-grew var(--duration-flash) var(--easing-out);
+}
+
+@keyframes count-grew {
+  0%,
+  25% {
+    background-color: var(--color-accent-soft);
+    color: var(--color-accent-strong);
+  }
+}

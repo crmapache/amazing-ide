@@ -1,0 +1,81 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Ряд чипов над лентой: в одну строку, лишнее листается вбок (колесом - тоже).
+.streamSwitcher {
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.list {
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+// Чип - не кнопка, а строка с кнопками: сам чип переключает поток, крестик останавливает.
+.chip {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  max-width: var(--size-tab-max);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+.active {
+  border-color: var(--color-border-strong);
+  background-color: var(--color-bg-selected);
+}
+
+.pick,
+.static {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  min-width: 0;
+  height: var(--size-control-sm);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-xs);
+}
+
+.pick {
+  @include button-reset;
+  @include interactive-surface;
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: calc(var(--focus-ring-width) * -1);
+  }
+}
+
+.label {
+  flex-shrink: 0;
+  color: var(--color-fg);
+  font-family: var(--font-code);
+}
+
+.duration {
+  flex-shrink: 0;
+  color: var(--color-fg-disabled);
+  font-family: var(--font-code);
+  font-variant-numeric: tabular-nums;
+}
+
+// Чем занят агент - узкая строка с многоточием, иначе один чип съел бы ряд.
+.meta {
+  @include truncate;
+
+  min-width: 0;
+  max-width: var(--size-text-narrow);
+  color: var(--color-fg-subtle);
+}
+
+.subject {
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-sm);
+  white-space: pre-wrap;
+}

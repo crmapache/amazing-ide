@@ -11,6 +11,7 @@ import { useGitDialogsStore } from '../git-dialogs.store'
 import { useGitHead, useGitActions } from '../git.queries'
 import { BranchMenu } from '../BranchMenu/BranchMenu'
 import { GitInputDialog } from '../GitInputDialog/GitInputDialog'
+import { PullRequestLink } from '../PullRequestLink/PullRequestLink'
 import { PushDialog } from '../PushDialog/PushDialog'
 import { useActiveProject } from '../../../state/workspace.queries'
 import { BRANCH_ICON_SIZE, BRANCH_ICON_STROKE_WIDTH } from './BranchSwitcher.constants'
@@ -19,9 +20,10 @@ import styles from './BranchSwitcher.module.scss'
 type BranchSwitcherBodyProps = { projectId: string }
 
 /**
- * Ветка активного проекта в шапке и меню ветки, как в WebStorm. Диалоги (новая ветка,
- * тег или коммит, push) живут здесь, снаружи всплывающей панели: она закрывается при
- * выборе пункта. Папка не репозиторий git - кнопки нет вовсе.
+ * Ветка активного проекта в шапке, меню ветки, как в WebStorm, и PR ветки справа от
+ * неё. Диалоги (новая ветка, тег или коммит, push) живут здесь, снаружи всплывающей
+ * панели: она закрывается при выборе пункта. Папка не репозиторий git - кнопки нет
+ * вовсе.
  */
 export const BranchSwitcher = () => {
   const project = useActiveProject()
@@ -73,6 +75,7 @@ const BranchSwitcherBody = ({ projectId }: BranchSwitcherBodyProps) => {
           />
         )}
       </Popover>
+      {head.kind === 'branch' && <PullRequestLink projectId={projectId} branch={head.name} />}
       <GitInputDialog
         open={dialog === 'newBranch'}
         title={t('git.newBranchTitle')}

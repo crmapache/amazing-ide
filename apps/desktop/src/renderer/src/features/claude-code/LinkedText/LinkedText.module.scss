@@ -1,0 +1,14 @@
+// Адрес сайта - как ссылка в ответе: цвет ссылки, сплошное подчёркивание по наведению
+// (пунктир - у путей, которые открываются в IDE). Длинный адрес переносится где угодно.
+.link {
+  color: var(--color-info);
+  text-decoration: none;
+  text-underline-offset: var(--space-0-5);
+  overflow-wrap: anywhere;
+
+  @media (hover: hover) {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

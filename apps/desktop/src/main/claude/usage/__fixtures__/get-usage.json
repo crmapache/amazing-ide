@@ -1,0 +1,75 @@
+{
+  "subscription_type": "max",
+  "rate_limits_available": true,
+  "rate_limits": {
+    "five_hour": {
+      "utilization": 75,
+      "resets_at": "2026-10-18T01:20:00.049754+00:00",
+      "limit_dollars": null,
+      "used_dollars": null,
+      "remaining_dollars": null,
+      "locked_reason": null
+    },
+    "seven_day": {
+      "utilization": 70,
+      "resets_at": "2026-10-19T00:00:00.049777+00:00",
+      "limit_dollars": null,
+      "used_dollars": null,
+      "remaining_dollars": null,
+      "locked_reason": null
+    },
+    "seven_day_opus": null,
+    "seven_day_sonnet": null,
+    "extra_usage": {
+      "is_enabled": false,
+      "monthly_limit": null,
+      "used_credits": null,
+      "utilization": null,
+      "currency": null,
+      "decimal_places": null,
+      "disabled_reason": null,
+      "user_disabled": false,
+      "spend_limit_reached": false,
+      "credits_ever_enabled": false,
+      "daily": null,
+      "weekly": null
+    },
+    "limits": [
+      {
+        "kind": "session",
+        "group": "session",
+        "percent": 75,
+        "severity": "warning",
+        "resets_at": "2026-10-18T01:20:00.049754+00:00",
+        "scope": null,
+        "is_active": true
+      },
+      {
+        "kind": "weekly_all",
+        "group": "weekly",
+        "percent": 70,
+        "severity": "normal",
+        "resets_at": "2026-10-19T00:00:00.049777+00:00",
+        "scope": null,
+        "is_active": false
+      },
+      {
+        "kind": "weekly_scoped",
+        "group": "weekly",
+        "percent": 0,
+        "severity": "normal",
+        "resets_at": "2026-10-19T00:00:00+00:00",
+        "scope": { "model": { "id": null, "display_name": "Fable" }, "surface": null },
+        "is_active": false
+      }
+    ],
+    "seven_day_breakdown": {
+      "as_of": "2026-10-17T22:25:02.083322+00:00",
+      "window_started_at": "2026-10-12T00:00:00.049777+00:00",
+      "rows": [{ "key": "claude_code", "display_name": "Claude Code", "percent": 100 }]
+    },
+    "model_scoped": [
+      { "display_name": "Fable", "utilization": 0, "resets_at": "2026-10-19T00:00:00+00:00" }
+    ]
+  }
+}

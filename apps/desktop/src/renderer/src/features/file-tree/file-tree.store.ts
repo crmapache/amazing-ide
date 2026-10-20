@@ -18,11 +18,14 @@ type FileTreeStore = {
   revealed: RevealRequest | null
   toggleDirectory: (projectId: string, relativePath: string) => void
   /**
-   * Показать файл в дереве: раскрыть все папки над ним и попросить строку прокрутиться
-   * к себе. Файл выбрали не в дереве (поиском), а видно его должно быть.
+   * Показать файл или папку в дереве: раскрыть все папки над ним и попросить строку
+   * прокрутиться к себе. Выбрали не в дереве (поиском, ссылкой в ленте), а видно
+   * должно быть. expand - раскрыть и саму папку: показать папку - показать, что в ней.
    */
-  revealPath: (projectId: string, relativePath: string) => void
+  revealPath: (projectId: string, relativePath: string, options?: RevealOptions) => void
 }
+
+type RevealOptions = { expand?: boolean }
 
 /** Какие папки раскрыты в дереве. Нужно только дереву, поэтому живёт в его фиче. */
 export const useFileTreeStore = create<FileTreeStore>()(
@@ -39,10 +42,15 @@ export const useFileTreeStore = create<FileTreeStore>()(
 
           return { expandedByProject: { ...state.expandedByProject, [projectId]: next } }
         }),
-      revealPath: (projectId, relativePath) =>
+      revealPath: (projectId, relativePath, options) =>
         set((state) => {
           const expanded = state.expandedByProject[projectId] ?? []
-          const missing = ancestorPaths(relativePath).filter((path) => !expanded.includes(path))
+          const wanted = ancestorPaths(relativePath)
+
+          // Корень проекта ('') - не строка дерева, раскрывать нечего.
+          if (options?.expand && relativePath) wanted.push(relativePath)
+
+          const missing = wanted.filter((path) => !expanded.includes(path))
 
           return {
             expandedByProject: {

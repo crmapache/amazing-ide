@@ -1,0 +1,80 @@
+import clsx from 'clsx'
+import { useTranslation } from 'react-i18next'
+
+import { GAUGE_VIVID_CALM, GAUGE_VIVID_FULL } from '@shared/claude-prefs'
+
+import { Card } from '@amazing-ide/ui/Card'
+import { ProgressBar } from '@amazing-ide/ui/ProgressBar'
+import { RingMeter } from '@amazing-ide/ui/RingMeter'
+import { Slider } from '@amazing-ide/ui/Slider'
+
+import { useClaudeActions } from '../claude-actions.hooks'
+import { usePanelPrefs } from '../claude.queries'
+import { contextTone } from '../claude.utils'
+import { useDelayedSave } from '../delayed-save.hooks'
+import { SLIDER_SAVE_MS } from '../panel-look.constants'
+import { CONTEXT_SEGMENTS } from '../Composer/Composer.constants'
+import { segmentFill } from '../Composer/Composer.utils'
+import { PanelScreen } from '../PanelScreen/PanelScreen'
+import { CALM_LADDER, CALM_BAR_SHARE } from './CalmColorsScreen.constants'
+import styles from './CalmColorsScreen.module.scss'
+import { vividStyle } from './CalmColorsScreen.utils'
+
+/**
+ * Спокойные цвета (Settings → No-stress colors): сколько цвета остаётся шкалам - полосе
+ * контекста, кольцам лимитов, процентам аккаунтов. Образец собран из тех же примитивов
+ * и ступеней, что настоящие шкалы, и перекрашивается под пальцем. Ошибки остаются
+ * красными: это то, что случилось, а не настроение.
+ */
+export const CalmColorsScreen = () => {
+  const { t } = useTranslation()
+  const prefs = usePanelPrefs()
+  const { setPrefs } = useClaudeActions()
+  const [vivid, setVivid] = useDelayedSave(
+    prefs.gaugeVivid,
+    (gaugeVivid) => setPrefs({ gaugeVivid }),
+    SLIDER_SAVE_MS,
+  )
+  const barTone = contextTone(CALM_BAR_SHARE)
+  const percent = (value: number) => t('claudeCode.calmColors.percent', { value })
+
+  return (
+    <PanelScreen title={t('claudeCode.menu.titles.calmColors.title')}>
+      <Card title={t('claudeCode.calmColors.sample')}>
+        {/* eslint-disable-next-line no-restricted-syntax -- доля цвета образца меняется под пальцем */}
+        <div className={styles.sample} style={vividStyle(vivid)} data-gauge-calm="">
+          <div className={styles.bar}>
+            {CONTEXT_SEGMENTS.map((index) => (
+              <ProgressBar
+                key={index}
+                value={segmentFill(CALM_BAR_SHARE, index)}
+                tone={barTone}
+                label={t('claudeCode.context.label')}
+              />
+            ))}
+          </div>
+          <div className={styles.ladder}>
+            {CALM_LADDER.map((step) => (
+              <span key={step.value} className={clsx(styles.step, styles[step.tone])}>
+                <RingMeter value={step.value} tone={step.tone} label={percent(step.value)} />
+                {percent(step.value)}
+              </span>
+            ))}
+          </div>
+        </div>
+      </Card>
+      <div className={styles.control}>
+        <Slider
+          label={t('claudeCode.calmColors.label')}
+          value={vivid}
+          min={GAUGE_VIVID_CALM}
+          max={GAUGE_VIVID_FULL}
+          valueText={percent(vivid)}
+          onChange={setVivid}
+        />
+        <span className={styles.hint}>{t('claudeCode.calmColors.hint')}</span>
+      </div>
+      <p className={styles.note}>{t('claudeCode.calmColors.keeps')}</p>
+    </PanelScreen>
+  )
+}

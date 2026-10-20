@@ -1,0 +1,117 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+.queueList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  padding: var(--space-1-5) var(--space-1-5) var(--space-1-5) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-raised);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-height: var(--size-control-sm);
+  padding-left: var(--space-1);
+}
+
+.caption {
+  @include caps-label;
+
+  color: var(--color-fg-muted);
+}
+
+.hint {
+  @include truncate;
+
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-xs);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  border-radius: var(--radius-md);
+
+  // Строку несут за ручку: сама она бледнеет, а место, куда встанет, подсвечено.
+  &.dragging {
+    opacity: var(--opacity-breathe);
+  }
+
+  &.over {
+    background-color: var(--color-bg-selected);
+  }
+}
+
+.grip {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+  cursor: grab;
+  touch-action: none;
+}
+
+.number {
+  flex-shrink: 0;
+  min-width: var(--space-3);
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+// Сообщение - две строки, дальше многоточие: строка очереди - напоминание, а не чтение.
+.line {
+  display: -webkit-box;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-fg);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.quote {
+  @include truncate;
+
+  display: block;
+  color: var(--color-fg-muted);
+}
+
+.images {
+  margin-left: var(--space-1-5);
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+}
+
+// Место сообщения, вынутого в поле: пунктир - куда оно вернётся.
+.editingRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  min-height: var(--size-control-sm);
+  padding: 0 var(--space-2);
+  border: var(--border-width) dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-xs);
+}
+
+.editingText {
+  @include truncate;
+}
+
+// Чип картинки нажимается - открывает её крупно; в строке он стоит как стоял.
+.chipButton {
+  @include button-reset;
+
+  display: inline;
+  cursor: pointer;
+}

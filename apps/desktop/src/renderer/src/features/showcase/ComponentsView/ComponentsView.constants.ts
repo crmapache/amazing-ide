@@ -1,4 +1,10 @@
-import type { FileSample, BadgeSample, AvatarSample } from './ComponentsView.types'
+import type {
+  FileSample,
+  RingSample,
+  BadgeSample,
+  AvatarSample,
+  ProgressSample,
+} from './ComponentsView.types'
 
 // Инициалы - данные, как у настоящих проектов (projectInitials), а не текст интерфейса.
 export const AVATAR_SAMPLES: readonly AvatarSample[] = [
@@ -27,7 +33,13 @@ export const KBD_SAMPLES: readonly (readonly string[])[] = [
   ['G', 'G'],
 ]
 
-export const PROGRESS_SAMPLES: readonly number[] = [0.18, 0.64, 1]
+export const PROGRESS_SAMPLES: readonly ProgressSample[] = [
+  { value: 0.32, tone: 'success' },
+  { value: 0.18, tone: 'accent' },
+  { value: 0.58, tone: 'warning' },
+  { value: 0.78, tone: 'high' },
+  { value: 0.93, tone: 'danger' },
+]
 
 // Иконка рядом с подписью в переключателе ветки - как в шапке окна.
 export const SAMPLE_ICON_SIZE = 14
@@ -40,4 +52,13 @@ export const FILE_SAMPLES: readonly FileSample[] = [
   { name: 'file-tree.store.ts', folder: 'features/file-tree' },
   { name: 'ProjectTabs.tsx', folder: 'features/projects/ProjectTabs' },
   { name: 'tokens.css', folder: 'packages/ui/src/styles' },
+]
+
+/** Кольца лимитов: в запасе, быстрее нормы с темпом недели, почти кончилось, доплата. */
+export const RING_SAMPLES: readonly RingSample[] = [
+  { key: 'calm', value: 22, pace: null, tone: 'success', burning: false },
+  { key: 'pace', value: 57, pace: 41, tone: 'warning', burning: false },
+  { key: 'high', value: 78, pace: 52, tone: 'high', burning: false },
+  { key: 'danger', value: 91, pace: null, tone: 'danger', burning: false },
+  { key: 'burning', value: 100, pace: null, tone: 'accent', burning: true },
 ]

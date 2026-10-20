@@ -22,18 +22,21 @@
   cursor: pointer;
   transition: background-color var(--duration-normal) var(--easing-standard);
 
+  // aria-disabled - недоступно, но подсказка видна (настоящий disabled в Chromium не
+  // получает событий указателя): наведение и нажатие не зажигают, как у disabled.
   @media (hover: hover) {
-    &:not(:disabled):hover {
+    &:not(:disabled, [aria-disabled='true']):hover {
       background-color: $hover;
     }
   }
 
-  &:not(:disabled):active {
+  &:not(:disabled, [aria-disabled='true']):active {
     background-color: $active;
     transition-duration: var(--duration-fast);
   }
 
-  &:disabled {
+  &:disabled,
+  &[aria-disabled='true'] {
     cursor: not-allowed;
   }
 }
@@ -109,5 +112,54 @@
   @starting-style {
     opacity: 0;
     translate: 0 $offset-y;
+  }
+}
+
+// Рамка поля ввода: тёмная плоская подложка с тонкой рамкой, в фокусе - оранжевая
+// рамка и мягкое кольцо. Одна на TextField и на поле разговора, чтобы фокус везде
+// выглядел одинаково. Радиус и раскладку задаёт тот, кто подключил.
+@mixin field-frame {
+  border: var(--border-width) solid var(--color-border-strong);
+  background-color: var(--color-surface-sunken);
+  transition:
+    border-color var(--duration-normal) var(--easing-standard),
+    box-shadow var(--duration-normal) var(--easing-standard);
+
+  @media (hover: hover) {
+    &:hover:not(:focus-within) {
+      border-color: var(--color-fg-disabled);
+    }
+  }
+
+  &:focus-within {
+    border-color: var(--color-accent-border);
+    box-shadow: var(--shadow-focus);
+  }
+}
+
+// «Работа идёт»: медленное мерцание точки или подписи. Имя анимации в CSS Modules
+// локальное, поэтому кадры подключаются в модуль отдельно - breathing-keyframes в корне.
+@mixin breathing {
+  animation: breathing var(--duration-breathe) var(--easing-standard) infinite;
+}
+
+@mixin breathing-keyframes {
+  @keyframes breathing {
+    50% {
+      opacity: var(--opacity-breathe);
+    }
+  }
+}
+
+// Вращение значка загрузки. Кадры - spinning-keyframes в корне модуля.
+@mixin spinning {
+  animation: spinning var(--duration-spin) linear infinite;
+}
+
+@mixin spinning-keyframes {
+  @keyframes spinning {
+    to {
+      rotate: 360deg;
+    }
   }
 }

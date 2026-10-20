@@ -1,0 +1,60 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Размышления - тише ответа: моно, приглушённый текст, одна строка, пока свёрнута.
+.thinkingRow {
+  min-width: 0;
+}
+
+.chip {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+// Мысль ещё пишется - чип «дышит», как всё живое в ленте.
+.writing {
+  @include breathing;
+}
+
+.lastThought {
+  @include truncate;
+
+  flex: 1;
+  min-width: 0;
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-sm);
+}
+
+.count {
+  flex-shrink: 0;
+  color: var(--color-fg-disabled);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+  margin: var(--space-0-5) 0 var(--space-1) var(--space-6);
+  padding-left: var(--space-2);
+  border-left: var(--border-width) solid var(--color-border);
+}
+
+.label {
+  @include caps-label;
+
+  color: var(--color-fg-disabled);
+}
+
+.thought {
+  margin: 0;
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+@include breathing-keyframes;

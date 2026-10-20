@@ -1,0 +1,46 @@
+.slider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.label {
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-sm);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.value {
+  flex-shrink: 0;
+  min-width: var(--size-slider-value);
+  color: var(--color-fg-muted);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  text-align: right;
+}
+
+// Шкалу и ручку рисует браузер в тоне акцента: плоско и без своих градиентов.
+.input {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  color-scheme: dark;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    border-radius: var(--radius-full);
+    outline: none;
+    box-shadow: var(--shadow-focus);
+  }
+}

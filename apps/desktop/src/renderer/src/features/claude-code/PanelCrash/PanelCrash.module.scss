@@ -1,0 +1,18 @@
+// Упавшая панель: текст ошибки моноширинным и тихо - для того, кто будет разбираться.
+.action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: var(--size-popover-md);
+  max-width: 100%;
+}
+
+.message {
+  margin: 0;
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  text-align: center;
+  overflow-wrap: anywhere;
+}

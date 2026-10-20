@@ -1,0 +1,30 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Итог вызова - мелким моно тише цели: это подпись, а не содержание строки.
+.meta {
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// Идёт - «дышит» акцентом; ждёт человека - жёлтым, как всё, что ждёт решения.
+.running {
+  @include breathing;
+
+  color: var(--color-fg-accent);
+}
+
+.waiting {
+  @include breathing;
+
+  color: var(--color-warning);
+}
+
+.failed {
+  color: var(--color-danger);
+}
+
+@include breathing-keyframes;

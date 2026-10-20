@@ -1,6 +1,8 @@
 // Нативный <progress>: семантика и доля без inline-стиля. Плоская серая дорожка и
 // оранжевое заполнение, как полоса заряда в референсе.
 .progressBar {
+  --tone: var(--color-accent);
+
   display: block;
   width: 100%;
   height: var(--size-progress);
@@ -16,7 +18,49 @@
 
   &::-webkit-progress-value {
     border-radius: var(--radius-full);
-    background-color: var(--color-accent);
+    background-color: var(--tone);
     transition: inline-size var(--duration-slow) var(--easing-standard);
   }
+}
+
+// Доли нет: по той же дорожке бежит отрезок тона. Сколько осталось, не знает никто, и
+// полоса это признаёт, а не выдумывает процент.
+.sweep {
+  display: block;
+  width: 40%;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background-color: var(--tone);
+  animation: sweep var(--duration-breathe) var(--easing-standard) infinite;
+}
+
+@keyframes sweep {
+  from {
+    translate: -100% 0;
+  }
+
+  to {
+    translate: 250% 0;
+  }
+}
+
+.accent {
+  --tone: var(--color-accent);
+}
+
+// Ступени шкалы - роли, а не цвета состояний: их приглушает режим спокойных цветов.
+.success {
+  --tone: var(--color-gauge-1);
+}
+
+.warning {
+  --tone: var(--color-gauge-2);
+}
+
+.high {
+  --tone: var(--color-gauge-3);
+}
+
+.danger {
+  --tone: var(--color-gauge-4);
 }

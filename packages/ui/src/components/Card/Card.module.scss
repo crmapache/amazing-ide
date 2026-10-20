@@ -31,8 +31,27 @@
   @include truncate;
   @include caps-label;
 
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
   color: var(--color-fg-muted);
   line-height: var(--size-control-sm);
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+}
+
+// Ход ждёт человека: оранжевая рамка и заголовок - «обрати внимание» (ADR 0006).
+// Подложка обычная: заливка цветом кричала бы громче самого вопроса.
+.accent {
+  border-color: var(--color-accent-border);
+
+  .title,
+  .icon {
+    color: var(--color-fg-accent);
+  }
 }
 
 .description {
@@ -55,4 +74,15 @@
 .body {
   padding: var(--space-3) var(--space-4) var(--space-4);
   color: var(--color-fg-muted);
+}
+
+// Плотная плитка: подпись, под ней сразу содержимое - без линии и с узкими полями.
+.sm {
+  .header {
+    padding: var(--space-2) var(--space-3) 0;
+  }
+
+  .body {
+    padding: var(--space-1-5) var(--space-3) var(--space-3);
+  }
 }

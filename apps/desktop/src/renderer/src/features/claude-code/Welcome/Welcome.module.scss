@@ -1,0 +1,48 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Приветствие - пустое состояние IDE (EmptyState) с идеями списком меню и клавишами
+// поля под ним. Свои здесь только рамка списка идей и строка клавиш.
+.welcome {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.extras {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  width: var(--size-popover-lg);
+  max-width: 100%;
+}
+
+.ideas {
+  width: 100%;
+  padding: var(--space-1-5);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: left;
+}
+
+.caption {
+  @include caps-label;
+
+  padding: var(--space-1) var(--space-2) var(--space-1-5);
+  color: var(--color-fg-subtle);
+}
+
+.keys {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.key {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+}

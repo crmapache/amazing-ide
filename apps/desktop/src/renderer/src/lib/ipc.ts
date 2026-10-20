@@ -23,3 +23,6 @@ export const subscribe = <E extends EventChannel>(
   event: E,
   listener: (payload: EventPayload<E>) => void,
 ): (() => void) => window.ide.on(event, listener)
+
+/** Путь на диске у файла, перетащенного из Finder; пусто - у файла нет пути. */
+export const pathForFile = (file: File): string => window.ide.pathForFile(file)

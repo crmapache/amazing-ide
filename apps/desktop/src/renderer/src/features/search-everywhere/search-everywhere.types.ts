@@ -2,7 +2,8 @@ import type { LucideIcon } from 'lucide-react'
 
 import type { TextMatch } from '@shared/search'
 
-import type { TextRange } from '@amazing-ide/ui/ListBoxOption.types'
+import type { PreparedFile } from '../../lib/file-match.types'
+import type { FuzzyMatch } from '../../lib/fuzzy-match.types'
 
 /** Вкладки поиска, как в WebStorm. Classes и Symbols появятся вместе с разбором кода. */
 export type SearchTab = 'all' | 'files' | 'actions' | 'text'
@@ -20,21 +21,6 @@ export type SearchAction = {
   /** Сочетание клавиш - справа серым. */
   shortcut?: string | undefined
   run: () => void
-}
-
-/** Насколько текст подходит под запрос и какие его символы совпали. */
-export type FuzzyMatch = {
-  score: number
-  ranges: TextRange[]
-}
-
-/** Файл проекта, заранее разобранный для поиска: имя отдельно, нижний регистр готов. */
-export type PreparedFile = {
-  path: string
-  name: string
-  folder: string
-  pathLower: string
-  nameLower: string
 }
 
 export type FileResult = { kind: 'file'; file: PreparedFile; match: FuzzyMatch }

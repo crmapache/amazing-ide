@@ -1,6 +1,6 @@
 import { join } from 'node:path'
 
-import { shell, BrowserWindow } from 'electron'
+import { BrowserWindow } from 'electron'
 
 import {
   MIN_WINDOW_SIZE,
@@ -8,8 +8,8 @@ import {
   DEFAULT_WINDOW_SIZE,
   TRAFFIC_LIGHT_POSITION,
 } from './main-window.constants'
-
-const isExternalWebUrl = (url: string) => /^https?:\/\//.test(url)
+import { openExternalWeb } from './open-external'
+import { installSpellMenu } from './spell-menu'
 
 /**
  * Главное окно IDE. Страница работает в песочнице без Node, а наружу ходит только
@@ -30,19 +30,22 @@ export const createMainWindow = (rendererUrl: string | undefined): BrowserWindow
       sandbox: true,
       contextIsolation: true,
       nodeIntegration: false,
-      spellcheck: false,
+      // Проверку орфографии включает страница (Settings → Spell check): выключенная
+      // настройка ставит spellcheck="false" на корень документа.
+      spellcheck: true,
     },
   })
 
   window.once('ready-to-show', () => window.show())
 
   window.webContents.setWindowOpenHandler(({ url }) => {
-    if (isExternalWebUrl(url)) void shell.openExternal(url)
+    openExternalWeb(url)
 
     return { action: 'deny' }
   })
 
   window.webContents.on('will-navigate', (event) => event.preventDefault())
+  installSpellMenu(window)
 
   if (rendererUrl) {
     void window.loadURL(rendererUrl)

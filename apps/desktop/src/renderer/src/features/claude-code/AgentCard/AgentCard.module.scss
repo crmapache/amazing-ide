@@ -1,0 +1,97 @@
+@use '@amazing-ide/ui/mixins' as *;
+@include breathing-keyframes;
+
+// Агент - строка разговора, как вызов: шапка-раскрывашка, под ней тело с линией слева.
+.agentCard {
+  min-width: 0;
+}
+
+// Чип вида: тонированная плашка, как у вызовов. Тон нейтральный - это вид, а не
+// состояние; красный - только у упавшего (цвет смыслом, ADR 0006).
+.chip {
+  --tone: var(--color-fg-muted);
+
+  @include tinted-plaque(var(--tone));
+  @include caps-label;
+
+  flex-shrink: 0;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-code);
+}
+
+.chipFailed {
+  --tone: var(--color-danger);
+}
+
+.type {
+  flex-shrink: 0;
+  color: var(--color-fg);
+  font-family: var(--font-code);
+  font-size: var(--font-size-sm);
+}
+
+.failed {
+  color: var(--color-danger);
+}
+
+.description {
+  @include truncate;
+
+  flex: 1;
+  min-width: 0;
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-sm);
+}
+
+.duration {
+  flex-shrink: 0;
+  color: var(--color-fg-disabled);
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+  font-variant-numeric: tabular-nums;
+}
+
+// Живого агента выдаёт время: оно тикает и дышит на другом конце строки.
+.running {
+  @include breathing;
+
+  color: var(--color-warning);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+  margin: var(--space-0-5) 0 var(--space-2) var(--space-6);
+  padding: var(--space-1) 0 var(--space-1) var(--space-3);
+  border-left: var(--border-width) solid var(--color-border-strong);
+}
+
+.errand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.caption {
+  @include caps-label;
+
+  color: var(--color-fg-subtle);
+}
+
+// Задание как написано, с переносами: промпт - документ, а не фраза. Длинное листается
+// внутри блока, а не уводит за собой ленту.
+.prompt {
+  max-height: var(--size-scroll-compact-max);
+  overflow: auto;
+  color: var(--color-fg-muted);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}

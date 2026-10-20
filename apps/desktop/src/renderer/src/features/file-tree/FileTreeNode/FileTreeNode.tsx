@@ -1,8 +1,10 @@
 import { useRef, useEffect } from 'react'
+import type { DragEvent } from 'react'
 import clsx from 'clsx'
 import { File, Folder, ChevronRight } from 'lucide-react'
 
 import { useIsExpanded, useRevealSerial, useFileTreeStore } from '../file-tree.store'
+import { writeProjectPaths } from '../../../lib/project-drag'
 import { useSelectedFile, useSelectionStore } from '../../../state/selection.store'
 import { TREE_ICON_SIZE, TREE_ICON_STROKE_WIDTH } from './FileTreeNode.constants'
 import styles from './FileTreeNode.module.scss'
@@ -26,14 +28,23 @@ export const FileTreeNode = ({ projectId, entry, depth }: FileTreeNodeProps) => 
 
   // Файл выбрали поиском (и даже тот же самый ещё раз), а строка за краем панели -
   // прокрутить к ней. Кликнутая строка и так видна, для неё это ничего не делает.
+  // Папку не выбирают, её только показывают (ссылка в ленте) - к ней по просьбе.
   useEffect(() => {
-    if (isSelected) ref.current?.scrollIntoView({ block: 'nearest' })
-  }, [isSelected, revealSerial])
+    if (isSelected || (isDirectory && revealSerial > 0)) {
+      ref.current?.scrollIntoView({ block: 'nearest' })
+    }
+  }, [isSelected, isDirectory, revealSerial])
 
   const handleClick = () =>
     isDirectory
       ? toggleDirectory(projectId, entry.relativePath)
       : selectFile(projectId, entry.relativePath)
+
+  // Строку можно бросить в поле Claude Code: файл или папка встанут туда чипом.
+  const handleDragStart = (event: DragEvent<HTMLButtonElement>) =>
+    writeProjectPaths(event.dataTransfer, [
+      isDirectory ? `${entry.relativePath}/` : entry.relativePath,
+    ])
 
   return (
     <>
@@ -44,6 +55,8 @@ export const FileTreeNode = ({ projectId, entry, depth }: FileTreeNodeProps) => 
         className={clsx(styles.row, isSelected && styles.selected)}
         // eslint-disable-next-line no-restricted-syntax -- отступ зависит от глубины
         style={depthStyle(depth)}
+        draggable
+        onDragStart={handleDragStart}
         onClick={handleClick}>
         <ChevronRight
           size={TREE_ICON_SIZE}

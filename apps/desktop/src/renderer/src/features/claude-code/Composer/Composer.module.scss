@@ -1,0 +1,221 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+.composer {
+  position: relative;
+  flex-shrink: 0;
+  padding: 0 var(--space-3) var(--space-3);
+}
+
+// Поле - самая тёмная поверхность панели с тонкой рамкой, как TextField: в фокусе -
+// оранжевая рамка и мягкое кольцо. Кнопки живут внутри рамки, под текстом.
+.box {
+  @include field-frame;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+
+  // Файл несут над полем - рамка зовёт бросить его сюда.
+  &[data-dropping] {
+    border-color: var(--color-accent);
+  }
+
+  // Команда терминала «!» - рамка тоном справки: это уйдёт не модели, а в терминал.
+  &[data-shell] {
+    border-color: color-mix(in srgb, var(--color-info) var(--tint-border), transparent);
+  }
+}
+
+// Текст с чипами внутри строки. Растёт с текстом до потолка, дальше - прокрутка внутри.
+.field {
+  min-height: calc(2lh + var(--space-3) + var(--space-1));
+  max-height: var(--size-composer-max);
+  padding: var(--space-3) var(--space-3) var(--space-1);
+  overflow-y: auto;
+  outline: none;
+  color: var(--color-fg-strong);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-normal);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+
+  &:empty::before {
+    color: var(--color-fg-disabled);
+    content: attr(data-placeholder);
+    pointer-events: none;
+  }
+
+  // Команда в терминал - моноширинным, как в терминале.
+  &[data-shell] {
+    font-family: var(--font-code);
+    font-size: var(--font-size-sm);
+  }
+}
+
+// Узел чипа в поле: неделимый, внутренности рисует React порталом.
+.chip {
+  display: inline;
+
+  // Стрелка остановилась на чипе: Backspace уберёт именно его.
+  &[data-selected] > * {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+  }
+}
+
+// Серый синтаксис аргумента - слой поверх поля, где встанет следующий символ.
+.ghost {
+  position: absolute;
+  right: var(--space-3);
+  z-index: var(--z-sticky);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-fg-disabled);
+  font-size: var(--font-size-md);
+  white-space: pre;
+  pointer-events: none;
+}
+
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-1) var(--space-1-5) var(--space-1-5);
+}
+
+// Ряд кнопок не переносится: на узкой панели он отдаёт шаги и сужает Send и Queue
+// (composer-fit.utils.ts). Квадраты своей ширины не уступают - они уходят целиком.
+.toolRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+
+  > * {
+    flex-shrink: 0;
+  }
+}
+
+// Группы кнопок - с зазором пошире, чем между кнопками группы: две пары не сливаются в
+// одну кучу квадратов.
+.toolGroups {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.toolGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-0-5);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.sendButtons {
+  display: flex;
+  flex-shrink: 1;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  margin-left: auto;
+}
+
+// Queue и Send сужаются до первой буквы: кнопка уступает ширину, буква - своя коробка,
+// остальное режется. Stop и «не отвечает» не сужаются.
+.shrinking {
+  display: inline-flex;
+  min-width: 0;
+
+  button {
+    min-width: 0;
+  }
+}
+
+.fitLabel {
+  display: inline-flex;
+  min-width: 0;
+}
+
+.fitHead {
+  flex-shrink: 0;
+}
+
+.fitClip {
+  min-width: 0;
+  overflow: hidden;
+}
+
+// Ужатая раскладка: строка селекторов и колец - своей строкой внутри рамки, под кнопками.
+.compactSelectors {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.contextBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3) 0;
+  cursor: default;
+}
+
+// Пять отрезков с зазором - риски на 20, 40, 60 и 80 процентах.
+.contextSegments {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-1) 0;
+
+  &:focus-visible {
+    border-radius: var(--radius-sm);
+    outline: var(--focus-ring-width) solid var(--color-focus);
+  }
+}
+
+.contextValue {
+  margin-left: auto;
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+  font-variant-numeric: tabular-nums;
+
+  &.success {
+    color: var(--color-success);
+  }
+
+  &.warning {
+    color: var(--color-warning);
+  }
+
+  &.accent {
+    color: var(--color-accent-strong);
+  }
+
+  &.danger {
+    color: var(--color-danger);
+  }
+}
+
+// Подсказка команд - стеклянный слой над полем, как всплывающие панели окна.
+.suggest {
+  @include glass-overlay;
+  @include enter-transition;
+
+  position: absolute;
+  right: var(--space-3);
+  bottom: calc(100% + var(--space-1));
+  left: var(--space-3);
+  z-index: var(--z-overlay);
+  max-height: var(--size-listbox-max);
+  padding: var(--space-1);
+  overflow-y: auto;
+  border-radius: var(--radius-lg);
+}

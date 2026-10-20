@@ -11,7 +11,7 @@ import { nextIndex } from './Menu.utils'
  * пунктам (из поля поиска - на первый), Home и End - в начало и конец, Enter
  * выбирает. Пункты - MenuItem, группы - MenuSection, линии - MenuSeparator.
  */
-export const Menu = ({ label, autoFocus = false, children }: MenuProps) => {
+export const Menu = ({ label, autoFocus = false, header, children }: MenuProps) => {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -39,6 +39,7 @@ export const Menu = ({ label, autoFocus = false, children }: MenuProps) => {
 
   return (
     <div ref={ref} role="menu" aria-label={label} className={styles.menu} onKeyDown={handleKeyDown}>
+      {header && <div className={styles.header}>{header}</div>}
       {children}
     </div>
   )

@@ -19,3 +19,9 @@ export const GIT_STDERR_KEEP_CHARS = 4_000
  * credential helper, если он настроен; иначе git честно откажет.
  */
 export const GIT_ENV_OVERRIDES = { GIT_TERMINAL_PROMPT: '0', LC_ALL: 'C' }
+
+/** Сколько ждать `gh pr view`: он ходит в сеть, а шапка панели ждёт ответа. */
+export const GH_TIMEOUT_MS = 5_000
+
+/** Где gh лежит у Homebrew, если в PATH оболочки его нет. */
+export const GH_FALLBACK_DIRS: readonly string[] = ['/opt/homebrew/bin', '/usr/local/bin']

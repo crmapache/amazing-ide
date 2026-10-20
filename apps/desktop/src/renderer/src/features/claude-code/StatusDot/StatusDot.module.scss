@@ -1,0 +1,33 @@
+@use '@amazing-ide/ui/mixins' as *;
+@include breathing-keyframes;
+
+.statusDot {
+  flex-shrink: 0;
+  width: var(--size-status-dot);
+  height: var(--size-status-dot);
+  border-radius: var(--radius-full);
+  background-color: var(--color-fg-disabled);
+  transition: background-color var(--duration-normal) var(--easing-standard);
+}
+
+// Дышат только работа и ожидание человека: остальное стоит, иначе полоса рябит.
+.running {
+  @include breathing;
+
+  background-color: var(--color-warning);
+}
+
+.done {
+  background-color: var(--color-success);
+}
+
+.attention {
+  @include breathing;
+
+  background-color: var(--color-accent);
+}
+
+// Не дышит: это не работа, а факт - разговор оборвался.
+.crashed {
+  background-color: var(--color-danger);
+}

@@ -8,15 +8,34 @@
   align-items: center;
   gap: var(--space-2);
   min-width: 0;
-  height: var(--size-control-md);
-  padding: 0 var(--space-2);
   border-radius: var(--radius-sm);
   color: var(--color-fg);
-  font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
 
   &:disabled {
     color: var(--color-fg-disabled);
+  }
+}
+
+.md {
+  height: var(--size-control-md);
+  padding: 0 var(--space-2);
+  font-size: var(--font-size-md);
+}
+
+// Плотная строка под полем ввода: значение мельче и приглушённее, чтобы не спорить
+// с текстом в поле.
+.sm {
+  gap: var(--space-1);
+  height: var(--size-control-sm);
+  padding: 0 var(--space-1-5);
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-xs);
+
+  @media (hover: hover) {
+    &:not(:disabled):hover {
+      color: var(--color-fg);
+    }
   }
 }
 

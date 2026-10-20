@@ -14,9 +14,10 @@ export const PROVIDER_VIEWS: readonly ViewDescriptor<ProviderViewId>[] = [
     id: 'claude-code',
     icon: Sparkles,
     labelKey: 'providerViews.claudeCode',
+    // Панель за границей ошибок: упавшая отрисовка - экран «Reload the panel», а не пустота.
     Component: lazy(() =>
-      import('../../features/claude-code/ClaudeCodeView/ClaudeCodeView').then((module) => ({
-        default: module.ClaudeCodeView,
+      import('../../features/claude-code/ClaudeCodePanel/ClaudeCodePanel').then((module) => ({
+        default: module.ClaudeCodePanel,
       })),
     ),
   },

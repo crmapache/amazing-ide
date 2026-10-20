@@ -28,3 +28,4 @@ minimumReleaseAgeExclude:
   - react-i18next@17.0.18
   - sass@1.105.2
   - vitest@5.0.5
+  - smooth-stream-text@0.2.2

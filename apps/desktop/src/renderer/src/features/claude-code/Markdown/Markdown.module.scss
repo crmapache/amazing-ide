@@ -1,0 +1,198 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Ответ читается часами - ровный текст интерфейса, спокойные заголовки, код на тёмной
+// поверхности. Цвет только там, где он что-то значит: ссылка - мятная (справка),
+// сделанный пункт - зелёный.
+.markdown {
+  min-width: 0;
+  color: var(--color-fg);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-normal);
+  overflow-wrap: anywhere;
+  user-select: text;
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+.paragraph {
+  margin: 0 0 var(--space-2);
+}
+
+.h1,
+.h2,
+.h3 {
+  margin: var(--space-4) 0 var(--space-2);
+  color: var(--color-fg-strong);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+}
+
+.h1 {
+  font-size: var(--font-size-lg);
+}
+
+.h2,
+.h3 {
+  font-size: var(--font-size-md);
+}
+
+.h4 {
+  @include caps-label;
+
+  margin: var(--space-3) 0 var(--space-1-5);
+  color: var(--color-fg-muted);
+}
+
+.strong {
+  color: var(--color-fg-strong);
+  font-weight: var(--font-weight-semibold);
+}
+
+.deleted {
+  color: var(--color-fg-subtle);
+}
+
+.inlineCode {
+  padding: 0 var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-xs);
+  background-color: var(--color-surface-sunken);
+  color: var(--color-fg-strong);
+  font-family: var(--font-code);
+  font-size: var(--font-size-sm);
+}
+
+// Код, который копируется нажатием: отклик на наведение - подложкой, как у кнопки.
+.copyable {
+  cursor: pointer;
+  transition: background-color var(--duration-normal) var(--easing-standard);
+
+  @media (hover: hover) {
+    &:not(.copied):hover {
+      background-color: var(--color-surface-raised);
+    }
+  }
+}
+
+// Скопировано: зелёная плашка - единственный ответ, какой тут возможен: в буфер не
+// заглянуть.
+.copied {
+  @include tinted-plaque(var(--color-success));
+}
+
+.link {
+  color: var(--color-info);
+  text-decoration: none;
+  text-underline-offset: var(--space-0-5);
+
+  @media (hover: hover) {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Маркер - своя колонка общей сетки списка (subgrid): её ширина - самый широкий
+// маркер, так что «9.» и «10.» стоят ровно, а перенесённые строки пункта - под текстом.
+.list {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-1) var(--space-1-5);
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.listItem {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: baseline;
+}
+
+// Маркер как в ACC: моноширинный, тише текста - он отмечает пункт, а не читается.
+.marker {
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.listContent {
+  min-width: 0;
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Квадрат пункта-дела не имеет базовой линии текста - встаёт по верху строки.
+.checkbox {
+  display: inline-flex;
+  align-self: start;
+  margin-top: var(--space-0-5);
+}
+
+.quote {
+  margin: 0 0 var(--space-2);
+  padding-left: var(--space-3);
+  border-left: var(--border-width) solid var(--color-border-strong);
+  color: var(--color-fg-muted);
+}
+
+.rule {
+  margin: var(--space-4) 0;
+  border: none;
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.tableWrap {
+  margin: var(--space-2) 0;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.headCell,
+.cell {
+  padding: var(--space-1-5) var(--space-3);
+  text-align: left;
+  vertical-align: top;
+}
+
+.headCell {
+  @include caps-label;
+
+  border-bottom: var(--border-width) solid var(--color-border);
+  background-color: var(--color-surface-sunken);
+  color: var(--color-fg-subtle);
+  white-space: nowrap;
+}
+
+.cell {
+  border-top: var(--border-width) solid var(--color-border);
+
+  tr:first-child > & {
+    border-top: none;
+  }
+}
+
+.alignCenter {
+  text-align: center;
+}
+
+.alignRight {
+  text-align: right;
+}

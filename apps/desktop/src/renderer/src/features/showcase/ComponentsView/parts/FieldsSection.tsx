@@ -51,9 +51,10 @@ export const FieldsSection = () => {
       <SearchListSpecimen />
 
       <Specimen label={t('specimens.progress')} layout="column">
-        {PROGRESS_SAMPLES.map((value) => (
-          <ProgressBar key={value} value={value} label={t('samples.progressLabel')} />
+        {PROGRESS_SAMPLES.map(({ value, tone }) => (
+          <ProgressBar key={value} value={value} tone={tone} label={t('samples.progressLabel')} />
         ))}
+        <ProgressBar label={t('samples.progressLabel')} />
       </Specimen>
     </ShowcaseSection>
   )

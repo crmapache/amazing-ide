@@ -1,6 +1,8 @@
 import {
+  Bot,
   Play,
   Search,
+  ArrowUp,
   Settings,
   GitBranch,
   SquareTerminal,
@@ -61,8 +63,11 @@ export const ActionsSection = () => {
         <IconButton icon={Search} label={t('samples.search')} />
         <IconButton icon={SquareTerminal} label={t('samples.terminal')} active />
         <IconButton icon={Settings} label={t('samples.settings')} disabled />
+        <IconButton icon={Settings} label={t('samples.unavailable')} aria-disabled />
         <IconButton icon={Search} size="sm" label={t('samples.search')} />
         <IconButton icon={SquareTerminal} size="sm" label={t('samples.terminal')} active />
+        <IconButton icon={ArrowUp} variant="primary" label={t('samples.send')} />
+        <IconButton icon={ArrowUp} variant="primary" label={t('samples.send')} disabled />
       </Specimen>
 
       <Specimen label={t('specimens.dropdowns')}>
@@ -77,6 +82,14 @@ export const ActionsSection = () => {
             <GitBranch size={SAMPLE_ICON_SIZE} strokeWidth={SAMPLE_ICON_STROKE_WIDTH} aria-hidden />
           }
           menuLabel={t('samples.branchMenu')}
+        />
+        <DropdownButton
+          size="sm"
+          label={t('samples.model')}
+          leading={
+            <Bot size={SAMPLE_ICON_SIZE} strokeWidth={SAMPLE_ICON_STROKE_WIDTH} aria-hidden />
+          }
+          menuLabel={t('samples.modelMenu')}
         />
       </Specimen>
 

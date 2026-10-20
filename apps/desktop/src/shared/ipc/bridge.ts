@@ -17,4 +17,9 @@ export type IdeBridge = {
   ) => Promise<InvokeResponse<C>>
   /** Подписка на событие. Возвращает функцию отписки - её обязательно звать. */
   on: <E extends EventChannel>(event: E, listener: (payload: EventPayload<E>) => void) => () => void
+  /**
+   * Путь на диске у файла, перетащенного из Finder (webUtils.getPathForFile): песочница
+   * окна его не видит. Пусто - у файла нет пути (вставлен байтами из буфера).
+   */
+  pathForFile: (file: File) => string
 }

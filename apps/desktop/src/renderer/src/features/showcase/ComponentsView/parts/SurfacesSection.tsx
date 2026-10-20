@@ -35,6 +35,9 @@ export const SurfacesSection = () => {
             <Kbd keys={KBD_SAMPLES[0] ?? []} />
           </div>
         </Card>
+        <Card size="sm" title={t('samples.cardCompactTitle')}>
+          {t('samples.cardCompactBody')}
+        </Card>
       </Specimen>
 
       <Specimen label={t('specimens.emptyState')} layout="column">

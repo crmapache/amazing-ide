@@ -1,0 +1,63 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Полка лежит поверх верха ленты: непрозрачная (текст под полупрозрачным не читается
+// дважды), черта снизу говорит, что разговор уходит под неё, а не кончается.
+.pinnedBar {
+  position: absolute;
+  z-index: var(--z-sticky);
+  inset: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  padding: var(--space-1) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+  background-color: var(--color-surface-panel);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-0-5);
+  min-width: 0;
+}
+
+// Вся строка - цель нажатия, а не те несколько слов, что влезли.
+.jump {
+  @include button-reset;
+  @include interactive-surface;
+
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-1-5);
+  min-width: 0;
+  height: var(--size-control-sm);
+  padding: 0 var(--space-1-5);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-tight);
+  text-align: left;
+}
+
+.mark {
+  flex: none;
+  color: var(--color-fg-subtle);
+}
+
+// «Кто сказал» - кеглем самой строки: два кегля в одной строке разводят базовые линии.
+.who {
+  @include caps-label;
+
+  flex: none;
+  color: var(--color-fg-muted);
+  font-size: inherit;
+}
+
+// Обрез делает браузер: только он следит за шириной панели.
+.text {
+  @include truncate;
+
+  flex: 1;
+  min-width: 0;
+  color: var(--color-fg);
+}

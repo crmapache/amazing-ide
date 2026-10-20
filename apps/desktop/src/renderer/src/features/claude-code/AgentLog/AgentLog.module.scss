@@ -1,0 +1,69 @@
+@use '@amazing-ide/ui/mixins' as *;
+@include breathing-keyframes;
+
+// Журнал агента: флот, шаги, итог. Строки идут колонкой с ровным зазором - как в ACC.
+.agentLog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.journal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  min-width: 0;
+}
+
+.remark {
+  padding: var(--space-0-5) var(--space-1-5);
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-sm);
+  white-space: pre-wrap;
+  user-select: text;
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+}
+
+.step {
+  @include truncate;
+
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+}
+
+// Срезанное сверху и закрытие без ответа - слова панели, а не агента: тише его текста.
+.trimmed,
+.note {
+  color: var(--color-fg-disabled);
+  font-size: var(--font-size-xs);
+}
+
+.bad {
+  color: var(--color-danger);
+}
+
+.report {
+  min-width: 0;
+  color: var(--color-fg);
+  font-size: var(--font-size-sm);
+  user-select: text;
+}
+
+.failed {
+  color: var(--color-danger);
+}
+
+.working {
+  @include breathing;
+
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+}

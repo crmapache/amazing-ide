@@ -1,0 +1,36 @@
+// Карточка вызова: шапка и под ней тело с отступом под стрелку - вывод читается как
+// продолжение строки, а не отдельный блок.
+.toolRow {
+  min-width: 0;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  margin: var(--space-0-5) 0 var(--space-1) var(--space-6);
+  padding: var(--space-1-5) var(--space-2);
+  border-left: var(--border-width) solid var(--color-border);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  user-select: text;
+}
+
+.line {
+  color: var(--color-fg-subtle);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ok {
+  color: var(--color-success);
+}
+
+.bad {
+  color: var(--color-danger);
+}
+
+.note {
+  color: var(--color-fg-disabled);
+  font-family: var(--font-ui);
+}

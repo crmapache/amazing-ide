@@ -1,0 +1,17 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+.conversationBlocked {
+  @include enter-transition;
+}
+
+.text {
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-snug);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-1-5);
+  margin-top: var(--space-3);
+}

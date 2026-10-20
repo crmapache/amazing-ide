@@ -1,0 +1,103 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Флот строками, а не карточками: девять агентов видны разом в узкой панели.
+.workflowRun {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+}
+
+// Счётчики врозь: «3 running» и «5 done» не должны читаться одним числом.
+.counts {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-2);
+}
+
+.running {
+  color: var(--color-warning);
+}
+
+.failed {
+  color: var(--color-danger);
+}
+
+.phase {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+}
+
+.phaseTitle {
+  margin-bottom: var(--space-0-5);
+  color: var(--color-fg-disabled);
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+}
+
+// Вся строка - цель нажатия: сорок строк в колонке, а стрелка была бы мишенью в 12px.
+.agent {
+  @include button-reset;
+  @include interactive-surface;
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-0-5) var(--space-1);
+  border-radius: var(--radius-sm);
+  color: var(--color-fg-muted);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  text-align: left;
+
+  &:disabled {
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: calc(var(--focus-ring-width) * -1);
+  }
+}
+
+// Ждущий, снятый и оборванный - не работа и не итог: тише остальных.
+.quiet {
+  color: var(--color-fg-disabled);
+}
+
+.active {
+  color: var(--color-fg);
+}
+
+// Подпись берёт, сколько есть места: обрезанная подпись узнаётся, обрезанные цифры - нет.
+.label {
+  @include truncate;
+
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.facts {
+  flex-shrink: 0;
+  color: var(--color-fg-disabled);
+}
+
+.log {
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  white-space: pre-wrap;
+}

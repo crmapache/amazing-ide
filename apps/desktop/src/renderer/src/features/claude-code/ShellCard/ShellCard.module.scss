@@ -1,0 +1,67 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Команда человека - лист терминала: тёмная поверхность кода, шапка с «$ команда».
+.shellCard {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-sunken);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  min-height: var(--size-control-md);
+  padding: 0 var(--space-1) 0 var(--space-3);
+}
+
+.running {
+  @include breathing;
+
+  flex-shrink: 0;
+  color: var(--color-fg-accent);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+}
+
+.command {
+  @include truncate;
+
+  flex: 1;
+  min-width: 0;
+  color: var(--color-fg-strong);
+  font-family: var(--font-code);
+  font-size: var(--font-size-sm);
+  user-select: text;
+}
+
+.output {
+  max-height: var(--size-code-max);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  overflow: auto;
+  border-top: var(--border-width) solid var(--color-border);
+  color: var(--color-fg);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+.stderr {
+  color: var(--color-danger);
+}
+
+.note {
+  padding: var(--space-1) var(--space-3) var(--space-2);
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+}
+
+@include breathing-keyframes;

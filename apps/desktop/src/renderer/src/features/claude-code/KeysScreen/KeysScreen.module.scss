@@ -1,0 +1,64 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+.note {
+  margin: 0;
+  padding: 0 var(--space-2);
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-snug);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+}
+
+.groupTitle {
+  @include caps-label;
+
+  margin: 0;
+  padding: var(--space-3) var(--space-2) var(--space-1);
+  color: var(--color-fg-subtle);
+}
+
+// Подпись слева (с «когда» серым под ней), клавиши справа - в одну строку каждая.
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--size-menu-item);
+  padding: var(--space-1) var(--space-2);
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.label {
+  @include truncate;
+
+  color: var(--color-fg);
+  font-size: var(--font-size-sm);
+}
+
+.when {
+  @include truncate;
+
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+}
+
+.caps {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.between {
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+}

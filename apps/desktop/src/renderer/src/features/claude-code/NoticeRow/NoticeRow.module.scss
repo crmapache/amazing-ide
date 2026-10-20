@@ -1,0 +1,250 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Отметка разговора: чип, подпись и пунктир до края - граница, а не событие (как в ACC).
+.checkpoint,
+.checkpointButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: var(--space-1) 0;
+}
+
+.checkpointButton {
+  @include button-reset;
+
+  width: 100%;
+  min-height: var(--size-control-sm);
+  text-align: left;
+
+  @media (hover: hover) {
+    &:hover .checkpointText {
+      color: var(--color-fg-muted);
+    }
+  }
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+  }
+}
+
+.checkpointChip {
+  @include caps-label;
+
+  flex-shrink: 0;
+  color: var(--color-fg-disabled);
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+}
+
+.checkpointText {
+  min-width: 0;
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+}
+
+.checkpointLink {
+  @include button-reset;
+
+  color: var(--color-fg-muted);
+  font: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: var(--space-0-5);
+
+  @media (hover: hover) {
+    &:hover {
+      color: var(--color-fg);
+    }
+  }
+}
+
+.dashed {
+  flex: 1;
+  min-width: var(--space-4);
+  border-top: var(--border-width) dashed var(--color-border-strong);
+}
+
+// Служебная строка с подписью капсом: CONTEXT, RETRY, MODEL, SESSION…
+.labelRow {
+  --tone: var(--color-fg-subtle);
+
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: var(--font-size-xs);
+}
+
+.neutral {
+  --tone: var(--color-fg-subtle);
+}
+
+.warning {
+  --tone: var(--color-warning);
+}
+
+.danger {
+  --tone: var(--color-danger);
+}
+
+.label {
+  @include caps-label;
+
+  flex-shrink: 0;
+  color: var(--tone);
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+}
+
+.pending {
+  @include breathing;
+}
+
+.text {
+  min-width: 0;
+  color: var(--color-fg-muted);
+  font-family: var(--font-code);
+  overflow-wrap: anywhere;
+}
+
+.muted {
+  color: var(--color-fg-subtle);
+}
+
+.modelFrom {
+  color: var(--color-fg-subtle);
+  text-decoration: line-through;
+}
+
+.modelTo {
+  color: var(--color-fg);
+}
+
+.reason {
+  display: block;
+  margin-top: var(--space-0-5);
+  color: var(--color-fg-subtle);
+  font-family: var(--font-ui);
+  white-space: pre-wrap;
+}
+
+.aside {
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.quiet {
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+}
+
+// Ошибка - красная плашка с крестиком: текст CLI как есть, адреса в нём - ссылки.
+.error {
+  @include tinted-plaque(var(--color-danger));
+
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-1) var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+}
+
+.errorBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.errorTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.errorText {
+  color: var(--color-fg);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-snug);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+.errorNote {
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-xs);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-1-5);
+  margin-top: var(--space-1);
+}
+
+// /status: подпись и две плашки, которые копируются нажатием.
+.session {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.sessionField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+}
+
+.sessionCaption {
+  display: flex;
+  gap: var(--space-1-5);
+  margin: 0;
+  font-size: var(--font-size-xs);
+}
+
+.sessionName {
+  color: var(--color-fg-muted);
+}
+
+.sessionNote {
+  margin: 0;
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+}
+
+.sessionValue {
+  @include button-reset;
+  @include interactive-surface;
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 100%;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-sunken);
+  color: var(--color-fg-subtle);
+  text-align: left;
+}
+
+.sessionCode {
+  @include truncate;
+
+  min-width: 0;
+  color: var(--color-fg);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+}
+
+@include breathing-keyframes;

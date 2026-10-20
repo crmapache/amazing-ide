@@ -1,0 +1,64 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Тихая карточка списка настроек; выбранная - рамкой акцента.
+.settingsItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-raised);
+
+  &[data-selected] {
+    border-color: var(--color-accent);
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.title {
+  @include truncate;
+
+  flex: 1;
+  min-width: 0;
+  color: var(--color-fg-strong);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.meta {
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+}
+
+.detail {
+  @include truncate;
+
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+
+  &[data-code] {
+    color: var(--color-fg-muted);
+    font-family: var(--font-code);
+  }
+}
+
+.error {
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+}

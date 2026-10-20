@@ -12,7 +12,6 @@ import { GIT_BRANCH_ACTIONS, GIT_REPOSITORY_ACTIONS } from '../git-actions.const
 import type { GitActionEntry } from '../git-actions.types'
 import { isAvailableAction } from '../git-actions.utils'
 import { useGitBranches } from '../git.queries'
-import styles from './BranchMenu.module.scss'
 import type { BranchMenuProps } from './BranchMenu.types'
 import { filterByQuery } from './BranchMenu.utils'
 
@@ -56,8 +55,10 @@ export const BranchMenu = ({ projectId, head, onSwitch, onAction }: BranchMenuPr
   }
 
   return (
-    <Menu label={t('git.menuLabel')} autoFocus>
-      <div className={styles.search}>
+    <Menu
+      label={t('git.menuLabel')}
+      autoFocus
+      header={
         <TextField
           label={t('git.search')}
           hideLabel
@@ -67,7 +68,7 @@ export const BranchMenu = ({ projectId, head, onSwitch, onAction }: BranchMenuPr
           data-autofocus
           onChange={setQuery}
         />
-      </div>
+      }>
       {repositoryActions.map(renderAction)}
       {repositoryActions.length > 0 && branchActions.length > 0 && <MenuSeparator />}
       {branchActions.map(renderAction)}

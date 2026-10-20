@@ -1,0 +1,37 @@
+@use '../../styles/mixins' as *;
+
+// Пустая отметка - контур, отмеченная - тонированная плашка своего тона с галочкой.
+.choiceMark {
+  --tone: var(--color-info);
+
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+  border: var(--border-width) solid var(--color-border-strong);
+  transition:
+    background-color var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard);
+}
+
+.circle {
+  border-radius: var(--radius-full);
+}
+
+.square {
+  border-radius: var(--radius-xs);
+}
+
+.info {
+  --tone: var(--color-info);
+}
+
+.success {
+  --tone: var(--color-success);
+}
+
+.checked {
+  @include tinted-plaque(var(--tone));
+}

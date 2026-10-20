@@ -22,6 +22,12 @@
     "files": "Files",
     "resize": "Resize side panel"
   },
+  "mainViews": {
+    "label": "Main area views",
+    "file": "File",
+    "scenarios": "Scenarios",
+    "statistics": "Statistics"
+  },
   "providerViews": {
     "label": "LLM providers",
     "claudeCode": "Claude Code",
@@ -40,9 +46,1570 @@
     "noFileText": "Choose a file in the tree on the left.",
     "stub": "The editor is not built yet. This area will show the selected file."
   },
+  "scenarios": {
+    "title": "Scenarios",
+    "stub": "Scenarios are not built yet. This area will hold the project's scenarios and their runs."
+  },
+  "statistics": {
+    "title": "Statistics",
+    "stub": "Statistics are not built yet. This area will show usage across all LLM providers."
+  },
   "claudeCode": {
     "title": "Claude Code",
-    "stub": "The Claude Code GUI will live here."
+    "agents": {
+      "chipAgent": "AGENT",
+      "chipWorkflow": "WORKFLOW",
+      "agent": "agent",
+      "workflow": "workflow",
+      "errand": "WHAT IT WAS ASKED",
+      "progressStep": "→ {{name}}",
+      "working": "Working · {{duration}}",
+      "trimmed_one": "…{{count}} earlier step trimmed",
+      "trimmed_other": "…{{count}} earlier steps trimmed",
+      "failedBeforeFinishing": "Failed before it finished.",
+      "stoppedBeforeFinishing": "Stopped before it finished.",
+      "closed": {
+        "replay": "How this one ended is not part of the saved conversation.",
+        "exited": "Session ended before this returned.",
+        "stopped": "Stopped before it returned.",
+        "turnEnded": "The turn ended before this returned.",
+        "untracked": "Still running - the panel no longer follows it.",
+        "restarted": "Claude Code was restarted here, and this agent did not survive it."
+      },
+      "commandEnded": "Background command {{outcome}} after {{duration}}.",
+      "commandEndedNoTime": "Background command {{outcome}}.",
+      "commandOutcome": {
+        "completed": "finished",
+        "failed": "failed",
+        "stopped": "was stopped"
+      },
+      "commandUntracked": "Still running in the background - the panel no longer follows it.",
+      "waiting_one": "Waiting for subagent",
+      "waiting_other": "Waiting for {{count}} subagents",
+      "fleet": {
+        "agents_one": "{{count}} agent",
+        "agents_other": "{{count}} agents",
+        "running": "{{count}} running",
+        "done": "{{count}} done",
+        "failed": "{{count}} failed",
+        "queued": "queued",
+        "skipped": "skipped",
+        "dropped": "dropped",
+        "attempt": "try {{count}}",
+        "cached": "cached",
+        "tools_one": "{{count}} tool",
+        "tools_other": "{{count}} tools",
+        "steps": "WHAT IT DID",
+        "returned": "WHAT IT RETURNED",
+        "cut": "Cut here - the answer runs on past what fits.",
+        "noTranscript": "Its own record is gone from disk - this is the run report's own preview.",
+        "reading": "Reading its record…",
+        "close": "Close"
+      },
+      "streams": {
+        "label": "Agent streams",
+        "main": "main",
+        "background": "bg",
+        "workflow": "workflow:{{count}}",
+        "stopAgent": "Stop this agent",
+        "stopAgentTitle": "Stop this agent?",
+        "stopCommand": "Stop this command",
+        "stopCommandTitle": "Stop this command?",
+        "cancel": "Cancel",
+        "stop": "Stop"
+      },
+      "findings": {
+        "label": "REVIEW",
+        "count_one": "{{count}} finding",
+        "count_other": "{{count}} findings",
+        "fixed": "fixed",
+        "skipped": "skipped",
+        "noChange": "no change needed",
+        "unconfirmed": "unconfirmed"
+      }
+    },
+    "newChat": "New chat",
+    "tabsLabel": "Conversations",
+    "tabs": {
+      "dot": {
+        "idle": "Idle",
+        "running": "Claude is working",
+        "done": "Turn finished",
+        "attention": "Waiting for you",
+        "crashed": "Session stopped unexpectedly"
+      },
+      "closeActive": "Close {{title}} · {{close}} · {{reopen}} opens it again",
+      "newChat": "New chat ({{key}})",
+      "rename": "Rename conversation",
+      "menu": {
+        "label": "Conversation",
+        "copyId": "Copy Session ID",
+        "rename": "Rename"
+      },
+      "closeWorking": {
+        "title": "Close a tab that is still working?",
+        "note": "The agent stops. {{key}} brings the tab back, its queue waiting for your next message.",
+        "cancel": "Cancel",
+        "close": "Close"
+      },
+      "noChats": {
+        "title": "Excited to work together!",
+        "button": "Let's start"
+      },
+      "recentlyClosed": "Recently closed",
+      "closedFork": "{{when}} · fork"
+    },
+    "search": {
+      "title": "Search",
+      "button": "Search the conversations",
+      "close": "Close the search",
+      "tabsLabel": "Where to search",
+      "tabs": {
+        "chat": "This chat",
+        "project": "All chats",
+        "ai": "Ask Claude"
+      },
+      "placeholder": "Words, or a phrase \"in quotes\"…",
+      "aiPlaceholder": "Describe what you are looking for - what it was about, roughly when…",
+      "aiNote": "Claude reads this project's conversations · a run of its own, counts against your usage",
+      "find": "Find",
+      "cancel": "Cancel",
+      "retry": "Retry",
+      "copy": "Copy",
+      "copied": "Copied",
+      "openInChat": "Open in chat",
+      "aiSearching": "Reading the conversations…",
+      "noChat": "This tab holds no conversation yet - try all chats.",
+      "typeToSearch": "Results will show up here.",
+      "aiEmpty": "Describe it above and press Find.",
+      "nothing": "Nothing found.",
+      "nothingHere": "Nothing in this chat.",
+      "aiNothing": "Claude found nothing that fits.",
+      "results_one": "{{count}} result",
+      "results_other": "{{count}} results",
+      "chats_one": "{{count}} chat",
+      "chats_other": "{{count}} chats",
+      "inChats": "{{total}} in {{chats}}",
+      "showing": "showing {{shown}} of {{total}}",
+      "places_one": "{{count}} place Claude points at",
+      "places_other": "{{count}} places Claude points at",
+      "messages_one": "{{count}} message",
+      "messages_other": "{{count}} messages",
+      "today": "today {{time}}",
+      "untitled": "Untitled",
+      "you": "You",
+      "claude": "Claude",
+      "more": "Show the whole message",
+      "less": "Show less",
+      "clear": "Clear",
+      "matchCase": "Match case",
+      "wholeWords": "Whole words",
+      "withKey": "{{label}} ({{keys}})",
+      "chars": "{{shown}} of {{total}} chars",
+      "failed": "The search failed.",
+      "failedLabel": "Failed",
+      "aiFailures": {
+        "cli-not-found": "Claude Code is not installed.",
+        "outdated": "This needs a newer Claude Code - update it and try again.",
+        "corpus": "The conversations could not be prepared for the search.",
+        "timeout": "The search took too long and was stopped.",
+        "failed": "Claude Code could not finish the search.",
+        "answer": "Claude answered with something that is not a list of places."
+      },
+      "stepsMeta": "{{steps}} · {{seconds}}s",
+      "steps": {
+        "grep": "searched for “{{subject}}”",
+        "read": "read “{{subject}}”",
+        "list": "read the list of conversations",
+        "other": "looked through the files",
+        "more": "+ {{count}}",
+        "count_one": "{{count}} step",
+        "count_other": "{{count}} steps"
+      },
+      "capsule": {
+        "reopen": "Back to search",
+        "close": "Close the search",
+        "loading": "Finding the message…",
+        "missing": "not among the loaded messages",
+        "position": "{{at}}/{{total}}",
+        "previous": "Previous match in this chat",
+        "next": "Next match in this chat"
+      }
+    },
+    "keys": {
+      "note": "The keys work while the focus is in the panel, except Open the panel.",
+      "or": "or",
+      "groups": {
+        "tabs": "Tabs",
+        "message": "Message field",
+        "agent": "Agent",
+        "panel": "Panel",
+        "search": "Search window"
+      },
+      "rows": {
+        "nextTab": {
+          "label": "Next tab",
+          "when": "in the search window, its tabs"
+        },
+        "previousTab": {
+          "label": "Previous tab",
+          "when": "in the search window, its tabs"
+        },
+        "newTab": {
+          "label": "New tab"
+        },
+        "closeTab": {
+          "label": "Close tab",
+          "when": "asks first if the agent is working"
+        },
+        "reopenTab": {
+          "label": "Reopen closed tab",
+          "when": "the last 20, also in History"
+        },
+        "openPanel": {
+          "label": "Open the panel",
+          "when": "from anywhere in the IDE; again to hide it"
+        },
+        "send": {
+          "label": "Send"
+        },
+        "newLine": {
+          "label": "New line"
+        },
+        "queue": {
+          "label": "Queue",
+          "when": "sent once the agent finishes"
+        },
+        "history": {
+          "label": "Browse sent messages",
+          "when": "in an empty field"
+        },
+        "commands": {
+          "label": "Commands"
+        },
+        "files": {
+          "label": "Files"
+        },
+        "shell": {
+          "label": "Shell command",
+          "when": "at the start of a message"
+        },
+        "deleteWord": {
+          "label": "Delete a word"
+        },
+        "undo": {
+          "label": "Undo"
+        },
+        "redo": {
+          "label": "Redo"
+        },
+        "stop": {
+          "label": "Stop",
+          "when": "while the agent works"
+        },
+        "mode": {
+          "label": "Next permission mode"
+        },
+        "answer": {
+          "label": "Answer by number",
+          "when": "a permission or a question, with the field empty"
+        },
+        "search": {
+          "label": "Search conversations"
+        },
+        "fork": {
+          "label": "Fork from the selection",
+          "when": "with text selected in the feed"
+        },
+        "searchChat": {
+          "label": "This chat"
+        },
+        "searchAll": {
+          "label": "All chats"
+        },
+        "searchAsk": {
+          "label": "Ask Claude"
+        },
+        "matchCase": {
+          "label": "Match case"
+        },
+        "wholeWords": {
+          "label": "Whole words"
+        }
+      }
+    },
+    "closeChat": "Close {{title}}",
+    "history": "Past conversations",
+    "historySearch": "Search past conversations",
+    "historyEmpty": "No past conversations in this project yet.",
+    "historyNothingFound": "Nothing found",
+    "historyToday": "Today",
+    "historyEarlier": "Earlier",
+    "noProjectTitle": "Open a project to start",
+    "noProjectText": "Claude Code works inside a project folder: it reads, edits and runs things there.",
+    "cliMissingTitle": "Claude Code is not installed",
+    "cliMissingText": "Install it in a terminal and sign in once. The panel finds it by itself after that.",
+    "checkAgain": "Check again",
+    "welcome": {
+      "title": "Ask Claude about this project",
+      "text": "@ for files · / for commands",
+      "suggestionsLabel": "Ideas to start with",
+      "suggestions": {
+        "explain": "Explain how this project is organized",
+        "bug": "Find a bug and fix it",
+        "review": "Review my uncommitted changes",
+        "tests": "Write tests for the code I'm changing"
+      },
+      "send": "send",
+      "newLine": "new line",
+      "commands": "commands"
+    },
+    "composer": {
+      "label": "Message to Claude",
+      "placeholder": "Ask Claude to build, fix or explain something…",
+      "placeholderPlan": "Describe what to plan…",
+      "placeholderRunning": "Add to the conversation - Claude reads it at its next step",
+      "placeholderWaiting": "Or answer in your own words…",
+      "send": "Send",
+      "queue": "Queue",
+      "stop": "Stop",
+      "forceStop": "Not responding · Force stop",
+      "attach": "Attach files or folders",
+      "run": "Run",
+      "slash": "Slash commands",
+      "queueHint": "Send after the current run finishes",
+      "runHint": "Run in your shell - Claude sees the output with your next message",
+      "forceStopHint": "Claude isn’t confirming the stop"
+    },
+    "modes": {
+      "menu": "Permission mode (⇧ Tab)",
+      "labels": {
+        "default": "Ask before edits",
+        "acceptEdits": "Accept edits",
+        "plan": "Plan mode",
+        "auto": "Auto",
+        "bypassPermissions": "Bypass permissions"
+      },
+      "hints": {
+        "default": "Claude asks before editing files or running commands",
+        "acceptEdits": "File edits go through, commands still ask",
+        "plan": "Claude explores and plans, changes nothing",
+        "auto": "Claude decides what is safe to run on its own",
+        "bypassPermissions": "Nothing asks. Only where mistakes are cheap"
+      }
+    },
+    "model": {
+      "menu": "Model",
+      "default": "Default",
+      "defaultHint": "The model set in Claude Code settings",
+      "other": "Other models"
+    },
+    "effort": {
+      "menu": "Effort",
+      "default": "Default effort",
+      "defaultHint": "As set in Claude Code settings",
+      "levels": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "xhigh": "Extra high",
+        "max": "Max"
+      },
+      "hints": {
+        "low": "Quick answers, little thinking",
+        "medium": "Balanced speed and depth",
+        "high": "Thinks things through",
+        "xhigh": "Deep work on hard problems",
+        "max": "Everything it has, slowest"
+      }
+    },
+    "context": {
+      "label": "Context used",
+      "percent": "{{value}}%",
+      "hint": "{{used}} of {{total}} tokens in context · {{cost}} spent in this chat",
+      "empty": "Context fills up as the conversation goes",
+      "short": "ctx {{value}}%"
+    },
+    "stream": {
+      "thinking": "Claude is thinking",
+      "withElapsed": "{{label}} · {{elapsed}}",
+      "waitingForYou": "Waiting for you",
+      "waitingForSubagent": "Waiting for subagent",
+      "waitingForSubagents": "Waiting for {{count}} subagents",
+      "retryWaiting": "{{label}} · waiting {{waited}}",
+      "compacting": "Compacting conversation…",
+      "stopping": "Stopping…"
+    },
+    "status": {
+      "modelCaption": "Model",
+      "effortCaption": "Effort",
+      "modeCaption": "Mode",
+      "modelHint": "Model: {{value}}",
+      "effortHint": "Reasoning effort: {{value}}",
+      "modeHint": "Permission mode: {{value}}"
+    },
+    "feed": {
+      "label": "Conversation",
+      "you": "YOU",
+      "jumpToLatest": "Jump to latest",
+      "loadEarlier": "load earlier messages",
+      "truncated": "Output is cut: only the beginning is shown.",
+      "chips": {
+        "read": "READ",
+        "grep": "GREP",
+        "edit": "EDIT",
+        "write": "WRITE",
+        "bash": "BASH",
+        "web": "WEB",
+        "mcp": "MCP",
+        "skill": "SKILL",
+        "tool": "TOOL"
+      },
+      "tool": {
+        "running": "· running",
+        "waitingForYou": "· waiting for you",
+        "failed": "· failed",
+        "denied": "· denied",
+        "lines_one": "· {{count}} line",
+        "lines_other": "· {{count}} lines",
+        "matches_one": "· {{count}} match",
+        "matches_other": "· {{count}} matches",
+        "noMatches": "· no matches",
+        "output": "· output",
+        "noOutput": "· no output",
+        "diff": "· +{{added}} −{{removed}}",
+        "moreLines": "… {{count}} more lines",
+        "fewerLines": "… collapse",
+        "count_one": "{{count}} tool",
+        "count_other": "{{count}} tools",
+        "closed": {
+          "replay": "The saved conversation keeps no result for this call.",
+          "exited": "Claude Code stopped responding before this finished.",
+          "stopped": "Stopped before it finished.",
+          "turnEnded": "The turn ended before this finished.",
+          "untracked": "Still running in the background - the panel no longer follows it.",
+          "restarted": "Claude Code was restarted here, and this did not survive it."
+        },
+        "closedMeta": {
+          "replay": "· not in the transcript",
+          "exited": "· interrupted",
+          "stopped": "· interrupted",
+          "turnEnded": "· unfinished",
+          "untracked": "· let go",
+          "restarted": "· lost in the restart"
+        }
+      },
+      "diff": {
+        "range": "@@ {{line}} @@",
+        "rangeUnknown": "@@ edit @@",
+        "note": "+{{added}} −{{removed}}"
+      },
+      "think": {
+        "chip": "THINK",
+        "thoughts_one": "{{count}} thought",
+        "thoughts_other": "{{count}} thoughts"
+      },
+      "plan": {
+        "label": "PLAN READY",
+        "steps_one": "· {{count}} step",
+        "steps_other": "· {{count}} steps",
+        "approve": "Approve & run",
+        "keepPlanning": "Keep planning",
+        "withdrawn": "The agent stopped waiting for a decision"
+      },
+      "result": {
+        "worked": "Worked {{time}}",
+        "workedBare": "Worked",
+        "stopped": "Stopped by you · {{time}}",
+        "stoppedBare": "Stopped by you",
+        "movedAccount": "Stopped to switch account · {{time}}",
+        "movedAccountBare": "Stopped to switch account"
+      }
+    },
+    "notice": {
+      "interrupted": "Stopped by you",
+      "interruptedForAccount": "Stopped to switch account",
+      "startFailed": "Claude Code could not start",
+      "notLoggedIn": "Claude Code is not signed in, or the sign-in has expired.",
+      "logIn": "Log in",
+      "switchAccount": "Switch account",
+      "sendAgainAfter": "Finish the login in the terminal, then send your message again.",
+      "dismiss": "Dismiss",
+      "copied": "Copied",
+      "clickToCopy": "Click to copy",
+      "cleared": "conversation cleared - nothing above this is remembered anymore",
+      "rewound": "rewound to here · what came after is no longer part of the conversation",
+      "forkedBefore": "new branch from ",
+      "forkedAfter": " · what follows stays in this branch",
+      "forkUntitled": "the original conversation",
+      "chips": {
+        "clear": "CLEAR",
+        "rewind": "REWIND",
+        "fork": "FORK",
+        "earlier": "EARLIER"
+      },
+      "compact": {
+        "label": "CONTEXT",
+        "running": "Compacting conversation…",
+        "doneManual": "context manually compacted",
+        "doneAuto": "context automatically compacted",
+        "manually": "manually compacted {{before}} of context into {{summary}}",
+        "automatically": "automatically compacted {{before}} of context into {{summary}}",
+        "into": "a {{after}} summary",
+        "intoSummary": "a summary",
+        "took": "in {{took}}"
+      },
+      "retry": {
+        "label": "RETRY",
+        "reason": {
+          "rateLimited": "Rate limited",
+          "overloaded": "API overloaded",
+          "auth": "Authentication failed",
+          "error": "API error"
+        },
+        "attempt": "attempt {{attempt}}",
+        "attemptOf": "attempt {{attempt}}/{{max}}",
+        "retryingIn": "retrying in {{seconds}}s",
+        "retrying": "retrying…",
+        "recovered_one": "went through after {{count}} attempt",
+        "recovered_other": "went through after {{count}} attempts",
+        "failed_one": "gave up after {{count}} attempt",
+        "failed_other": "gave up after {{count}} attempts",
+        "stopped_one": "stopped after {{count}} attempt",
+        "stopped_other": "stopped after {{count}} attempts"
+      },
+      "model": {
+        "label": "MODEL",
+        "note": "switched by Claude Code, not by you"
+      },
+      "limit": {
+        "label": "LIMIT",
+        "extraLabel": "EXTRA USAGE",
+        "extra": "The usage limit is used up - the work goes on as extra usage, billed on top of the plan",
+        "extraNamed": "The {{window}} limit is used up - the work goes on as extra usage, billed on top of the plan",
+        "waiting": "The usage limit is used up - waiting for it to reset",
+        "waitingNamed": "The {{window}} limit is used up - waiting for it to reset",
+        "resetAt": "{{clock}} · in {{left}}",
+        "windows": {
+          "fiveHour": "5-hour",
+          "weekly": "weekly",
+          "weeklyOpus": "weekly Opus",
+          "weeklySonnet": "weekly Sonnet"
+        }
+      },
+      "fast": {
+        "label": "FAST",
+        "title": "Fast mode did not turn on",
+        "hint": "This conversation goes on at standard speed.",
+        "reasons": {
+          "extraUsageDisabled": "It is paid from usage credits, which are off for this account.",
+          "free": "It needs a paid plan.",
+          "preference": "Your organization has turned it off.",
+          "networkError": "Claude Code could not check it: a network problem.",
+          "notFirstParty": "It works only with the Anthropic API directly.",
+          "disabledByEnv": "It is switched off on this machine.",
+          "modelNotAllowed": "Opus is not among the models your organization allows.",
+          "unknown": "It is unavailable right now."
+        }
+      },
+      "outranked": {
+        "label": "SETTINGS",
+        "text": "This repository overrides the account chosen here:",
+        "open": "Settings sources"
+      },
+      "sampling": "The newest models no longer accept a sampling parameter, and this request carried one. Claude Code adds none of its own, so it comes from whatever the requests are routed through - usually a gateway or proxy set by an address in the settings.",
+      "crash": {
+        "label": "SESSION",
+        "text": "Claude Code stopped unexpectedly.",
+        "withCode": "Claude Code stopped unexpectedly (exit code {{code}})."
+      },
+      "session": {
+        "label": "SESSION",
+        "id": "Session ID",
+        "terminal": "In a terminal",
+        "terminalNote": "Continues this conversation in a terminal opened in the project folder",
+        "none": "No ID yet - the conversation gets one with its first message"
+      }
+    },
+    "permission": {
+      "title": "Permission",
+      "run": "Claude wants to run a command",
+      "edit": "Claude wants to edit {{file}}",
+      "write": "Claude wants to create {{file}}",
+      "fetch": "Claude wants to reach {{target}}",
+      "use": "Claude wants to use {{tool}}",
+      "allow": "Allow",
+      "allowAlways": "Always allow",
+      "allowSession": "Allow edits this chat",
+      "deny": "Deny",
+      "orType": "Or type below to tell Claude what to do instead",
+      "more_one": "{{count}} more waiting",
+      "more_other": "{{count}} more waiting",
+      "underMode": "under {{mode}}"
+    },
+    "question": {
+      "title": "Claude asks",
+      "pickAny": "pick any",
+      "other": "Other",
+      "otherPlaceholder": "Your own answer",
+      "submit": "Send answers",
+      "dismiss": "Close and answer in your own words",
+      "leftOver_one": "{{count}} question · never answered",
+      "leftOver_other": "{{count}} questions · never answered",
+      "leftOverNote": "that run is long over - your answer goes on as a new message",
+      "blocks_one": "{{count}} question · blocks the run",
+      "blocks_other": "{{count}} questions · blocks the run",
+      "expand": "Show the questions",
+      "collapse": "Hide the questions",
+      "pick": "Pick to continue",
+      "note": "the run continues right where it asked"
+    },
+    "tasks": {
+      "title": "Tasks",
+      "progress": "{{done}} / {{total}}"
+    },
+    "queue": {
+      "title": "Queued",
+      "hint": "{{count}} will fire in order when the run finishes · drag to reorder",
+      "sendNow": "Send now",
+      "remove": "Remove from queue",
+      "images_one": "+ {{count}} image",
+      "images_other": "+ {{count}} images",
+      "held": "{{count}} waiting to be sent · drag to reorder",
+      "afterYou": "{{count}} will fire in order after your next message · drag to reorder",
+      "afterReopen": "{{count}} will fire in order after your next message - the turn they waited for was stopped · drag to reorder",
+      "edit": "Edit in the field",
+      "editing": "Being edited in the field · {{key}} or {{button}} puts it back here",
+      "drag": "Drag to reorder"
+    },
+    "slash": {
+      "label": "Commands",
+      "groups": {
+        "panel": "panel",
+        "built-in": "built-in"
+      },
+      "customModel": "added by hand",
+      "panel": {
+        "resume": "open a past conversation of this project",
+        "fork": "continue this conversation in a new tab",
+        "login": "sign in to Claude Code in the Terminal",
+        "logout": "sign out - opens the Terminal",
+        "design-login": "authorize Claude Design in the Terminal",
+        "rename": "rename this tab; without a name, opens the field on it",
+        "config": "Claude Code settings - opens them in the menu",
+        "btw": "ask a quick side question - the work goes on",
+        "fast": "toggle fast mode - Opus up to 2.5× faster, paid from usage credits",
+        "status": "this conversation’s ID and the command to resume it in a terminal"
+      },
+      "builtin": {
+        "model": "switch the model for this conversation",
+        "effort": "set how long Claude thinks before acting",
+        "context": "what fills the context window right now",
+        "cost": "spend and usage windows of this session",
+        "usage": "subscription windows and when they reset",
+        "code-review": "review a pull request"
+      }
+    },
+    "blocked": {
+      "trustTitle": "Trust this folder?",
+      "trustText": "Claude Code will load this project's settings, hooks and CLAUDE.md. Hooks can run any command on your Mac, so trust only folders you know.",
+      "trust": "Trust and send",
+      "trustOnly": "Trust folder",
+      "missingTitle": "Project folder not found",
+      "missingText": "It was moved or deleted while the project was open. Put it back, then try again. Your message is waiting in the queue.",
+      "retry": "Try again",
+      "cliTitle": "Claude Code is not installed",
+      "cliText": "Install it, then check again. Your message is waiting in the queue."
+    },
+    "forkChat": "Fork this chat",
+    "forkNothing": "Nothing to fork yet",
+    "forkTitle": "Fork of {{title}}",
+    "rewind": {
+      "title": "Rewind to this message",
+      "lead": "This message and everything after it leave the conversation. Its text comes back into the field.",
+      "what": "Rewind",
+      "conversation": "Conversation",
+      "code": "Code",
+      "both": "Both",
+      "codeLead": "The code goes back to how it was before this message.",
+      "checking": "Checking what Claude changed since…",
+      "files_one": "{{count}} file changed since",
+      "files_other": "{{count}} files changed since",
+      "more": "and {{count}} more",
+      "none": "Claude changed no files since this message.",
+      "off": "Code is not kept: \"Rewind code (checkpoints)\" is off in the Claude Code settings.",
+      "notTracked": "Code is not kept for this conversation yet - its Claude Code was started without keeping copies of files.",
+      "noCheckpoint": "No copy of the code was kept when this message was sent.",
+      "unavailable": "Claude Code can't restore the code here: {{detail}}",
+      "queued_one": "The queued message is dropped too.",
+      "queued_other": "The {{count}} queued messages are dropped too.",
+      "running": "The turn that is running stops.",
+      "codeWhileRunning": "Claude is still working - stop the turn before restoring code alone.",
+      "forkWhileRunning": "While Claude works here, the code can't be put back alongside a fork - choose Conversation to fork without it, or stop the turn first.",
+      "cancel": "Cancel",
+      "close": "Close",
+      "go": "Rewind",
+      "goCode": "Restore code",
+      "fork": "In a new tab",
+      "forkHint": "Leave this tab as it is and open a fork without this message and what came after",
+      "working": "Rewinding…",
+      "refused": {
+        "busy": "Claude is busy with something that cannot be stopped from here. Try again in a moment.",
+        "gone": "Claude no longer holds this message - a compaction folded it away. Only messages after the last compaction can be rewound to.",
+        "moved": "The conversation moved on while this was open - a message arrived that this window has not shown yet. Look again and retry.",
+        "midCall": "This message sits inside a tool call and its answer, so the conversation can't be cut there.",
+        "notSaved": "Claude Code couldn't record the rewind, so it didn't make it.",
+        "unsupported": "This version of Claude Code cannot rewind. Update Claude Code and try again.",
+        "noProcess": "Claude Code couldn't be started for this conversation.",
+        "ended": "Claude Code stopped while the rewind was under way, so it is not known whether the cut was made. To see what the conversation holds now, open it again from the history.",
+        "other": "Claude Code refused: {{detail}}",
+        "failed": "The rewind didn't go through. Try again."
+      },
+      "filesFailed": "The conversation was rewound, but the code could not be restored: {{detail}}",
+      "forkWhole": "This fork couldn't be cut at the chosen message, so it carries the whole conversation."
+    },
+    "message": {
+      "you": "YOU",
+      "copy": "Copy this message, with the paths of what was attached",
+      "copied": "Copied",
+      "copyReply": "Copy the whole reply",
+      "reuse": "Put this message back into the input field, to edit and send again",
+      "reuseLostImages_one": "Back into the input field - but the pasted image cannot come with it, attach it again",
+      "reuseLostImages_other": "Back into the input field - but the {{count}} pasted images cannot come with it, attach them again",
+      "rewind": "Rewind to here: this message and everything after it leave the conversation",
+      "rewindSteering": "Written while Claude was working - rewind to the message that started that turn",
+      "pastedLines_one": "{{count}} line pasted",
+      "pastedLines_other": "{{count}} lines pasted",
+      "pasteClose": "Collapse it back",
+      "copyPaste": "Copy the pasted text",
+      "pasteShown": "First {{shown}} lines of {{total}} · copying takes all of it",
+      "editorSelected_one": "1 line from {{name}}",
+      "editorSelected_other": "{{count}} lines from {{name}}",
+      "editorOpened": "In {{name}}",
+      "openImage": "Open image {{number}}",
+      "imageLoading": "Loading image…",
+      "imageMissing": "The picture could not be read - the file is gone, or the message no longer holds it",
+      "closeImage": "Close"
+    },
+    "pins": {
+      "add": "Pin it to the top of the chat",
+      "crowded": "Three is the most - unpin one of them before pinning this",
+      "remove": "Unpin it",
+      "claude": "CLAUDE"
+    },
+    "mention": {
+      "label": "Files"
+    },
+    "paths": {
+      "openFile": "Open in the editor",
+      "openFolder": "Show the folder",
+      "missing": "No such file on disk - press to look again",
+      "chooseTitle": "Several files match",
+      "chooseLabel": "Choose a file for {{path}}"
+    },
+    "markdown": {
+      "copyBlock": "Copy this block",
+      "copied": "Copied",
+      "clickToCopy": "Click to copy"
+    },
+    "shell": {
+      "hint": "Runs in the project folder. Claude sees the output with your next message.",
+      "ok": "OK",
+      "exitCode": "Exit {{code}}",
+      "stopped": "Stopped",
+      "failed": "Didn't start",
+      "stop": "Stop command",
+      "truncated": "Output is long, showing the end.",
+      "chip": "!",
+      "running": "running",
+      "noOutput": "no output"
+    },
+    "changes": {
+      "label": "Files changed in this turn",
+      "open": "Open in the editor",
+      "openPath": "Open {{path}} in the editor",
+      "revert": "Revert this file",
+      "restore": "Bring the changes back",
+      "revertAll": "Revert all",
+      "restoreAll": "Bring all back",
+      "reverting": "Reverting…",
+      "restoring": "Bringing back…",
+      "reverted": "Reverted",
+      "uncounted": "±",
+      "showAll": "Show all ({{count}})",
+      "showFewer": "Show fewer",
+      "refusedChanged": "Changed since, left as is",
+      "refusedMissing": "The file is gone",
+      "refusedFailed": "Couldn't write the file"
+    },
+    "mcp": {
+      "refresh": "Refresh",
+      "loading": "Asking Claude Code for its servers…",
+      "none": "No MCP servers configured for this project.",
+      "finishInBrowser": "Finish signing in to {{name}} in the browser. The list updates itself.",
+      "tools_one": "{{count}} tool",
+      "tools_other": "{{count}} tools",
+      "authenticate": "Sign in",
+      "reconnect": "Reconnect",
+      "retry": "Retry",
+      "enable": "Enable",
+      "disable": "Disable",
+      "remove": "Remove",
+      "cancel": "Cancel",
+      "removeTitle": "Remove {{name}}?",
+      "removeText": "The server goes out of its configuration. Chats in this project restart Claude Code to pick that up when they are free.",
+      "addTitle": "Add a server",
+      "addHint": "Chats in this project pick it up when Claude Code restarts after the current turn.",
+      "name": "Name",
+      "namePlaceholder": "sentry",
+      "transport": "Connection",
+      "command": "Command",
+      "commandPlaceholder": "npx -y @sentry/mcp-server",
+      "url": "URL",
+      "urlPlaceholder": "https://mcp.sentry.dev/mcp",
+      "scope": "Save to",
+      "add": "Add server",
+      "transports": {
+        "stdio": "Command",
+        "http": "HTTP",
+        "sse": "SSE"
+      },
+      "addScopes": {
+        "local": "Just me, this project",
+        "project": "Project (.mcp.json)",
+        "user": "Just me, everywhere"
+      },
+      "scopes": {
+        "project": "This project (.mcp.json)",
+        "local": "Just me, this project",
+        "user": "Just me, everywhere",
+        "claudeai": "claude.ai",
+        "managed": "Organization",
+        "dynamic": "Built-in and plugins",
+        "other": "Other"
+      },
+      "status": {
+        "connected": "Connected",
+        "pending": "Connecting",
+        "needsAuth": "Needs sign-in",
+        "failed": "Failed",
+        "disabled": "Off",
+        "unknown": "Unknown"
+      },
+      "done": {
+        "reconnect": "{{name}} reconnected.",
+        "enable": "{{name}} is on.",
+        "disable": "{{name}} is off.",
+        "authenticate": "{{name}} is signed in.",
+        "add": "{{name}} added. Chats pick it up after their current turn.",
+        "remove": "{{name}} removed."
+      }
+    },
+    "plugins": {
+      "loading": "Reading plugins…",
+      "tabs": {
+        "installed": "Installed",
+        "browse": "Browse",
+        "marketplaces": "Marketplaces"
+      },
+      "noneInstalled": "No plugins installed yet.",
+      "enabled": "On",
+      "disabled": "Off",
+      "enable": "Enable",
+      "disable": "Disable",
+      "update": "Update",
+      "uninstall": "Uninstall",
+      "install": "Install",
+      "installAnyway": "Install anyway",
+      "scopes": {
+        "user": "just me",
+        "project": "project",
+        "local": "just me, this project",
+        "managed": "organization"
+      },
+      "search": "Search plugins",
+      "searchPlaceholder": "Search by name or description",
+      "nothingFound": "Nothing found.",
+      "installs_one": "{{count}} install",
+      "installs_other": "{{count}} installs",
+      "removeMarketplace": "Remove",
+      "marketplaceSource": "Marketplace source",
+      "marketplacePlaceholder": "owner/repo, URL or path",
+      "addMarketplace": "Add",
+      "done": {
+        "install": "{{name}} installed.",
+        "uninstall": "{{name}} uninstalled.",
+        "enable": "{{name}} is on.",
+        "disable": "{{name}} is off.",
+        "update": "{{name}} updated.",
+        "addMarketplace": "Marketplace {{name}} added.",
+        "removeMarketplace": "Marketplace {{name}} removed."
+      }
+    },
+    "tools": {
+      "failures": {
+        "untrusted": "Claude Code doesn't work in this folder until you trust it.",
+        "cliNotFound": "Claude Code is not installed.",
+        "projectMissing": "The project folder is gone.",
+        "processExited": "Claude Code stopped before answering. Try again.",
+        "refused": "Claude Code didn't manage it.",
+        "unsafeUrl": "The server asked to open an address that isn't a website, so it stayed closed.",
+        "badCommand": "The command has an unclosed quote.",
+        "failed": "Something went wrong. Try again."
+      }
+    },
+    "accounts": {
+      "intro": "Chats run on the selected account. Each account keeps only its own sign-in: chats, settings, MCP servers and plugins are shared.",
+      "defaultTitle": "Default sign-in",
+      "untitled": "Account",
+      "current": "In use",
+      "signedIn": "Signed in",
+      "signedOut": "Signed out",
+      "fromAcc": "From Amazing Claude Code",
+      "use": "Use",
+      "signIn": "Sign in",
+      "rename": "Rename",
+      "forget": "Forget",
+      "logout": "Log out",
+      "cancel": "Cancel",
+      "save": "Save",
+      "add": "Add account",
+      "import": "Add here",
+      "fromAccTitle": "Accounts from Amazing Claude Code",
+      "waiting": "Finish signing in in the Terminal window. The panel picks it up by itself.",
+      "landed": "Signed in.",
+      "timeout": "No sign-in for 10 minutes. Try again when you're ready.",
+      "twin": "This account is already here.",
+      "cancelled": "Sign-in cancelled.",
+      "forgetTitle": "Forget {{name}}?",
+      "forgetText": "Its sign-in is removed from this Mac. Chats on it switch to the default sign-in.",
+      "forgetExternalText": "It goes off this list. Amazing Claude Code keeps it as it is.",
+      "logoutTitle": "Log out of the default sign-in?",
+      "logoutText": "This signs Claude Code out on every machine that uses this sign-in.",
+      "renameTitle": "Rename account",
+      "alias": "Name",
+      "openFailed": "Terminal didn't open, so the sign-in didn't start. Try again.",
+      "logoutFailed": "Couldn't sign out: Claude Code is still signed in. Try again.",
+      "designNoAccount": "The account in use could not be resolved, so nothing was opened.",
+      "addHint": "A Terminal window opens for the sign-in. Your existing account is not touched.",
+      "mcpNote": "MCP servers sign in per account, so a new one authenticates them once. Skills, hooks, settings and history are shared.",
+      "designTitle": "Claude Design",
+      "designNote": "Claude Design signs in per account too, and only a terminal can do it. This opens one for the account in use; DesignSync then works in the panel by itself.",
+      "designAuthorize": "Authorize Claude Design",
+      "refusedUntil": "Limit refused · until {{clock}}",
+      "unavailable": {
+        "ignored": "This Claude Code cannot keep two sign-ins apart. Update it and open this screen again.",
+        "notSignedIn": "Sign in to Claude Code first, then add a second account here.",
+        "apiKey": "This machine signs in with an API key, which applies to every conversation. Accounts cannot be switched while it is set."
+      }
+    },
+    "usage": {
+      "title": "Plan limits",
+      "session": "5-hour",
+      "weekly": "Week",
+      "weeklyModel": "Week · {{model}}",
+      "percent": "{{value}}%",
+      "resetsIn": "resets in {{time}}",
+      "extra": "Extra usage is on: past the limits, work goes on and is billed separately.",
+      "extraPercent": "Extra usage is on: {{value}}% of the monthly cap spent.",
+      "backIn": "Limit reached. Available again in {{time}}.",
+      "updated": "Updated {{time}} ago.",
+      "manage": "Accounts",
+      "ringHint": "{{label}}: {{value}}%",
+      "paceBudget": "even pace: {{value}}% by today",
+      "todayTokens": "Tokens used today across all projects"
+    },
+    "menu": {
+      "open": "Menu",
+      "back": "Back",
+      "close": "Close the menu",
+      "footer": "Amazing IDE",
+      "version": "v{{version}}",
+      "titles": {
+        "menu": {
+          "title": "Menu",
+          "hint": "everything the panel keeps out of the way"
+        },
+        "history": {
+          "title": "History",
+          "hint": "past conversations of this project"
+        },
+        "mcp": {
+          "title": "MCP servers",
+          "hint": "status · sign in · reconnect"
+        },
+        "plugins": {
+          "title": "Plugins",
+          "hint": "installed · browse · marketplaces"
+        },
+        "accounts": {
+          "title": "Claude accounts",
+          "hint": "which subscription pays for the work"
+        },
+        "settings": {
+          "title": "Settings",
+          "hint": "how the panel behaves and sounds"
+        },
+        "appearance": {
+          "title": "Appearance",
+          "hint": "text size"
+        },
+        "sounds": {
+          "title": "Sound alerts",
+          "hint": "when the panel calls you"
+        },
+        "calmColors": {
+          "title": "No-stress colors",
+          "hint": "how the gauges are painted"
+        },
+        "indicators": {
+          "title": "Indicators",
+          "hint": "what stays around the field"
+        },
+        "newChat": {
+          "title": "New chats",
+          "hint": "what a new tab starts with"
+        },
+        "newChatModel": {
+          "title": "Default model",
+          "hint": "what a new tab starts on"
+        },
+        "newChatEffort": {
+          "title": "Default effort",
+          "hint": "how hard a new tab thinks"
+        },
+        "newChatMode": {
+          "title": "Default mode",
+          "hint": "what new tabs start in"
+        },
+        "restoreTabs": {
+          "title": "Tabs on start",
+          "hint": "what comes back after a restart"
+        },
+        "shareEditor": {
+          "title": "Editor in messages",
+          "hint": "what goes along with a message"
+        },
+        "composerLayout": {
+          "title": "Composer layout",
+          "hint": "where the input sits"
+        },
+        "pasteCollapse": {
+          "title": "Pasted text",
+          "hint": "when a paste folds into a chip"
+        },
+        "spellcheck": {
+          "title": "Spell check",
+          "hint": "underlines under misspelled words"
+        },
+        "sendKey": {
+          "title": "Sending a message",
+          "hint": "which key sends it"
+        },
+        "keys": {
+          "title": "Keyboard shortcuts",
+          "hint": "every key the panel answers to"
+        },
+        "settingSources": {
+          "title": "Where settings come from",
+          "hint": "which layers Claude Code loads"
+        },
+        "claudeConfig": {
+          "title": "Claude Code settings",
+          "hint": "what /config changes"
+        },
+        "customModels": {
+          "title": "Custom models",
+          "hint": "ones Claude Code does not offer"
+        }
+      },
+      "rows": {
+        "history": {
+          "label": "History",
+          "sub": "Past conversations of this project"
+        },
+        "mcp": {
+          "label": "MCP servers",
+          "sub": "Status, sign-in, reconnect"
+        },
+        "plugins": {
+          "label": "Plugins",
+          "sub": "Installed, browse, marketplaces"
+        },
+        "accounts": {
+          "label": "Claude accounts",
+          "sub": "Switch without signing out"
+        },
+        "settings": {
+          "label": "Settings",
+          "sub": "Text size, sounds, new chats"
+        }
+      }
+    },
+    "settings": {
+      "rows": {
+        "appearance": {
+          "label": "Appearance",
+          "sub": "Text size of the panel"
+        },
+        "sounds": {
+          "label": "Sound alerts",
+          "sub": "When the panel calls you"
+        },
+        "calmColors": {
+          "label": "No-stress colors",
+          "sub": "How much colour the gauges keep"
+        },
+        "indicators": {
+          "label": "Indicators",
+          "sub": "Which readings stay around the field"
+        },
+        "newChat": {
+          "label": "New chats",
+          "sub": "Model, effort and permission mode"
+        },
+        "restoreTabs": {
+          "label": "Tabs on start",
+          "sub": "Reopen what was open, drafts included"
+        },
+        "shareEditor": {
+          "label": "Open file and selection",
+          "sub": "What goes along with each message"
+        },
+        "composerLayout": {
+          "label": "Composer layout",
+          "sub": "Where the input sits"
+        },
+        "pasteCollapse": {
+          "label": "Pasted text",
+          "sub": "When a paste folds into a chip"
+        },
+        "spellcheck": {
+          "label": "Spell check",
+          "sub": "Underline misspelled words"
+        },
+        "sendKey": {
+          "label": "Sending a message",
+          "sub": "Which key sends it"
+        },
+        "keys": {
+          "label": "Keyboard shortcuts",
+          "sub": "Tabs, queue, search and the rest"
+        },
+        "settingSources": {
+          "label": "Settings sources",
+          "sub": "Which of Claude Code's layers load here"
+        },
+        "claudeConfig": {
+          "label": "Claude Code settings",
+          "sub": "Its own - what /config changes"
+        },
+        "customModels": {
+          "label": "Custom models",
+          "sub": "Ones Claude Code does not offer"
+        }
+      },
+      "values": {
+        "on": "On",
+        "off": "Off",
+        "default": "Default",
+        "none": "None",
+        "never": "Never",
+        "points": "{{size}} pt",
+        "countOn": "{{count}} on",
+        "fullColor": "Full colour",
+        "calm": "One tone",
+        "percent": "{{value}}%",
+        "fromLines_one": "From {{count}} line",
+        "fromLines_other": "From {{count}} lines",
+        "layouts": {
+          "bottom": "Default",
+          "compact": "Compact",
+          "left": "Left",
+          "right": "Right"
+        },
+        "sendKeys": {
+          "enter": "Enter",
+          "modEnter": "⌘ Enter"
+        },
+        "sources": {
+          "all": "Everything",
+          "noLocal": "Without local",
+          "user": "Only mine"
+        }
+      }
+    },
+    "appearance": {
+      "size": "Text size",
+      "follow": "As in the IDE",
+      "followSub": "Follow the IDE's text - {{size}} right now",
+      "own": "A size of its own",
+      "ownSub": "The panel alone - the editor and the file tree stay as they are",
+      "smaller": "Smaller",
+      "larger": "Larger",
+      "points": "{{size}} pt"
+    },
+    "sounds": {
+      "events": {
+        "turnDone": {
+          "label": "Turn finished",
+          "hint": "Claude answered and is waiting for you"
+        },
+        "permission": {
+          "label": "Permission asked",
+          "hint": "A tool call needs your approval"
+        },
+        "question": {
+          "label": "Question asked",
+          "hint": "Claude asked you to pick an answer"
+        },
+        "plan": {
+          "label": "Plan ready",
+          "hint": "A plan is waiting for your approval"
+        },
+        "limit": {
+          "label": "Limit reached",
+          "hint": "The subscription limit stopped the turn"
+        },
+        "extraUsage": {
+          "label": "Extra usage started",
+          "hint": "The plan is used up - the work is now billed on top"
+        },
+        "error": {
+          "label": "Something broke",
+          "hint": "An error, a dead process or a signed-out session"
+        }
+      },
+      "play": "Play {{sound}}",
+      "volume": "{{sound}} volume",
+      "percent": "{{value}}%",
+      "muted": "Muted"
+    },
+    "calmColors": {
+      "sample": "A gauge at every level",
+      "label": "Colour in the gauges",
+      "hint": "The whole ladder at 100%, one calm tone at 0%",
+      "percent": "{{value}}%",
+      "keeps": "Nothing else changes: an error stays red, a permission stays what it is. Those are things that happened, not a mood."
+    },
+    "indicators": {
+      "above": "Above the field",
+      "below": "Under the field",
+      "items": {
+        "contextBar": {
+          "label": "Context bar",
+          "hint": "The strip over the field that fills as the conversation grows"
+        },
+        "contextLabel": {
+          "label": "Context figure",
+          "hint": "“ctx 42%” at the end of the bar"
+        },
+        "ring5h": {
+          "label": "5-hour limit",
+          "hint": "The ring for the plan’s five-hour window"
+        },
+        "ringWeek": {
+          "label": "Weekly limit",
+          "hint": "The ring for the plan’s weekly window"
+        },
+        "ringModel": {
+          "label": "A model’s weekly limit",
+          "hint": "A model’s own week, as on the account page - shown only while the plan keeps one"
+        },
+        "tokensToday": {
+          "label": "Tokens today",
+          "hint": "Spent today, across every project"
+        }
+      },
+      "modelNamed": "{{model}} weekly limit"
+    },
+    "newChats": {
+      "rows": {
+        "model": {
+          "label": "Model",
+          "sub": "What a new tab starts on"
+        },
+        "effort": {
+          "label": "Effort",
+          "sub": "How hard a new tab thinks"
+        },
+        "mode": {
+          "label": "Mode",
+          "sub": "What new tabs start in"
+        }
+      },
+      "lastUsed": "As last chosen",
+      "lastUsedNow": "Follows the last pick - {{value}}",
+      "custom": "Added by you",
+      "bypassOff": "Bypass permissions is not offered: this project's or your organization's settings switch it off."
+    },
+    "restoreTabs": {
+      "label": "Bring the tabs back",
+      "hint": "The tabs, their conversations and what was being typed in them come back after the IDE restarts - after a crash too",
+      "note": "Nothing is started again: an agent comes up only when its tab is opened or written into. Drafts are kept on this machine, in the IDE's own data, and nowhere else."
+    },
+    "settingSources": {
+      "note": "Claude Code reads its settings from several files, and a repository's own win over yours: an env block committed to it decides the address and the key every request goes out with. Leaving a layer out drops its permissions, hooks and MCP servers along with it. Managed settings from your organization apply either way.",
+      "options": {
+        "all": {
+          "label": "Everything",
+          "sub": "Yours, the repository's and its local file - what Claude Code does by itself"
+        },
+        "noLocal": {
+          "label": "Without the local file",
+          "sub": "Skips settings.local.json, keeps the repository's shared settings"
+        },
+        "user": {
+          "label": "Only my own",
+          "sub": "Skips both files in the repository - your sign-in and your settings decide"
+        }
+      },
+      "repositorySets": "This repository sets",
+      "repositoryMeans": "While its layers load, these win over the account and the address chosen here.",
+      "repositoryQuiet": "This repository sets nothing that would override your account or your address.",
+      "needsNewer": "This Claude Code does not know the flag this needs - every layer loads whatever is chosen here. Update it.",
+      "restarts": "Open conversations of this project restart with the new layers as soon as their turn ends."
+    },
+    "claudeConfig": {
+      "intro": "Claude Code's own settings - the ones /config changes in a terminal, and they apply there too. Claude Code writes every change itself.",
+      "loading": "Asking Claude Code for its settings…",
+      "unreadable": "This Claude Code listed its settings in a form the panel cannot read. /config in a terminal still works.",
+      "groups": {
+        "work": "How Claude works",
+        "terminal": "Terminal only",
+        "other": "Other"
+      },
+      "on": "On",
+      "off": "Off",
+      "saving": "Saving…",
+      "notSet": "Not set - Claude Code decides",
+      "locked": {
+        "policy": "Set by your organization's policy - it cannot be changed here.",
+        "project": "Set in the project's settings - a change here would not win over them.",
+        "local": "Set in the project's local settings - a change here would not win over them."
+      },
+      "chips": "In the panel the MODEL and MODE chips under the input field decide this.",
+      "projectOnly": "This project only - Claude Code keeps it in the project's local settings.",
+      "failed": "Claude Code did not take this change.",
+      "save": "Save",
+      "valueLabel": "{{setting}} value",
+      "labels": {
+        "autoCompact": "Auto-compact",
+        "checkpoints": "Rewind code (checkpoints)",
+        "thinking": "Thinking mode",
+        "language": "Language Claude answers in",
+        "outputStyle": "Output style",
+        "workflows": "Dynamic workflows",
+        "workflowKeywordTriggerEnabled": "Ultracode keyword trigger",
+        "workflowSizeGuideline": "Dynamic workflow size",
+        "useAutoModeDuringPlan": "Use auto mode during plan",
+        "worktreeBaseRef": "Worktree base ref",
+        "switchModelsOnFlag": "Switch models when a message is flagged",
+        "chrome": "Claude in Chrome by default",
+        "remoteControl": "Remote Control for all sessions",
+        "inputNeededNotifEnabled": "Push when actions are required",
+        "agentPushNotifEnabled": "Push when Claude decides",
+        "model": "Model",
+        "permissionMode": "Default permission mode",
+        "theme": "Theme",
+        "editor": "Editor mode",
+        "verbose": "Verbose output",
+        "tips": "Show tips",
+        "reduceMotion": "Reduce motion",
+        "promptSuggestionEnabled": "Prompt suggestions",
+        "recap": "Session recap",
+        "timeFormat": "Time format",
+        "turnDuration": "Show turn duration",
+        "progressBar": "Terminal progress bar",
+        "notifChannel": "Notification channel",
+        "autoScroll": "Auto-scroll",
+        "copyFullResponse": "Skip the /copy picker",
+        "copyOnSelect": "Copy on select",
+        "gitignore": "Respect .gitignore in the file picker",
+        "defaultToAgentsView": "Open the agents view by default",
+        "leftArrowOpensAgents": "← opens agents",
+        "externalEditorContext": "Show the last response in the external editor",
+        "prStatus": "Show the PR status footer",
+        "autoInstallIdeExtension": "Auto-install the IDE extension"
+      }
+    },
+    "customModels": {
+      "note": "Claude Code names the models it knows about, and the menu shows exactly those. Working through a proxy or a gateway, add the identifiers it serves here and they will stand in the menu beside the rest.",
+      "warn": "On an ordinary Claude sign-in there is nothing to add: a name Claude Code does not know is refused before the first turn.",
+      "field": "Model identifier",
+      "placeholder": "model identifier",
+      "add": "Add",
+      "remove": "Remove",
+      "removeNamed": "Remove {{model}}",
+      "added": "Added",
+      "invalid": "Letters, digits and . _ : / @ [ ] - only: the name goes to Claude Code as a launch argument",
+      "duplicate": "Already on the list",
+      "menuAdd": "Add a model…",
+      "menuAddHint": "One Claude Code does not offer",
+      "menuCustom": "Added by you"
+    },
+    "chips": {
+      "expand": "Insert as plain text",
+      "remove": "Remove {{name}}"
+    },
+    "picture": {
+      "size": "{{width}} × {{height}}",
+      "opens": "click to open",
+      "missing": "The picture could not be read - the file is gone, or the message no longer holds it",
+      "open": "Open {{name}}"
+    },
+    "editor": {
+      "on": "Claude sees {{place}} with this message · click to choose",
+      "off": "{{place}} is left out of this message · click to choose",
+      "muted": "{{place}} is not sent - sending the open file is off · click to choose",
+      "menu": "Open file in messages",
+      "always": "Send with every message",
+      "alwaysSub": "The open file, in every tab",
+      "skip": "Leave out of this message",
+      "skipSub": "The next message takes it again",
+      "only": "Send with this message only",
+      "onlySub": "The next message goes without it again",
+      "never": "Never send",
+      "neverSub": "In every tab, until turned back on - the same switch as in Settings"
+    },
+    "quotes": {
+      "ref": "REF {{number}}",
+      "text": "“{{text}}”",
+      "fromOutput": "from output",
+      "remove": "Remove the quote"
+    },
+    "selection": {
+      "label": "Selected text",
+      "quote": "Quote",
+      "fork": "Fork from here"
+    },
+    "shareEditor": {
+      "label": "Send the open file along",
+      "hint": "Each message carries the file open in the editor - the way Claude Code does it in a terminal",
+      "note": "The file’s chip under the field has this same switch, and there a single message can go without it, or with it. A slash command never carries it."
+    },
+    "spellcheck": {
+      "label": "Check spelling",
+      "hint": "Words the checker does not know get a red underline - in the message field and the panel’s other text fields",
+      "note": "Turn it off if you write in several languages and words in the others come up underlined. Right-click an underlined word for suggestions."
+    },
+    "sendKey": {
+      "note": "Which key lets a message go. The other one breaks the line - so a message written as several paragraphs is typed with the same key either way.",
+      "enter": {
+        "label": "Enter",
+        "sub": "Shift+Enter breaks the line"
+      },
+      "modEnter": {
+        "label": "⌘ Enter",
+        "sub": "Enter breaks the line"
+      }
+    },
+    "composerLayout": {
+      "bottom": {
+        "label": "Default",
+        "sub": "Model, effort, mode and usage on a line under the field"
+      },
+      "compact": {
+        "label": "Compact",
+        "sub": "All of that in the field’s own row - more room for the conversation"
+      },
+      "note": "The panel always stands at the right edge of the window, so the side columns of the plugin are not offered here."
+    },
+    "pasteCollapse": {
+      "note": "A long paste folds into a chip so that a wall of text does not fill the field. Lines are counted as they would fall in the field itself, so text pasted as one endless line folds too. Nothing is lost - a folded paste holds the text whole and unfolds back by the pencil on it.",
+      "never": "Never fold",
+      "neverSub": "Everything stays in the field, except a paste over {{thousands}},000 characters",
+      "fold": "Fold long pastes",
+      "foldSub": "From how many lines - {{min}} to {{max}}",
+      "lines": "From how many lines"
+    },
+    "aside": {
+      "title": "Side question",
+      "unseen": "Claude doesn't see this",
+      "thinking": "Thinking aside · {{elapsed}}",
+      "retrying": "API error, retry {{attempt}} of {{max}} in {{seconds}}s",
+      "cancel": "Cancel",
+      "cancelled": "Cancelled",
+      "askAgain": "Ask again",
+      "empty": "No answer came back",
+      "failed": {
+        "ended": "The conversation stopped before answering",
+        "timeout": "No answer in ten minutes",
+        "refused": "Claude Code turned it down"
+      },
+      "copy": "Copy the answer",
+      "copied": "Copied",
+      "close": "Close (Esc)",
+      "notSaved": "Not saved to the chat",
+      "askInChat": "Ask in the chat",
+      "askInChatHint": "Put the question into the field as an ordinary message - there Claude can read files and run tools",
+      "hint": "Type /btw and a question. Claude answers from this conversation without stopping its work, and the answer stays out of the chat.",
+      "askAside": "Ask aside",
+      "askAsideHint": "Claude answers from the conversation and keeps working"
+    },
+    "mods": {
+      "label": "Mods",
+      "logLabel": "MOD",
+      "asks": "A mod asks",
+      "pane": "{{name}} opened its own window. The panel can't show mod windows yet: if the turn is standing still, that window is holding it, and Stop cancels it."
+    },
+    "fast": {
+      "label": "Fast mode",
+      "offSub": "Off · Opus up to 2.5× faster, paid from usage credits",
+      "waitingSub": "On from the next message · paid from usage credits",
+      "onSub": "On · paid from usage credits",
+      "cooldownSub": "Paused after a rate limit - comes back on by itself",
+      "unavailableSub": "Unavailable. {{reason}}",
+      "chipOn": "Fast mode is on",
+      "chipWaiting": "Fast mode turns on with the next message",
+      "chipCooldown": "Fast mode is paused after a rate limit",
+      "chipUnavailable": "Fast mode is unavailable. {{reason}}",
+      "argumentOn": "turn fast mode on for this conversation",
+      "argumentOff": "back to standard speed"
+    },
+    "modelNote": {
+      "label": "MODEL",
+      "stuck": "picked, but the answers keep coming on {{running}}",
+      "stuckTip": "The change did not reach Claude Code - try picking the model again.",
+      "switchedHint": "Model: {{model}} - Claude Code switched to it on its own, off {{from}}",
+      "stuckHint": "Model: {{model}} - {{picked}} was picked and did not take"
+    },
+    "carryOn": {
+      "label": "PANEL",
+      "planned": "Carries this conversation on by itself at {{clock}}, once the limit resets",
+      "guessed": "Tries to carry this conversation on by itself at {{clock}} - the limit did not say when it resets",
+      "cancel": "Don't continue",
+      "why": {
+        "accountSwitch": "Not written by you: switching the account cut the turn short, and the panel carried it on by itself",
+        "limit": "Not written by you: the usage limit stopped the turn, and the panel carried it on once it could go on",
+        "restart": "Not written by you: Claude Code was restarted under the conversation and its background agents were lost, so the panel told it to carry on"
+      }
+    },
+    "loginGate": {
+      "signIn": "Sign in to Claude Code",
+      "signInAs": "Sign in as {{account}}",
+      "text": "Signing in happens once, in the Terminal: Claude opens a browser and waits for you to come back. The panel picks it up on its own.",
+      "logIn": "Log in",
+      "openAgain": "Open the terminal again",
+      "finish": "Finish the login in the Terminal - this screen closes by itself.",
+      "noTerminal": "The Terminal would not open, and the sign-in happens in one.",
+      "orSwitch": "Or switch to another account:"
+    },
+    "cliPath": {
+      "text": "The panel drives the claude CLI. If it is installed, point the panel at it - the IDE does not always see the same PATH as your terminal.",
+      "label": "Path to the claude CLI",
+      "use": "Use this",
+      "whereLooked": "Where the panel looked",
+      "rejected": {
+        "missing": "There is no runnable file at this path.",
+        "not-claude": "This file does not answer as Claude Code."
+      }
+    },
+    "crash": {
+      "title": "The panel hit an error",
+      "text": "Reloading is safe: your conversations live in the Claude Code processes behind the panel and survive it.",
+      "button": "Reload the panel"
+    }
   },
   "statusBar": {
     "version": "v{{version}}",
@@ -81,9 +1648,6 @@
       "unsigned-build": "This build is not signed, so the update cannot be verified."
     }
   },
-  "titleBar": {
-    "settingsSoon": "Settings (not built yet)"
-  },
   "git": {
     "switcherLabel": "Switch branch",
     "detached": "Detached at {{commit}}",
@@ -115,7 +1679,17 @@
     "pushCommits_other": "Push {{count}} commits from {{branch}} to {{upstream}}.",
     "pushPublish": "Publish {{branch}} to {{remote}}. It will track the new remote branch.",
     "pushNoRemote": "This repository has no remote to push to.",
-    "pushNotOnBranch": "Push works only on a branch, not on a detached commit."
+    "pushNotOnBranch": "Push works only on a branch, not on a detached commit.",
+    "pullRequest": {
+      "number": "#{{number}}",
+      "label": "Pull request #{{number}}, {{state}}. Opens in the browser",
+      "states": {
+        "open": "open",
+        "draft": "draft",
+        "merged": "merged",
+        "closed": "closed"
+      }
+    }
   },
   "clone": {
     "title": "Clone Repository",
@@ -127,7 +1701,6 @@
     "cloning": "Cloning…"
   },
   "searchEverywhere": {
-    "open": "Search Everywhere (Double ⇧)",
     "label": "Search everywhere",
     "tabsLabel": "Search in",
     "tabs": {
@@ -166,7 +1739,9 @@
       "switchProject": "Switch to Project {{name}}",
       "openRecent": "Open Recent Project {{name}}",
       "toggleFiles": "Show or Hide Files",
-      "toggleClaudeCode": "Show or Hide Claude Code"
+      "toggleClaudeCode": "Show or Hide Claude Code",
+      "toggleMainView": "Show or Hide {{name}}",
+      "toggleDesignSystem": "Show or Hide Design System"
     },
     "longQuery": "The text is too long: search takes up to {{count}} characters."
   }

@@ -1,0 +1,38 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+.composerQuotes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+}
+
+// Цитата - строка с меткой, началом текста и откуда она: читается, что уйдёт сверху.
+.quote {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: 0 var(--space-1) 0 var(--space-2);
+  border-left: var(--focus-ring-width) solid var(--color-border-strong);
+  font-size: var(--font-size-xs);
+}
+
+.label {
+  @include caps-label;
+
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+}
+
+.text {
+  @include truncate;
+
+  flex: 1;
+  min-width: 0;
+  color: var(--color-fg-muted);
+}
+
+.source {
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+}

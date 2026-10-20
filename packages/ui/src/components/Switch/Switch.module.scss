@@ -1,0 +1,83 @@
+@use '../../styles/mixins' as *;
+
+.switch {
+  @include button-reset;
+  @include interactive-surface;
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--size-menu-item);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  color: var(--color-fg);
+  text-align: left;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+  }
+
+  &:disabled {
+    color: var(--color-fg-disabled);
+  }
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--font-size-md);
+}
+
+.description {
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-snug);
+}
+
+// Выключено - пустой контур, включено - тонированная плашка акцента: тот же язык, что
+// у отметки выбора, без заливки и бликов.
+.track {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  width: var(--size-switch-width);
+  height: var(--size-control-xs);
+  padding: var(--space-0-5);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface-sunken);
+  transition:
+    background-color var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard);
+}
+
+.on {
+  @include tinted-plaque(var(--color-accent));
+}
+
+.thumb {
+  width: var(--size-switch-thumb);
+  height: var(--size-switch-thumb);
+  border-radius: var(--radius-full);
+  background-color: var(--color-fg-subtle);
+  transition:
+    translate var(--duration-fast) var(--easing-standard),
+    background-color var(--duration-fast) var(--easing-standard);
+
+  .on & {
+    translate: var(--offset-switch-thumb) 0;
+    background-color: var(--color-accent);
+  }
+
+  .switch:disabled & {
+    background-color: var(--color-fg-disabled);
+  }
+}

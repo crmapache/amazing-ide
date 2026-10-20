@@ -1,0 +1,21 @@
+// Модели в строке MODEL: покинутая зачёркнута, работающая - обычным цветом, пояснение и
+// совет - тише, как у смены модели самим CLI рядом.
+.model {
+  color: var(--color-fg);
+}
+
+.from {
+  color: var(--color-fg-subtle);
+  text-decoration: line-through;
+}
+
+.muted {
+  color: var(--color-fg-subtle);
+}
+
+.hint {
+  display: block;
+  margin-top: var(--space-0-5);
+  color: var(--color-fg-subtle);
+  font-family: var(--font-ui);
+}

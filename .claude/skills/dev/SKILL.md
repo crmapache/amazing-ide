@@ -96,9 +96,11 @@ node apps/desktop/scripts/cdp.mjs eval "document.title = 'Amazing IDE agent'"
 то, что видит человек. Окно JetBrains снимай так же через Graphite, всё лишнее
 закрывай `redact`.
 
-Витрина дизайн-системы (все токены и компоненты) в копии есть:
-`button[aria-label="Design system"]` в шапке, вкладки витрины - `[role=tab]` с
-текстом «Foundations» и «Components». Прокрутка - у `[role=region]`.
+Витрина дизайн-системы (все токены и компоненты) в копии есть, кнопки в шапке у неё
+нет - открывается действием поиска: `key KeyA meta+shift`, `type 'Design System'`,
+`key Enter` (тем же действием и закрывается, или кнопкой `button[aria-label="Close
+design system"]`). Вкладки витрины - `[role=tab]` с текстом «Foundations» и
+«Components». Прокрутка - у `[role=region]`.
 
 Меню проекта и ветки - панели в странице: их можно открыть кликом по
 `button[aria-haspopup=menu]`, искать и снимать. Системные - только диалоги выбора

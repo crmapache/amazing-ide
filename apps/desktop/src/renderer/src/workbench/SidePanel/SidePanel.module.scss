@@ -13,12 +13,3 @@
 .closed {
   display: none;
 }
-
-.view {
-  height: 100%;
-  overflow: hidden;
-
-  &[hidden] {
-    display: none;
-  }
-}

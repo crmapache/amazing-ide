@@ -3,9 +3,9 @@ import type { ViewDescriptor } from '../views/views.types'
 export type ActivityBarProps<ViewId extends string> = {
   views: readonly ViewDescriptor<ViewId>[]
   activeViewId: ViewId
-  /** Открыта ли панель: при свёрнутой ни одна иконка не горит. */
+  /** Развёрнута ли область полосы: при свёрнутой ни одна иконка не горит. */
   isPanelOpen: boolean
-  /** С какой стороны окна стоит полоса: от этого зависит, где у неё граница. */
+  /** С какой стороны от своей области стоит полоса: подсказка встаёт в сторону области. */
   edge: 'start' | 'end'
   label: string
   onSelect: (viewId: ViewId) => void

@@ -1,0 +1,19 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Меню у выделения - стеклянный слой поверх ленты, как всплывающие панели окна.
+.selectionMenu {
+  @include glass-overlay;
+  @include enter-transition;
+
+  position: fixed;
+  z-index: var(--z-overlay);
+  display: flex;
+  align-items: center;
+  gap: var(--space-0-5);
+  padding: var(--space-0-5);
+  border-radius: var(--radius-md);
+
+  &:not([data-placed]) {
+    visibility: hidden;
+  }
+}

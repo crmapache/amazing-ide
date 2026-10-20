@@ -49,6 +49,16 @@ export const COLOR_GROUPS: readonly ColorGroup[] = [
     ],
   },
   {
+    titleKey: 'groups.gauges',
+    tokens: [
+      '--color-gauge-1',
+      '--color-gauge-2',
+      '--color-gauge-3',
+      '--color-gauge-4',
+      '--color-gauge-calm',
+    ],
+  },
+  {
     titleKey: 'groups.interaction',
     tokens: [
       '--color-bg-hover',
@@ -72,8 +82,34 @@ export const COLOR_GROUPS: readonly ColorGroup[] = [
     ],
   },
   {
+    titleKey: 'groups.tabGroups',
+    tokens: [
+      '--color-tab-group-0',
+      '--color-tab-group-1',
+      '--color-tab-group-2',
+      '--color-tab-group-3',
+      '--color-tab-group-4',
+      '--color-tab-group-5',
+    ],
+  },
+  {
     titleKey: 'groups.lines',
     tokens: ['--color-border', '--color-border-strong', '--color-focus', '--color-scrollbar'],
+  },
+  {
+    titleKey: 'groups.syntax',
+    tokens: [
+      '--color-syntax-fg',
+      '--color-syntax-keyword',
+      '--color-syntax-string',
+      '--color-syntax-string-expression',
+      '--color-syntax-function',
+      '--color-syntax-constant',
+      '--color-syntax-parameter',
+      '--color-syntax-punctuation',
+      '--color-syntax-comment',
+      '--color-syntax-link',
+    ],
   },
 ]
 

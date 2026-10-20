@@ -1,0 +1,18 @@
+.conversationPane {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+
+  // Фокус панели - только чтобы её клавиши слышали нажатия из ленты: рамки нет.
+  &:focus {
+    outline: none;
+  }
+}
+
+.feedArea {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}

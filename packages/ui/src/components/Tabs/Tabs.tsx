@@ -1,6 +1,7 @@
 import type { KeyboardEvent } from 'react'
 import clsx from 'clsx'
 
+import { Tooltip } from '../Tooltip/Tooltip'
 import { TAB_SELECTOR, TAB_ICON_SIZE, TAB_ICON_STROKE_WIDTH } from './Tabs.constants'
 import styles from './Tabs.module.scss'
 import type { TabsProps } from './Tabs.types'
@@ -10,6 +11,7 @@ import { nextTabIndex } from './Tabs.utils'
  * Ряд вкладок-разделов: переключает содержимое одной зоны (разделы витрины,
  * позже - настройки). Стрелки ходят по кругу и сразу выбирают, в ряд по Tab
  * попадает только выбранная. Вкладки проектов в шапке - своя фича, не эта.
+ * Со счётчиком - разделы найденного (окно поиска по разговорам).
  */
 export const Tabs = <TabId extends string>({ label, items, value, onChange }: TabsProps<TabId>) => {
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -26,10 +28,9 @@ export const Tabs = <TabId extends string>({ label, items, value, onChange }: Ta
 
   return (
     <div role="tablist" aria-label={label} className={styles.tabs} onKeyDown={handleKeyDown}>
-      {items.map(({ id, label: itemLabel, icon: Icon }) => {
+      {items.map(({ id, label: itemLabel, icon: Icon, count, flash, hint }) => {
         const isActive = id === value
-
-        return (
+        const tab = (
           <button
             key={id}
             type="button"
@@ -40,7 +41,23 @@ export const Tabs = <TabId extends string>({ label, items, value, onChange }: Ta
             onClick={() => onChange(id)}>
             {Icon && <Icon size={TAB_ICON_SIZE} strokeWidth={TAB_ICON_STROKE_WIDTH} aria-hidden />}
             {itemLabel}
+            {count !== undefined && (
+              // Ключ - номер вспышки: новый рост посреди вспышки начинает её заново.
+              <span
+                key={flash ?? 0}
+                className={clsx(styles.count, count > 0 && styles.countLive, flash && styles.grew)}>
+                {count}
+              </span>
+            )}
           </button>
+        )
+
+        return hint ? (
+          <Tooltip key={id} label={hint}>
+            {tab}
+          </Tooltip>
+        ) : (
+          tab
         )
       })}
     </div>

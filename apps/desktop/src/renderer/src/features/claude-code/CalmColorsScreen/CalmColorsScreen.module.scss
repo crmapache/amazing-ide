@@ -1,0 +1,61 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+.sample {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+// Та же раскладка, что у полосы над полем: пять отрезков с зазором.
+.bar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-1);
+}
+
+.ladder {
+  display: flex;
+  justify-content: space-between;
+}
+
+.step {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+}
+
+.success {
+  color: var(--color-gauge-1);
+}
+
+.warning {
+  color: var(--color-gauge-2);
+}
+
+.high {
+  color: var(--color-gauge-3);
+}
+
+.danger {
+  color: var(--color-gauge-4);
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.hint,
+.note {
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-snug);
+}
+
+.note {
+  margin: 0;
+  padding: 0 var(--space-1);
+}

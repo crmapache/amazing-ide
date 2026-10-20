@@ -1,13 +1,7 @@
-import type { MouseEvent } from 'react'
-import clsx from 'clsx'
-import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { IconButton } from '@amazing-ide/ui/IconButton'
-import { Tooltip } from '@amazing-ide/ui/Tooltip'
+import { ClosableTab } from '@amazing-ide/ui/ClosableTab'
 
-import { MIDDLE_MOUSE_BUTTON } from './ProjectTab.constants'
-import styles from './ProjectTab.module.scss'
 import type { ProjectTabProps } from './ProjectTab.types'
 
 /**
@@ -17,35 +11,14 @@ import type { ProjectTabProps } from './ProjectTab.types'
 export const ProjectTab = ({ project, isActive, onActivate, onClose }: ProjectTabProps) => {
   const { t } = useTranslation()
 
-  const handleActivate = () => onActivate(project.id)
-
-  const handleClose = () => onClose(project.id)
-
-  const handleAuxClick = (event: MouseEvent) => {
-    if (event.button === MIDDLE_MOUSE_BUTTON) handleClose()
-  }
-
   return (
-    <div className={clsx(styles.projectTab, isActive && styles.active)}>
-      <Tooltip label={project.rootPath} stretch>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={isActive}
-          className={styles.label}
-          onClick={handleActivate}
-          onAuxClick={handleAuxClick}>
-          {project.name}
-        </button>
-      </Tooltip>
-      <span className={styles.close}>
-        <IconButton
-          icon={X}
-          size="sm"
-          label={t('projects.close', { name: project.name })}
-          onClick={handleClose}
-        />
-      </span>
-    </div>
+    <ClosableTab
+      label={project.name}
+      hint={project.rootPath}
+      active={isActive}
+      closeLabel={t('projects.close', { name: project.name })}
+      onActivate={() => onActivate(project.id)}
+      onClose={() => onClose(project.id)}
+    />
   )
 }

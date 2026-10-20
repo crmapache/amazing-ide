@@ -36,7 +36,7 @@ start() {
   mkdir -p "$WORK_DIR/profile/user-data"
 
   cd "$DESKTOP_DIR"
-  # VITE_SHOWCASE=1 - в копии есть витрина дизайн-системы (кнопка с палитрой в шапке),
+  # VITE_SHOWCASE=1 - в копии есть витрина дизайн-системы (действие в поиске везде),
   # как в dev. Релизная сборка флага не получает, и витрины в ней нет.
   VITE_SHOWCASE=1 pnpm exec electron-vite build --outDir "$WORK_DIR/out" >"$WORK_DIR/build.log" 2>&1 ||
     { echo "Сборка упала: $WORK_DIR/build.log" >&2; exit 1; }

@@ -1,0 +1,69 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Плашка вложения внутри строки текста: не ломает высоту строки, тон - по смыслу.
+.draftChip {
+  @include tinted-plaque(var(--chip-tone));
+
+  --chip-tone: var(--color-info);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-0-5);
+  max-width: 100%;
+  margin: 0 var(--space-0-5);
+  padding: 0 var(--space-0-5) 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-code);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  vertical-align: baseline;
+  white-space: nowrap;
+  user-select: none;
+
+  // Команда - то, что делает сообщение: акцентом.
+  &[data-kind='cmd'] {
+    --chip-tone: var(--color-fg-accent);
+  }
+
+  // Цитата и вставка - просто текст: нейтрально.
+  &[data-kind='quote'],
+  &[data-kind='paste'] {
+    --chip-tone: var(--color-fg-muted);
+  }
+}
+
+.body {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.icon {
+  flex-shrink: 0;
+  width: var(--font-size-sm);
+  height: var(--font-size-sm);
+}
+
+.label {
+  @include truncate;
+}
+
+.action {
+  @include button-reset;
+  @include interactive-surface;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-xs);
+  height: var(--size-control-xs);
+  border-radius: var(--radius-xs);
+  color: inherit;
+  cursor: pointer;
+}
+
+.actionIcon {
+  width: var(--font-size-xs);
+  height: var(--font-size-xs);
+}

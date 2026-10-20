@@ -14,9 +14,10 @@ export const Tooltip = ({
   label,
   placement = 'bottom',
   stretch = false,
+  disabled = false,
   children,
 }: TooltipProps) => {
-  const { anchorRef, tooltipRef, handlers } = useTooltip()
+  const { anchorRef, tooltipRef, handlers } = useTooltip(disabled)
 
   return (
     <span ref={anchorRef} className={clsx(styles.anchor, stretch && styles.stretch)} {...handlers}>

@@ -1,26 +1,50 @@
+import clsx from 'clsx'
+
+import { CARD_ICON_SIZE, CARD_ICON_STROKE_WIDTH } from './Card.constants'
 import styles from './Card.module.scss'
 import type { CardProps } from './Card.types'
 
 /**
  * Стеклянная карточка внутри панели: заголовок, строка пояснения, действия справа и
- * содержимое. Для группы настроек, сводки, блока в GUI провайдера. Всплывающее
- * поверх окна - Popover или Dialog, не карточка.
+ * содержимое. Для группы настроек, сводки, блока в GUI провайдера. Тон accent - то, что
+ * ждёт ответа человека: оранжевая рамка и заголовок. Всплывающее поверх окна - Popover
+ * или Dialog, не карточка.
  */
-export const Card = ({ title, description, actions, children }: CardProps) => {
+export const Card = ({
+  title,
+  description,
+  icon: Icon,
+  tone = 'neutral',
+  size = 'md',
+  actions,
+  children,
+}: CardProps) => {
   const hasHeader = Boolean(title || actions)
 
   return (
-    <section aria-label={title} className={styles.card}>
+    <section aria-label={title} className={clsx(styles.card, styles[tone], styles[size])}>
       {hasHeader && (
         <>
           <div className={styles.header}>
             <div className={styles.heading}>
-              {title && <div className={styles.title}>{title}</div>}
+              {title && (
+                <div className={styles.title}>
+                  {Icon && (
+                    <Icon
+                      className={styles.icon}
+                      size={CARD_ICON_SIZE}
+                      strokeWidth={CARD_ICON_STROKE_WIDTH}
+                      aria-hidden
+                    />
+                  )}
+                  {title}
+                </div>
+              )}
               {description && <div className={styles.description}>{description}</div>}
             </div>
             {actions && <div className={styles.actions}>{actions}</div>}
           </div>
-          <div className={styles.divider} />
+          {size === 'md' && <div className={styles.divider} />}
         </>
       )}
       <div className={styles.body}>{children}</div>

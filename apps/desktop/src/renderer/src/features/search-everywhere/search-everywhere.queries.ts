@@ -1,9 +1,11 @@
 import type { ProjectFileList } from '@shared/search'
 import { useQuery, keepPreviousData } from '@tanstack/react-query'
 
+import { prepareFiles } from '../../lib/file-match.utils'
 import { invoke } from '../../lib/ipc'
+import { projectFilesQuery } from '../../state/project-files.queries'
 import { QUERY_KEYS } from '../../state/query-keys'
-import { isTextQuery, prepareFiles } from './search-results.utils'
+import { isTextQuery } from './search-results.utils'
 
 // Вне компонента: React Query пересчитывает select только при новой ссылке на функцию
 // или новых данных, а разбор десятков тысяч путей на каждую отрисовку не нужен.
@@ -19,10 +21,8 @@ const selectPreparedFiles = (list: ProjectFileList) => ({
  */
 export const useProjectFiles = (projectId: string | undefined) =>
   useQuery({
-    queryKey: QUERY_KEYS.projectFiles(projectId ?? ''),
-    queryFn: () => invoke('search:listFiles', { projectId: projectId ?? '' }),
+    ...projectFilesQuery(projectId ?? ''),
     enabled: projectId !== undefined,
-    staleTime: 0,
     select: selectPreparedFiles,
   })
 

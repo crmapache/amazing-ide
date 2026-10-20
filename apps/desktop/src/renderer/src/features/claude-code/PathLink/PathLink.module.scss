@@ -1,0 +1,43 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Ссылка внутри строки текста: шрифт и кегль - строки, длинный путь переносится где
+// угодно, а не распирает узкую панель. Подчёркивание - пунктиром: сплошное у адреса,
+// который уходит в браузер.
+.pathLink {
+  @include button-reset;
+
+  display: inline;
+  font: inherit;
+  text-align: left;
+  overflow-wrap: anywhere;
+  text-decoration-style: dotted;
+  text-underline-offset: var(--space-0-5);
+
+  @media (hover: hover) {
+    &:hover {
+      text-decoration-line: underline;
+    }
+  }
+}
+
+.link {
+  color: var(--color-info);
+}
+
+// Цвет текста вокруг (строка ошибки, код): ссылку выдаёт подчёркивание, оно видно всегда.
+.inherit {
+  color: inherit;
+  text-decoration-line: underline;
+}
+
+// Нажали, а файла нет: ссылка гаснет и зачёркнута, подсказка говорит почему.
+.missing {
+  color: var(--color-fg-subtle);
+  text-decoration-line: line-through;
+
+  @media (hover: hover) {
+    &:hover {
+      text-decoration-line: line-through;
+    }
+  }
+}

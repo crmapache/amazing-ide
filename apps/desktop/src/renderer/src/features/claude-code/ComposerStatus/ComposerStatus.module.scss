@@ -1,0 +1,144 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Строка под полем: селекторы слева, показания справа. Не помещается - показания
+// уходят на свою строку, а не сжимают селекторы.
+.composerStatus {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-2);
+  padding: 0 var(--space-2) var(--space-2);
+}
+
+.selectors,
+.meters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-0-5);
+  min-width: 0;
+}
+
+.meters {
+  margin-left: auto;
+}
+
+// Подпись селектора капсом перед значением: MODEL, EFFORT, MODE.
+.caption {
+  @include caps-label;
+
+  color: var(--color-fg-disabled);
+}
+
+.quiet {
+  color: var(--color-fg-disabled);
+}
+
+.info {
+  color: var(--color-info);
+}
+
+.accent {
+  color: var(--color-accent-strong);
+}
+
+.danger {
+  color: var(--color-danger);
+}
+
+// MODEL не та, что выбрали (CLI сменил сам или выбор не доехал) - предупреждение.
+.warning {
+  color: var(--color-warning);
+}
+
+// ↯ быстрого режима после MODEL: горит - акцент, ждёт ответа CLI - тускло, не работает -
+// предупреждение. Знак текстом, а не эмодзи: эмодзи красит себя сам.
+.fastMark {
+  margin-left: var(--space-0-5);
+  font-size: var(--font-size-xs);
+}
+
+.on {
+  color: var(--color-accent-strong);
+}
+
+.dim {
+  color: var(--color-fg-disabled);
+}
+
+.rings {
+  @include button-reset;
+  @include interactive-surface;
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--size-control-sm);
+  padding: 0 var(--space-1-5);
+  border-radius: var(--radius-sm);
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+  }
+}
+
+.ring {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+// Процент - цветом темпа, моноширинным: цифры не прыгают при смене.
+.ringValue {
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+
+  // Ступени шкалы - роли --color-gauge-*: их приглушает режим спокойных цветов.
+  &.success {
+    color: var(--color-gauge-1);
+  }
+
+  &.warning {
+    color: var(--color-gauge-2);
+  }
+
+  &.high {
+    color: var(--color-gauge-3);
+  }
+
+  &.danger {
+    color: var(--color-gauge-4);
+  }
+}
+
+.tokens {
+  padding: 0 var(--space-1-5);
+  color: var(--color-success);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  cursor: default;
+
+  &:focus-visible {
+    border-radius: var(--radius-sm);
+    outline: var(--focus-ring-width) solid var(--color-focus);
+  }
+}
+
+.usagePanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+
+.usageTitle {
+  @include caps-label;
+
+  color: var(--color-fg-subtle);
+}
+
+.usageActions {
+  display: flex;
+  justify-content: flex-end;
+}

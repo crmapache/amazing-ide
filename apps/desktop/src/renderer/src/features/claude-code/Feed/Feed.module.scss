@@ -1,0 +1,115 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+.feed {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+// Полка закреплённых лежит поверх верха ленты: её родитель - эта обёртка.
+.feedWrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+// Окно потока агента встаёт на место ленты, а лента под ним невидима, но держит своё
+// место и прокрутку.
+.streamLayer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.covered {
+  visibility: hidden;
+}
+
+.scroller {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-4) var(--space-3);
+}
+
+// Строки вне экрана браузер не раскладывает: длинный разговор листается без работы на
+// каждую реплику. Высота-заглушка - примерная, браузер уточняет её сам.
+.row {
+  min-width: 0;
+  border-radius: var(--radius-lg);
+  content-visibility: auto;
+  contain-intrinsic-size: auto var(--size-feed-row-estimate);
+  transition: background-color var(--duration-slow) var(--easing-standard);
+
+  // Строка, к которой прыгнули с полки, на миг подсвечена.
+  &[data-lit] {
+    background-color: var(--color-bg-selected);
+  }
+}
+
+.workingLine {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--size-control-sm);
+  font-family: var(--font-code);
+  font-size: var(--font-size-sm);
+}
+
+.workingLabel {
+  color: var(--color-fg-muted);
+}
+
+// Перелив по буквам: каждая буква по очереди светлеет и гаснет - волна идёт вдоль
+// строки. Номер буквы ставит разметка (--letter).
+.shimmer > span {
+  --letter: 0;
+
+  animation: shimmer var(--duration-shimmer) var(--easing-standard) infinite;
+  animation-delay: calc(var(--letter) * var(--duration-shimmer-step));
+}
+
+@keyframes shimmer {
+  0%,
+  60%,
+  100% {
+    color: var(--color-fg-muted);
+  }
+
+  30% {
+    color: var(--color-fg-strong);
+  }
+}
+
+.jump {
+  @include glass-overlay;
+
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-3);
+  border-radius: var(--radius-full);
+}
+
+// Число непрочитанных - акцентная капля на углу кнопки.
+.unread {
+  position: absolute;
+  top: calc(var(--space-1) * -1);
+  right: calc(var(--space-1) * -1);
+  min-width: var(--size-status-dot);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-full);
+  background-color: var(--color-accent);
+  color: var(--color-fg-strong);
+  font-size: var(--font-size-2xs);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-normal);
+  text-align: center;
+}

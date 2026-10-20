@@ -1,0 +1,104 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Дифф - на тёмной поверхности кода в тонкой рамке. Добавленное и удалённое -
+// тонированной подложкой своего тона (как плашки дизайн-системы), знак и номер -
+// приглушённые.
+.diffView {
+  overflow: hidden;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-sunken);
+}
+
+.scroller {
+  overflow-x: auto;
+  font-family: var(--font-code);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+.hunk {
+  width: max-content;
+  min-width: 100%;
+
+  & + & {
+    border-top: var(--border-width) solid var(--color-border);
+  }
+}
+
+.hunkHead {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-0-5) var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
+.range {
+  color: var(--color-info);
+}
+
+.note {
+  color: var(--color-fg-subtle);
+}
+
+.row {
+  --tone: transparent;
+
+  display: grid;
+  grid-template-columns: var(--size-diff-gutter) var(--size-diff-sign) 1fr;
+  background-color: color-mix(in srgb, var(--tone) var(--tint-soft), transparent);
+  user-select: text;
+}
+
+.add {
+  --tone: var(--color-success);
+}
+
+.del {
+  --tone: var(--color-danger);
+}
+
+.number {
+  padding-right: var(--space-2);
+  color: var(--color-fg-disabled);
+  text-align: right;
+  user-select: none;
+}
+
+.sign {
+  color: var(--color-fg-disabled);
+  user-select: none;
+
+  .add & {
+    color: var(--color-success);
+  }
+
+  .del & {
+    color: var(--color-danger);
+  }
+}
+
+.text {
+  padding-right: var(--space-4);
+  color: var(--color-syntax-fg);
+  white-space: pre;
+
+  .del & {
+    color: var(--color-fg-muted);
+  }
+}
+
+// Строка под диффом - сама кнопка: открывает остаток и сворачивает обратно.
+.more {
+  @include button-reset;
+  @include interactive-surface;
+
+  display: block;
+  width: 100%;
+  padding: var(--space-0-5) var(--space-2);
+  border-top: var(--border-width) solid var(--color-border);
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  text-align: left;
+}

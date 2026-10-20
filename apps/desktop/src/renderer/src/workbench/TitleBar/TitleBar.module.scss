@@ -8,7 +8,6 @@
   flex-shrink: 0;
   align-items: center;
   height: var(--size-title-bar);
-  padding-right: var(--space-2);
 }
 
 // Место под «светофор» macOS: кнопки рисует система, а за пустоту вокруг них окно
@@ -21,7 +20,7 @@
   width: var(--size-traffic-lights);
 }
 
-// Пустое место между группами кнопок - главная ручка окна.
+// Пустое место от проекта и ветки до правого края - главная ручка окна.
 .dragSpace {
   @include window-drag-region;
 
@@ -30,14 +29,9 @@
   min-width: var(--space-4);
 }
 
-.start,
-.end {
+.start {
   display: flex;
   align-items: center;
   gap: var(--space-1);
   min-width: 0;
-}
-
-.end {
-  flex-shrink: 0;
 }

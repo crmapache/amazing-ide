@@ -1,4 +1,4 @@
-import { ipcRenderer, contextBridge } from 'electron'
+import { webUtils, ipcRenderer, contextBridge } from 'electron'
 import type { IpcRendererEvent } from 'electron'
 
 import type { IdeBridge } from '@shared/ipc/bridge'
@@ -39,6 +39,9 @@ const bridge = {
       ipcRenderer.removeListener(event, forward)
     }
   },
+
+  // Путь перетащенного файла знает только preload: окну в песочнице он не виден.
+  pathForFile: (file: File) => webUtils.getPathForFile(file),
 } as IdeBridge
 
 contextBridge.exposeInMainWorld('ide', bridge)

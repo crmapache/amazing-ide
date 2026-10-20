@@ -1,0 +1,240 @@
+@use '../../styles/mixins' as *;
+@include breathing-keyframes;
+
+// Вкладка-плашка в полосе: выбранная залита графитом с тонкой рамкой, остальные -
+// только текстом. Радиус больше обычного: вкладка стоит в листе почти вплотную, и её
+// угол идёт параллельно углу листа. isolation - свой слой: свет позвавшей вкладки
+// (.call) ложится над фоном и под подписью, а не поверх соседей.
+.closableTab {
+  // Глубина форка приходит из разметки (style), без неё - корень группы.
+  --tab-indent: 0;
+  --tab-tone: var(--color-border-strong);
+
+  position: relative;
+  display: flex;
+  isolation: isolate;
+  align-items: center;
+  height: var(--size-control-md);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-lg);
+  transition:
+    transform var(--duration-normal) var(--easing-standard),
+    background-color var(--duration-normal) var(--easing-standard),
+    border-color var(--duration-normal) var(--easing-standard);
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--color-bg-hover);
+    }
+  }
+}
+
+.fill {
+  flex: 1 1 0;
+  min-width: var(--size-tab-min);
+}
+
+.fit {
+  flex-shrink: 0;
+  max-width: var(--size-tab-max);
+}
+
+// Ряды раскладываются так, будто каждая вкладка не шире основы: длинное имя не сталкивает
+// соседа на новый ряд. Потом вкладка, которой не хватает на имя, забирает свободный конец
+// ряда - не дальше своего полного имени.
+.grow {
+  flex: 1 1 var(--size-tab-basis);
+  min-width: var(--size-tab-min-narrow);
+  max-width: max-content;
+  user-select: none;
+}
+
+// Зазор от соседней группы; первая вкладка полосы стоит ровно у края.
+.groupStart:not(:first-child) {
+  margin-inline-start: var(--space-1-5);
+}
+
+.active,
+.active:hover {
+  border-color: var(--color-border);
+  background-color: var(--color-surface-raised);
+}
+
+// Выбранная вкладка группы - цветом своей группы, плоско: подложка и рамка тона, без
+// свечения и без жирного (ширина не прыгает на переключении).
+.tone0 {
+  --tab-tone: var(--color-tab-group-0);
+}
+
+.tone1 {
+  --tab-tone: var(--color-tab-group-1);
+}
+
+.tone2 {
+  --tab-tone: var(--color-tab-group-2);
+}
+
+.tone3 {
+  --tab-tone: var(--color-tab-group-3);
+}
+
+.tone4 {
+  --tab-tone: var(--color-tab-group-4);
+}
+
+.tone5 {
+  --tab-tone: var(--color-tab-group-5);
+}
+
+.active:is(.tone0, .tone1, .tone2, .tone3, .tone4, .tone5) {
+  border-color: color-mix(in srgb, var(--tab-tone) var(--tint-border), transparent);
+  background-color: color-mix(in srgb, var(--tab-tone) var(--tint-soft), transparent);
+}
+
+// Полоска группы сверху: разговор и все его форки носят один цвет.
+.groupBar {
+  position: absolute;
+  inset: calc(var(--border-width) * -1) var(--radius-lg) auto;
+  height: var(--space-0-5);
+  border-radius: var(--radius-full);
+  background-color: var(--tab-tone);
+  opacity: var(--opacity-muted);
+
+  .active & {
+    opacity: 1;
+  }
+}
+
+// Вкладку несут рукой: поверх соседей и без задержки - плавность здесь читалась бы
+// как отставание от курсора.
+.lifted {
+  z-index: var(--z-sticky);
+  border-color: var(--color-border-strong);
+  background-color: var(--color-surface-raised-hover);
+  cursor: grabbing;
+  transition: none;
+}
+
+// Позвавшая вкладка: подложка и черта снизу цветом повода, мерцает, пока не откроют.
+// Плоско - без бликов и теней (ADR 0006). Засыпает (.calm) и при reduced motion горит
+// ровно: цвет отвечает «какая это была», движение только зовёт взгляд.
+.call {
+  @include breathing;
+
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background-color: color-mix(in srgb, var(--call-tone) var(--tint-soft), transparent);
+  pointer-events: none;
+  transition: opacity var(--duration-slow) var(--easing-out);
+
+  @starting-style {
+    opacity: 0;
+  }
+
+  &::after {
+    position: absolute;
+    inset: auto 0 0;
+    height: var(--space-0-5);
+    background-color: var(--call-tone);
+    content: '';
+  }
+
+  .calm & {
+    animation-play-state: paused;
+  }
+}
+
+.success {
+  --call-tone: var(--color-success);
+}
+
+.attention {
+  --call-tone: var(--color-accent);
+}
+
+.danger {
+  --call-tone: var(--color-danger);
+}
+
+.label {
+  @include button-reset;
+
+  // Позиция - чтобы подпись легла поверх света позвавшей вкладки (он раньше в разметке).
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  min-width: 0;
+  height: 100%;
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: color var(--duration-normal) var(--easing-standard);
+
+  .closableTab:hover & {
+    color: var(--color-fg-muted);
+  }
+
+  .active & {
+    color: var(--color-fg-strong);
+  }
+
+  // Подпись по центру ряда, по бокам - место под крестик, чтобы она не прыгала.
+  .fill & {
+    flex: 1;
+    justify-content: center;
+    padding: 0 var(--space-8);
+  }
+
+  .fit & {
+    padding: 0 calc(var(--size-control-sm) + var(--space-1)) 0 var(--space-3);
+  }
+
+  // Форк отступает ступенью на каждый уровень глубины.
+  .grow & {
+    width: 100%;
+    padding: 0 calc(var(--size-control-sm) + var(--space-1)) 0
+      calc(var(--space-3) + var(--space-2) * var(--tab-indent));
+  }
+}
+
+.text {
+  @include truncate;
+}
+
+// Подпись, обрезанная посередине: целое имя в потоке, невидимое, даёт ширину и высоту,
+// видимое - поверх, ровно как влезает. pre - чтобы пробел на конце головы не пропал.
+.cut {
+  position: relative;
+  min-width: 0;
+}
+
+.cutWhole {
+  display: block;
+  overflow: hidden;
+  white-space: pre;
+  opacity: 0;
+}
+
+.cutShown {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  white-space: pre;
+}
+
+// Крестик виден на выбранной вкладке и при наведении - иначе полоса рябит.
+.close {
+  position: absolute;
+  right: var(--space-1);
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--easing-standard);
+
+  .active &,
+  .closableTab:hover &,
+  &:focus-within {
+    opacity: 1;
+  }
+}

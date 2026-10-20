@@ -1,0 +1,64 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Шапка панели: полоса вкладок разговоров над линией, переносится на столько рядов,
+// сколько нужно; кнопки справа стоят у первого ряда.
+.conversationTabs {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-start;
+  gap: var(--space-1);
+  min-height: var(--size-tab-bar);
+  margin: var(--space-1-5) var(--space-1-5) 0;
+  padding-bottom: var(--space-1-5);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+// Ряды прижаты кверху, даже когда полоса на время жеста выше своих вкладок: иначе
+// флекс растянул бы ряды, и вкладки съехали бы мимо замеренных мест.
+.tabList {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: center;
+  gap: var(--space-0-5);
+  min-width: 0;
+}
+
+.heading {
+  @include caps-label;
+  @include truncate;
+
+  flex: 1;
+  align-self: center;
+  padding: 0 var(--space-2);
+  color: var(--color-fg-subtle);
+}
+
+.forkMark {
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-tight);
+}
+
+// Поле имени на месте имени: тот же кегль, ширина - по набранному, а не во всю вкладку.
+.nameField {
+  @include field-frame;
+
+  min-width: var(--size-tab-min-narrow);
+  height: var(--size-control-sm);
+  padding: 0 var(--space-1-5);
+  border-radius: var(--radius-sm);
+  color: var(--color-fg-strong);
+  font: inherit;
+  outline: none;
+  field-sizing: content;
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-0-5);
+}

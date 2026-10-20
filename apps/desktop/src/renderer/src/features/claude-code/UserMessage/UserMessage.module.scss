@@ -1,0 +1,167 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Сообщение человека - карточка с рамкой на приподнятой подложке, во всю ширину ленты
+// (как в ACC): своё отделено от ответа шапкой «YOU» и подложкой, а не цветом.
+.userMessage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+  min-width: 0;
+  margin: var(--space-4) 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-surface-raised);
+}
+
+// По базовой линии, а не по середине: подпись и время - разные кегли, и центрованные
+// коробки ставят сами буквы на пиксель врозь. Справа - место под кнопки в углу.
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-height: var(--size-control-sm);
+  padding-right: calc(var(--size-control-sm) * 4);
+}
+
+.label {
+  @include caps-label;
+
+  color: var(--color-fg-subtle);
+}
+
+.time {
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+}
+
+// Кнопки в правом верхнем углу - на тех же отступах, что у ответа: при переходе курсора
+// между карточками они не прыгают. Видны всегда: кнопка, которая прячется до наведения,
+// - дорога назад, которую не найти.
+.actions {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  display: flex;
+  align-items: center;
+}
+
+// Цитата, с которой ушло сообщение: полоска слева и тихий текст - не спутать со своими
+// словами. Длинная прокручивается внутри.
+.quote {
+  max-height: var(--size-scroll-compact-max);
+  margin: 0;
+  padding: var(--space-1) 0 var(--space-1) var(--space-2);
+  overflow-y: auto;
+  border-left: var(--border-width) solid var(--color-border-strong);
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  white-space: pre-wrap;
+}
+
+// Обычный поток, а не flex: чипы стоят в тексте как слова, переносы набранного целы.
+.body {
+  color: var(--color-fg);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-normal);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+.imageGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1-5);
+}
+
+.editorLine {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+}
+
+.editorText {
+  @include truncate;
+}
+
+// Свёрнутая вставка посреди фразы - чип-кнопка: нажатие раскрывает текст под ней.
+.pasteChip {
+  @include button-reset;
+
+  display: inline;
+  cursor: pointer;
+}
+
+// Вставка во всю ширину: свёрнутая - первые строки, раскрытая - текст целиком на
+// глубокой подложке, как блок кода, с прокруткой внутри.
+.pasteBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+  padding: var(--space-1) var(--space-2) var(--space-1-5);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-sunken);
+  white-space: normal;
+}
+
+.pasteHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.pasteCount {
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+}
+
+// Три строки - сколько занял бы абзац ответа: дальше это уже вторая лента.
+.pastePreview {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--color-fg-muted);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.pasteBody {
+  max-height: var(--size-code-max);
+  overflow: auto;
+  overscroll-behavior: contain;
+  color: var(--color-fg-muted);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.pasteCut {
+  color: var(--color-fg-subtle);
+  font-family: var(--font-code);
+  font-size: var(--font-size-2xs);
+}
+
+// Кнопка вокруг плашки вставленной картинки: стоит в строке как слово, вид - у плашки.
+.chipButton {
+  @include button-reset;
+
+  display: inline;
+  cursor: pointer;
+}

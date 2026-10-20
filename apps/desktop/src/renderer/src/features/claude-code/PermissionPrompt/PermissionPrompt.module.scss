@@ -1,0 +1,65 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Сама карточка - Card с тоном accent; здесь только появление и раскладка тела.
+.permissionPrompt {
+  @include enter-transition;
+}
+
+.meta {
+  @include truncate;
+
+  color: var(--color-fg-muted);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.title {
+  color: var(--color-fg-strong);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-snug);
+  overflow-wrap: anywhere;
+}
+
+.command {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  overflow: auto;
+  max-height: var(--size-code-compact-max);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-sunken);
+  color: var(--color-fg-strong);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+.diff {
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+// Подписи на поднятой поверхности карточки - muted: subtle там не дотягивает до 4.5:1.
+.reason,
+.hint {
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-xs);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1-5);
+  margin-top: var(--space-1);
+}

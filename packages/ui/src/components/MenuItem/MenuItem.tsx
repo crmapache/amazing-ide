@@ -1,13 +1,17 @@
 import type { MouseEvent } from 'react'
 import clsx from 'clsx'
+import { ChevronRight } from 'lucide-react'
 
-import { MENU_ICON_SIZE, MENU_ICON_STROKE_WIDTH } from './MenuItem.constants'
+import { ChoiceMark } from '../ChoiceMark/ChoiceMark'
+import { MENU_ICON_SIZE, MENU_ITEM_ROLE, MENU_ICON_STROKE_WIDTH } from './MenuItem.constants'
 import styles from './MenuItem.module.scss'
 import type { MenuItemProps } from './MenuItem.types'
 
 /**
  * Пункт меню: иконка или значок, подпись, по желанию вторая строка и подсказка
- * справа. Выбор закрывает всплывающую панель, в которой пункт стоит.
+ * справа. Выбор закрывает всплывающую панель, в которой пункт стоит. С selection -
+ * вариант выбора с отметкой (вопрос с вариантами ответа). С iconTone и chevron -
+ * строка бокового меню: иконка в плитке, значение справа, стрелка на следующий экран.
  */
 export const MenuItem = ({
   label,
@@ -17,14 +21,24 @@ export const MenuItem = ({
   current = false,
   disabled = false,
   hint,
+  hintTone,
+  iconTone,
+  chevron = false,
+  selection,
+  checked = false,
   onSelect,
 }: MenuItemProps) => {
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
-    event.currentTarget.closest<HTMLElement>('[popover]')?.hidePopover()
+    if (selection !== 'multiple')
+      event.currentTarget.closest<HTMLElement>('[popover]')?.hidePopover()
     onSelect()
   }
 
+  const mark = selection && (
+    <ChoiceMark shape={selection === 'single' ? 'circle' : 'square'} checked={checked} />
+  )
   const visual =
+    mark ??
     leading ??
     (Icon ? (
       <Icon size={MENU_ICON_SIZE} strokeWidth={MENU_ICON_STROKE_WIDTH} aria-hidden />
@@ -35,17 +49,32 @@ export const MenuItem = ({
   return (
     <button
       type="button"
-      role="menuitem"
+      role={selection ? MENU_ITEM_ROLE[selection] : 'menuitem'}
       disabled={disabled}
       aria-current={current || undefined}
-      className={clsx(styles.menuItem, current && styles.current)}
+      aria-checked={selection ? checked : undefined}
+      className={clsx(styles.menuItem, (current || (selection && checked)) && styles.current)}
       onClick={handleClick}>
-      <span className={styles.visual}>{visual}</span>
+      <span className={clsx(styles.visual, iconTone && [styles.tile, styles[iconTone]])}>
+        {visual}
+      </span>
       <span className={styles.text}>
         <span className={styles.label}>{label}</span>
         {description && <span className={styles.description}>{description}</span>}
       </span>
-      {hint && <span className={styles.hint}>{hint}</span>}
+      {hint && (
+        <span className={clsx(styles.hint, hintTone && [styles.toned, styles[hintTone]])}>
+          {hint}
+        </span>
+      )}
+      {chevron && (
+        <ChevronRight
+          className={styles.chevron}
+          size={MENU_ICON_SIZE}
+          strokeWidth={MENU_ICON_STROKE_WIDTH}
+          aria-hidden
+        />
+      )}
     </button>
   )
 }

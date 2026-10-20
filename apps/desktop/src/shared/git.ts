@@ -29,5 +29,11 @@ export type GitPushInfo = {
   ahead: number | null
 }
 
+/** Состояние PR: черновик - отдельно от открытого, у GitHub это флаг, а не состояние. */
+export type GitPullRequestState = 'open' | 'draft' | 'merged' | 'closed'
+
+/** Pull request текущей ветки на GitHub: номер, адрес страницы и состояние. */
+export type GitPullRequest = { number: number; url: string; state: GitPullRequestState }
+
 /** Клонирование: получилось - новый набор проектов (клон уже открыт вкладкой). */
 export type GitCloneResult = { ok: true; state: WorkspaceState } | { ok: false; details: string }

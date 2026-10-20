@@ -1,12 +1,12 @@
 import { it, expect, describe } from 'vitest'
 
+import { prepareFiles } from '../../lib/file-match.utils'
 import type { SearchAction } from './search-everywhere.types'
 import {
   rankFiles,
   resultKey,
   isTextQuery,
   rankActions,
-  prepareFiles,
   searchStatus,
   buildSections,
   toTextResults,

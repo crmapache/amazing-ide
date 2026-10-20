@@ -1,0 +1,55 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Шапка вызова - одна строка одной высоты, что бы в ней ни стояло: пачка вызовов
+// сворачивается и разворачивается весь ход, и лента над ней не должна прыгать.
+.toolHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  min-width: 0;
+  min-height: var(--size-tree-row);
+  padding: 0 var(--space-1-5);
+  border-radius: var(--radius-sm);
+  color: var(--color-fg-muted);
+}
+
+.openable {
+  @include interactive-surface;
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: calc(var(--focus-ring-width) * -1);
+  }
+}
+
+.caret {
+  flex-shrink: 0;
+  color: var(--color-fg-disabled);
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.caretOpen {
+  transform: rotate(90deg);
+}
+
+.target {
+  @include truncate;
+
+  min-width: 0;
+  color: var(--color-fg-muted);
+  font-family: var(--font-code);
+  font-size: var(--font-size-sm);
+}
+
+.failed {
+  color: var(--color-danger);
+}
+
+// Путь в шапке - тот же тихий текст, ссылкой его делает подчёркивание по наведению.
+.link {
+  white-space: nowrap;
+}
+
+.spacer {
+  flex: 1;
+}
