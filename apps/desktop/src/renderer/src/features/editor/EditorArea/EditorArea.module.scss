@@ -1,28 +1,6 @@
-@use '@amazing-ide/ui/mixins' as *;
-
+// Вкладки сверху, под ними код на всю оставшуюся высоту.
 .editorArea {
   display: flex;
   flex-direction: column;
   height: 100%;
-}
-
-// Шапка с путём: папка приглушена, имя файла яркое, снизу тонкая линия.
-.fileHeader {
-  @include truncate;
-
-  flex-shrink: 0;
-  padding: var(--space-2) var(--space-4);
-  color: var(--color-fg-subtle);
-  font-family: var(--font-code);
-  font-size: var(--font-size-sm);
-}
-
-.fileName {
-  color: var(--color-fg-strong);
-}
-
-.divider {
-  flex-shrink: 0;
-  margin: 0 var(--space-4);
-  border-top: var(--border-width) solid var(--color-border);
 }

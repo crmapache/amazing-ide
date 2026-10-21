@@ -1,22 +1,27 @@
-import { FileCode, FolderOpen, MousePointerClick } from 'lucide-react'
+import { Suspense } from 'react'
+import { FolderOpen, MousePointerClick } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@amazing-ide/ui/Button'
 import { EmptyState } from '@amazing-ide/ui/EmptyState'
 
-import { splitPath } from '../../../lib/path.utils'
-import { useSelectedFile } from '../../../state/selection.store'
+import { EditorTabs } from '../EditorTabs/EditorTabs'
+import { useEditorTabs, useSelectedFile, useSelectedPlace } from '../../../state/selection.store'
 import { useActiveProject, useWorkspaceActions } from '../../../state/workspace.queries'
+import { CodeEditor } from './EditorArea.constants'
 import styles from './EditorArea.module.scss'
 
 /**
- * Зона 6: выбранный файл. Пока заглушка - показывает, какой файл выбран; сюда
- * встанет полноценный редактор (движок выбирается отдельным ADR).
+ * Зона 6, вид «файл»: вкладки открытых файлов проекта и редактор активной, у файла
+ * Markdown - и просмотр. Без проекта - приглашение открыть, без вкладок -
+ * выбрать файл в дереве.
  */
 export const EditorArea = () => {
   const { t } = useTranslation()
   const project = useActiveProject()
+  const tabs = useEditorTabs(project?.id)
   const selectedFile = useSelectedFile(project?.id)
+  const place = useSelectedPlace(project?.id)
   const { openProject } = useWorkspaceActions()
 
   if (!project) {
@@ -44,16 +49,12 @@ export const EditorArea = () => {
     )
   }
 
-  const { folder, name } = splitPath(selectedFile)
-
   return (
     <div className={styles.editorArea}>
-      <div className={styles.fileHeader}>
-        {folder && `${folder}/`}
-        <span className={styles.fileName}>{name}</span>
-      </div>
-      <div className={styles.divider} />
-      <EmptyState icon={FileCode} title={name} description={t('editor.stub')} />
+      <EditorTabs projectId={project.id} paths={tabs} active={selectedFile} />
+      <Suspense fallback={null}>
+        <CodeEditor projectId={project.id} path={selectedFile} place={place} />
+      </Suspense>
     </div>
   )
 }

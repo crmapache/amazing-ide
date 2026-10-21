@@ -4,6 +4,7 @@ import type {
   SearchResult,
   SearchStatus,
 } from '../search-everywhere.types'
+import type { OpenFileRequest } from '../../../state/open-file.context'
 
 export type SearchPanelProps = {
   /** Активный проект: в нём ищутся файлы и текст. Нет проекта - ищутся только действия. */
@@ -11,7 +12,7 @@ export type SearchPanelProps = {
   actions: readonly SearchAction[]
   tab: SearchTab
   onTabChange: (tab: SearchTab) => void
-  onOpenFile: (relativePath: string) => void
+  onOpenFile: (request: OpenFileRequest) => void
   onClose: () => void
 }
 

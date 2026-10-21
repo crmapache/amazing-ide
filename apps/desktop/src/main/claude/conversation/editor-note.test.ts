@@ -1,6 +1,8 @@
 import { it, expect, describe } from 'vitest'
 
-import { editorReminder, editorFromReminder, MAX_SELECTION_CHARS } from './editor-note'
+import { MAX_SELECTION_CHARS } from '@shared/claude-draft'
+
+import { editorReminder, editorFromReminder } from './editor-note'
 
 describe('заметка о редакторе', () => {
   it('открытый файл - словами CLI и читается обратно', () => {

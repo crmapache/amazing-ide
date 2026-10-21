@@ -188,14 +188,16 @@
     padding: 0 var(--space-8);
   }
 
+  // Справа - место под крестик и зазор до него: подложка крестика под курсором не
+  // касается последней буквы.
   .fit & {
-    padding: 0 calc(var(--size-control-sm) + var(--space-1)) 0 var(--space-3);
+    padding: 0 calc(var(--size-control-sm) + var(--space-2)) 0 var(--space-3);
   }
 
   // Форк отступает ступенью на каждый уровень глубины.
   .grow & {
     width: 100%;
-    padding: 0 calc(var(--size-control-sm) + var(--space-1)) 0
+    padding: 0 calc(var(--size-control-sm) + var(--space-2)) 0
       calc(var(--space-3) + var(--space-2) * var(--tab-indent));
   }
 }
@@ -225,10 +227,15 @@
   white-space: pre;
 }
 
-// Крестик виден на выбранной вкладке и при наведении - иначе полоса рябит.
+// Крестик виден на выбранной вкладке и при наведении - иначе полоса рябит. Стоит в углу
+// вкладки с одинаковым зазором до края со всех сторон: сверху и снизу его задаёт разница
+// высот вкладки и кнопки, справа - тот же (right - от края под рамкой).
 .close {
+  --close-inset: calc((var(--size-control-md) - var(--size-control-sm)) / 2);
+
   position: absolute;
-  right: var(--space-1);
+  right: calc(var(--close-inset) - var(--border-width));
+  display: flex;
   opacity: 0;
   transition: opacity var(--duration-fast) var(--easing-standard);
 
@@ -236,5 +243,11 @@
   .closableTab:hover &,
   &:focus-within {
     opacity: 1;
+  }
+
+  // Подложка крестика концентрична вкладке: радиус вкладки минус зазор до её края. С
+  // обычным радиусом кнопки угол подложки спорил с углом вкладки.
+  button {
+    border-radius: calc(var(--radius-lg) - var(--close-inset));
   }
 }

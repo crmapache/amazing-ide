@@ -111,6 +111,14 @@ export default {
       },
     },
     {
+      // Поправки к разметке Monaco: классы в ней чужие, не CSS Modules, и camelCase к ним
+      // не относится. Значения - по-прежнему только токены.
+      files: ['apps/desktop/src/renderer/src/features/editor/monaco.css'],
+      rules: {
+        'selector-class-pattern': null,
+      },
+    },
+    {
       // Здесь токены и объявляются: сырые значения тут на своём месте.
       files: ['packages/ui/src/styles/tokens.css'],
       rules: {

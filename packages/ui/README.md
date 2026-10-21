@@ -30,7 +30,7 @@ Design System».
 | `src/components/Toast`          | Карточка уведомления, по желанию с прогрессом. Сама себя не позиционирует                                                                                                                                                                                                                                                                                                             |
 | `src/components/ResizeHandle`   | Ручка изменения ширины панели, мышь и стрелки                                                                                                                                                                                                                                                                                                                                         |
 | `src/components/EmptyState`     | Пустая зона с объяснением и действием                                                                                                                                                                                                                                                                                                                                                 |
-| `src/components/Popover`        | Всплывающая панель под кнопкой или сверху по центру окна. Popover API + CSS anchor positioning; связку с кнопкой и открытие из кода даёт `usePopover`                                                                                                                                                                                                                                 |
+| `src/components/Popover`        | Всплывающая панель под кнопкой или сверху по центру окна. Popover API + CSS anchor positioning; связку с кнопкой и открытие из кода даёт `usePopover`, панель у якоря из кода (меню правой кнопки) - `useAnchoredPopover`, открытие после отпускания кнопки - `openWhenReleased`                                                                                                      |
 | `src/components/Menu`           | Меню в панели: стрелки, Home/End, фокус при появлении (`autoFocus`, `data-autofocus`), шапка для поля поиска (`header`)                                                                                                                                                                                                                                                               |
 | `src/components/MenuItem`       | Пункт меню: иконка или значок, подпись, вторая строка, подсказка справа, «текущий»; с selection - вариант выбора с отметкой; с iconTone и chevron - строка бокового меню                                                                                                                                                                                                              |
 | `src/components/MenuSection`    | Группа пунктов меню или вариантов списка с заголовком, может сворачиваться; во время поиска раскрыта                                                                                                                                                                                                                                                                                  |
@@ -55,6 +55,7 @@ Design System».
 import type { AvatarTone } from '@amazing-ide/ui/Avatar.types'
 import { Button } from '@amazing-ide/ui/Button'
 import { usePopover } from '@amazing-ide/ui/Popover.hooks'
+import { openWhenReleased } from '@amazing-ide/ui/Popover.utils'
 ```
 
 Стили - `@use '@amazing-ide/ui/mixins' as *;` в `.module.scss`.
@@ -76,7 +77,8 @@ import { usePopover } from '@amazing-ide/ui/Popover.hooks'
   Тень (`--shadow-overlay`) есть только у всплывающих слоёв (`glass-overlay`), плюс
   кольцо фокуса. Держит stylelint: градиенты и `drop-shadow` вне токенов, тень у
   текста и любая другая тень не пройдут.
-- **Подсветка кода** - роли `--color-syntax-*` на той же палитре: ключевые слова
+- **Подсветка кода** - роли `--color-syntax-*` на той же палитре, одни на блоки кода в
+  ленте и на редактор: ключевые слова
   фиолетовые, строки зелёные, функции стальные, числа и константы персиковые,
   комментарии серые курсивом. Контраст каждого тона на `--color-surface-sunken` - не
   ниже 4.5:1.
@@ -110,6 +112,6 @@ import { usePopover } from '@amazing-ide/ui/Popover.hooks'
 
 ## Что дальше
 
-Светлая тема (роли готовы, нужна вторая палитра), тема Monaco из ролей
-`--color-syntax-*`, иконка приложения. Заметное
+Светлая тема (роли готовы, нужна вторая палитра; тема редактора соберётся из неё сама -
+её строит `features/editor/monaco-theme.ts` из тех же ролей), иконка приложения. Заметное
 решение по дизайн-системе - запись в `docs/adr`.

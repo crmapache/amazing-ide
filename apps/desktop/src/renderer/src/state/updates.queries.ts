@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { invoke } from '../lib/ipc'
 import { useIpcEvent } from '../lib/ipc.hooks'
+import { heldPaths, guardDiscard } from './discard-guard.store'
 import { QUERY_KEYS } from './query-keys'
 
 /** Состояние обновления приложения. Ведёт его главный процесс. */
@@ -34,7 +35,12 @@ export const useUpdateActions = () => {
   })
 
   return {
-    install: () => void invoke('updates:install'),
+    // Установка перезапускает IDE: несохранённое пропадёт - сначала вопрос, а согласие
+    // заранее разрешает выход, иначе он спросил бы ещё раз посреди установки.
+    install: () =>
+      guardDiscard('update', heldPaths(), () => {
+        void invoke('editor:allowQuit', { quit: false }).then(() => invoke('updates:install'))
+      }),
     dismiss: () => dismiss.mutate(),
     openReleasePage: () => void invoke('updates:openReleasePage'),
   }

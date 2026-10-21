@@ -3,6 +3,7 @@ import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ClosableTab } from '@amazing-ide/ui/ClosableTab'
+import { openWhenReleased } from '@amazing-ide/ui/Popover.utils'
 
 import { FORK_MARK } from '../ConversationTabs.constants'
 import styles from '../ConversationTabs.module.scss'
@@ -84,8 +85,10 @@ export const ConversationTab = ({
   }
 
   const handleContextMenu = (event: MouseEvent<HTMLDivElement>) => {
+    const anchor = event.currentTarget
+
     event.preventDefault()
-    onMenu(id, event.currentTarget)
+    openWhenReleased(event.nativeEvent, () => onMenu(id, anchor))
   }
 
   const handleClose = () => void closeTab(conversation)

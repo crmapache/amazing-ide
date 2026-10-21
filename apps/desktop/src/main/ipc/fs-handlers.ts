@@ -18,12 +18,19 @@ export const createFsHandlers = (
   workspace: WorkspaceService,
   search: SearchService,
 ): Pick<InvokeHandlers, FsPathsChannels> => ({
-  'fs:locatePath': ({ projectId, path }) => {
+  'fs:locatePath': ({ projectId, path, exact }) => {
     assertString(path, 'path')
+
+    if (exact !== undefined && typeof exact !== 'boolean') {
+      throw new Error('Ожидалось да или нет в поле exact')
+    }
 
     const rootPath = projectRootOf(workspace, projectId)
 
-    return locatePath(rootPath, path, async () => (await search.listFiles(rootPath)).paths)
+    // Точный путь по имени не ищется: список файлов для него пуст.
+    return locatePath(rootPath, path, async () =>
+      exact ? [] : (await search.listFiles(rootPath)).paths,
+    )
   },
   'fs:openOutside': ({ projectId, path, reveal }) => {
     assertString(path, 'path')

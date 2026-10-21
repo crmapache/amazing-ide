@@ -1,7 +1,9 @@
 # Стенд: движок редактора
 
 Сравнение CodeMirror 6 и Monaco для зоны 6 (редактор). Результаты и решение -
-[ADR 0005](../../docs/adr/0005-editor-engine.md).
+[ADR 0005](../../docs/adr/0005-editor-engine.md). Вариант `monaco-shiki` - Monaco с
+подсветкой IDE (грамматики shiki, код из `apps/desktop`): цена TextMate против Monarch,
+[ADR 0018](../../docs/adr/0018-editor-tabs-autosave-highlighting.md).
 
 Стенд не входит в workspace: у него свои зависимости (Monaco весит десятки
 мегабайт), и основной `pnpm install` их не тянет.
@@ -14,7 +16,9 @@ pnpm install --ignore-workspace
 pnpm bench
 ```
 
-Около семи минут. Окна стенда появляются по очереди, но фокус не забирают. Итог -
+Около десяти минут. Только два варианта Monaco: `BENCH_ENTRIES=monaco,monaco-shiki
+BENCH_ENGINES=monaco,monaco-shiki pnpm bench`. Вариант `monaco-shiki` берёт shiki из
+`apps/desktop`, поэтому сначала нужен основной `pnpm install` в корне. Окна стенда появляются по очереди, но фокус не забирают. Итог -
 таблица в консоли и `results.json`.
 
 `node parse-cost.mjs` - цена разбора TypeScript парсером CodeMirror без окна:

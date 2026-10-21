@@ -1,0 +1,87 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+.codeEditor {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+// Код и просмотр Markdown рядом: код слева, просмотр справа, между ними - ручка и линия.
+// Над ними в правом верхнем углу - плавающие кнопки вида Markdown.
+.panes {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.codePane {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+// Рядом с просмотром ширину задаёт ручка (доля в style), а не поровну.
+.besidePreview {
+  flex: 0 0 auto;
+  border-right: var(--border-width) solid var(--color-border);
+}
+
+// Код выделяется мышью - в отличие от хрома окна (base.css выключает выделение).
+.host {
+  flex: 1;
+  min-height: 0;
+  user-select: text;
+}
+
+// Проба системных полос прокрутки (base.css): занимает дорожка в ней место или нет -
+// по этому редактор узнаёт, классические они у macOS сейчас или накладные.
+.scrollbarProbe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--space-10);
+  height: var(--space-10);
+  overflow: scroll;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+// Вопрос над кодом: тонированная жёлтым полоса - предупреждение, а не ошибка, решение
+// за человеком (ADR 0006: цвет значит смысл).
+.notice {
+  @include tinted-plaque(var(--color-warning));
+
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-2) var(--space-3) 0;
+  padding: var(--space-1-5) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.noticeIcon {
+  flex-shrink: 0;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.noticeText {
+  flex: 1;
+  min-width: 0;
+  color: var(--color-fg);
+}

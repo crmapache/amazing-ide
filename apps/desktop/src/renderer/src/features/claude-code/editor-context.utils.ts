@@ -1,5 +1,6 @@
 import type { EditorRef } from '@shared/claude-draft'
 
+import type { EditorSelection } from '../../state/editor-selection.store'
 import type { EditorOnce, EditorChoice } from './editor-context.types'
 
 /**
@@ -7,10 +8,21 @@ import type { EditorOnce, EditorChoice } from './editor-context.types'
  * и исключение на одно сообщение из меню чипа. Правила держит тест.
  */
 
-/** Открытый в редакторе файл проекта - ссылкой для чипа и заметки модели. */
-export const editorRefOf = (relativePath: string): EditorRef => ({
+/**
+ * Открытый в редакторе файл проекта - ссылкой для чипа и заметки модели; с выделением -
+ * и его строки с текстом.
+ */
+export const editorRefOf = (
+  relativePath: string,
+  selection?: Pick<EditorSelection, 'from' | 'to' | 'text'> | null,
+): EditorRef => ({
   path: relativePath,
   name: relativePath.split('/').filter(Boolean).at(-1) ?? relativePath,
+  ...(selection && {
+    from: selection.from,
+    to: selection.to,
+    ...(selection.text !== undefined && { text: selection.text }),
+  }),
 })
 
 /** Строки после имени: «12-18», «12» у одной; пусто - ничего не выделено. */

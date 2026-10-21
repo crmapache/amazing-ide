@@ -20,6 +20,7 @@ import { useField } from '../field.hooks'
 import { useCommandCatalog } from '../slash.hooks'
 import { useSuggestions } from '../suggestions.hooks'
 import { invoke } from '../../../lib/ipc'
+import { useEditorSelection } from '../../../state/editor-selection.store'
 import { useSelectedFile } from '../../../state/selection.store'
 import { NO_SENT } from './Composer.constants'
 import styles from './Composer.module.scss'
@@ -43,7 +44,8 @@ export const useComposer = ({ project, conversation, draftKey }: ComposerProps) 
   const items = feed?.items ?? []
   const imageBase = imageBaseOf(items, conversation?.queue ?? [])
   const selected = useSelectedFile(project.id)
-  const editor = selected ? editorRefOf(selected) : null
+  const selection = useEditorSelection(project.id, selected)
+  const editor = selected ? editorRefOf(selected, selection) : null
   const catalog = useCommandCatalog(project, conversation, isFocused)
   const isRunning = conversation !== null && conversation.status !== 'idle'
   const isShell = isShellDraft(draft.tokens)

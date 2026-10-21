@@ -42,6 +42,13 @@ paths:
 - Классы по условию - `clsx(styles.a, isActive && styles.active)`. Объектная форма
   `{ [styles.x]: cond }` не компилируется при `noUncheckedIndexedAccess`.
 
+## Меню правой кнопки
+
+Панель - `useAnchoredPopover` (`@amazing-ide/ui/Popover.hooks`), якорь - вкладка или
+точка нажатия. Открывать из `onContextMenu` через `openWhenReleased`
+(`@amazing-ide/ui/Popover.utils`): на macOS contextmenu приходит при нажатии, и
+отпускание закрыло бы только что открытую панель как клик мимо (ревью).
+
 ## Когда делить
 
 Лимит - 200 строк на `.tsx` (линтер). Но делить надо раньше, когда компонент

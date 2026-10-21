@@ -1,0 +1,18 @@
+// Полоса вкладок файлов над кодом: ряды вкладок по подписи, переносятся вниз, сколько
+// нужно; снизу - тонкая линия, как у полосы разговоров Claude Code.
+.editorTabs {
+  display: flex;
+  flex-shrink: 0;
+  margin: var(--space-1-5) var(--space-1-5) 0;
+  padding-bottom: var(--space-1-5);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.tabList {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-0-5);
+  min-width: 0;
+}

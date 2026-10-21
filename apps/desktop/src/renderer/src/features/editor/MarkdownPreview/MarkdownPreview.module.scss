@@ -1,0 +1,344 @@
+@use '@amazing-ide/ui/mixins' as *;
+@use '../../../lib/syntax-roles' as *;
+@use '../layout-switch' as *;
+
+// Просмотр рядом с кодом или вместо него: полоса о картинках с сайтов сверху, под ней лист.
+.markdownPreview {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+// Лист просмотра со своей прокруткой: по ней лист и код прокручиваются вместе.
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  user-select: text;
+}
+
+// Картинки с сайтов скрыты: мятная полоса - справка, а не ошибка (ADR 0006: цвет
+// значит смысл). Решение за человеком - кнопка «показать». Справа - место под плавающие
+// кнопки вида: они стоят в том же углу и иначе легли бы на «показать».
+.notice {
+  @include tinted-plaque(var(--color-info));
+
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  margin: var(--space-2) $layout-switch-room 0 var(--space-3);
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.noticeIcon {
+  flex-shrink: 0;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--color-info);
+}
+
+// Текст держится одной строкой, пока влезает рядом со значком: в узкой половине «рядом»
+// под него уходит на новую строку кнопка, а не сам он сжимается до слова в строке.
+.noticeText {
+  flex: 1 0 auto;
+  max-width: calc(100% - var(--size-icon-sm) - var(--space-2));
+  color: var(--color-fg);
+}
+
+// Документ, как на GitHub, но нашими ролями: ровный текст интерфейса, заголовки по
+// шкале кеглей, код на тёмной поверхности. Цвет - только там, где он что-то значит:
+// ссылка - мятная (справка), сделанный пункт - зелёный, найденное <mark> - акцент.
+.preview {
+  padding: var(--space-4) var(--space-4) var(--space-8);
+  color: var(--color-fg);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-normal);
+  overflow-wrap: break-word;
+
+  // Первый блок встаёт к верху листа: перед ним только метка строки.
+  > :first-child,
+  > .lineMark:first-child + * {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  p,
+  ul,
+  ol,
+  dl,
+  blockquote,
+  table,
+  pre,
+  details,
+  figure {
+    margin: 0 0 var(--space-3);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: var(--space-6) 0 var(--space-3);
+    color: var(--color-fg-strong);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+  }
+
+  // Два верхних уровня делят документ - под ними линия, как на GitHub.
+  h1,
+  h2 {
+    padding-bottom: var(--space-2);
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+
+  h1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  h2 {
+    font-size: var(--font-size-xl);
+  }
+
+  h3 {
+    font-size: var(--font-size-lg);
+  }
+
+  h4 {
+    font-size: var(--font-size-md);
+  }
+
+  h5,
+  h6 {
+    font-size: var(--font-size-sm);
+  }
+
+  h6 {
+    color: var(--color-fg-muted);
+  }
+
+  strong,
+  b {
+    color: var(--color-fg-strong);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  del,
+  s,
+  strike {
+    color: var(--color-fg-subtle);
+  }
+
+  mark {
+    border-radius: var(--radius-xs);
+    background-color: var(--color-accent-soft);
+    color: var(--color-fg-strong);
+  }
+
+  ul,
+  ol {
+    padding-left: var(--space-6);
+  }
+
+  li + li,
+  li > ul,
+  li > ol {
+    margin-top: var(--space-1);
+  }
+
+  li > ul,
+  li > ol {
+    margin-bottom: 0;
+  }
+
+  li::marker {
+    color: var(--color-fg-subtle);
+  }
+
+  // Пункт-дело: вместо точки - отметка, как на GitHub.
+  li:has(> .task) {
+    list-style: none;
+  }
+
+  dt {
+    color: var(--color-fg-strong);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  dd {
+    margin: 0 0 var(--space-2) var(--space-4);
+  }
+
+  blockquote {
+    padding: 0 var(--space-3);
+    border-left: var(--space-0-5) solid var(--color-border-strong);
+    color: var(--color-fg-muted);
+  }
+
+  hr {
+    margin: var(--space-6) 0;
+    border: none;
+    border-top: var(--border-width) solid var(--color-border-strong);
+  }
+
+  // Код в строке - как в ленте Claude Code: моноширинный на тёмной плашке.
+  :not(pre) > code,
+  kbd {
+    padding: 0 var(--space-1);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-xs);
+    background-color: var(--color-surface-sunken);
+    color: var(--color-fg-strong);
+    font-family: var(--font-code);
+    font-size: var(--font-size-sm);
+  }
+
+  kbd {
+    border-color: var(--color-border-strong);
+    background-color: var(--color-surface-raised);
+  }
+
+  // Таблица шире листа прокручивается сама, а не растягивает лист.
+  table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+  }
+
+  th,
+  td {
+    padding: var(--space-1-5) var(--space-3);
+    border: var(--border-width) solid var(--color-border);
+    vertical-align: top;
+  }
+
+  th {
+    background-color: var(--color-surface-sunken);
+    color: var(--color-fg-strong);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  // Заголовок колонки без align - по началу строки, как ячейки под ним.
+  th:not([align]) {
+    text-align: start;
+  }
+
+  summary {
+    cursor: pointer;
+  }
+
+  figcaption {
+    color: var(--color-fg-subtle);
+    font-size: var(--font-size-sm);
+  }
+}
+
+.link {
+  color: var(--color-info);
+  text-decoration: none;
+  text-underline-offset: var(--space-0-5);
+
+  @media (hover: hover) {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Ссылка, которую открыть нельзя (mailto, file): просто текст.
+.inertLink {
+  color: var(--color-fg-muted);
+}
+
+.image {
+  max-width: 100%;
+  vertical-align: middle;
+
+  // Высота из атрибута (логотип height="80") остаётся; без неё - по пропорции.
+  &:not([height]) {
+    height: auto;
+  }
+
+  // align у картинки на GitHub - обтекание текстом.
+  &[data-align='left'] {
+    float: left;
+    margin-right: var(--space-3);
+  }
+
+  &[data-align='right'] {
+    float: right;
+    margin-left: var(--space-3);
+  }
+}
+
+// Картинки нет или её нельзя показать: подпись в пунктирной рамке на её месте.
+.missingImage {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-1-5);
+  padding: 0 var(--space-1-5);
+  border: var(--border-width) dashed var(--color-border-strong);
+  border-radius: var(--radius-xs);
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-sm);
+}
+
+// Почему картинки нет - тише подписи: она говорит, что было на месте, причина - за ней.
+.missingReason {
+  color: var(--color-fg-disabled);
+}
+
+.imagePending {
+  display: inline-block;
+}
+
+// Отметка встаёт на место точки, а текст пункта - вровень с соседними, как на GitHub.
+.task {
+  display: inline-flex;
+  margin: 0 var(--space-1-5) 0 calc(-1 * (var(--size-icon-md) + var(--space-1-5)));
+  vertical-align: middle;
+}
+
+// Метка строки исходника: размера нет, меряется блок за ней.
+.lineMark {
+  display: none;
+}
+
+.codeBlock {
+  padding: var(--space-2) var(--space-3);
+  overflow: auto;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-sunken);
+}
+
+.code {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  color: var(--color-syntax-fg);
+  font-family: var(--font-code);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  white-space: pre;
+}
+
+.line {
+  display: block;
+  min-height: 1lh;
+}
+
+@include syntax-role-classes;

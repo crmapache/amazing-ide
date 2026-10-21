@@ -38,6 +38,9 @@ export const useDirectorySync = () => {
       return
     }
 
+    // Поменялось только содержимое файлов - списки папок прежние, это дело редактора.
+    if (directories.length === 0 && renamed.length === 0) return
+
     for (const directory of directories) {
       void queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.directory(projectId, directory),

@@ -1,10 +1,11 @@
-import { it, expect, describe } from 'vitest'
+import { it, vi, expect, describe } from 'vitest'
 
 import { prepareFiles } from '../../lib/file-match.utils'
 import type { SearchAction } from './search-everywhere.types'
 import {
   rankFiles,
   resultKey,
+  openResult,
   isTextQuery,
   rankActions,
   searchStatus,
@@ -167,5 +168,29 @@ describe('resultKey', () => {
 
     expect(file && resultKey(file)).toBe('file:package.json')
     expect(text && resultKey(text)).toBe('text:package.json:3')
+  })
+})
+
+describe('openResult', () => {
+  it('файл - открыть; найденная строка - открыть на ней, совпадение - текстом', () => {
+    const onOpenFile = vi.fn()
+    const [file] = rankFiles(files, 'package', 1)
+    const [text] = toTextResults([
+      {
+        relativePath: 'src/state/selection.store.ts',
+        line: 42,
+        preview: '…const selectFile = (projectId',
+        matchStart: 7,
+        matchLength: 10,
+      },
+    ])
+
+    if (file) openResult(file, onOpenFile)
+    if (text) openResult(text, onOpenFile)
+
+    expect(onOpenFile.mock.calls).toEqual([
+      [{ path: 'package.json' }],
+      [{ path: 'src/state/selection.store.ts', line: 42, find: 'selectFile' }],
+    ])
   })
 })

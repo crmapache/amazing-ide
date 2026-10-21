@@ -23,9 +23,9 @@ const placeOrNothing = (place: FilePlace): FilePlace | undefined =>
  * Куда ведёт путь - спрашиваем главный процесс: только он видит диск. Отказ канала
  * (проект успели закрыть) - «нет такого»: клик должен чем-то ответить.
  */
-const locate = async (projectId: string, path: string): Promise<PathLocation> => {
+const locate = async (projectId: string, path: string, exact: boolean): Promise<PathLocation> => {
   try {
-    return await invoke('fs:locatePath', { projectId, path })
+    return await invoke('fs:locatePath', { projectId, path, exact })
   } catch (error) {
     console.warn('[open-file] путь не разрешился:', error)
 
@@ -63,8 +63,12 @@ export const useOpenFile = (): OpenFile => {
     async (request) => {
       if (!project) return MISSING
 
-      const { path, ...place } = typeof request === 'string' ? { path: request } : request
-      const location = await locate(project.id, path)
+      const {
+        path,
+        exact = false,
+        ...place
+      } = typeof request === 'string' ? { path: request } : request
+      const location = await locate(project.id, path, exact)
       const refreshTree = () =>
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.projectDirectories(project.id) })
 

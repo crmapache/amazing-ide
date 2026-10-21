@@ -5,7 +5,8 @@
 //   pnpm install --ignore-workspace && pnpm bench
 //
 // Переменные: BENCH_QUICK=1 - один прогон на маленьком файле (проверить, что стенд
-// жив); BENCH_ENGINES=codemirror,monaco - только эти движки; BENCH_FOCUS=1 - окно с
+// жив); BENCH_ENGINES=codemirror,monaco - только эти движки (BENCH_ENTRIES - только их
+// сборка); BENCH_FOCUS=1 - окно с
 // фокусом (по умолчанию видно, но фокус у человека не забирает).
 
 const { app, BrowserWindow, net, protocol } = require('electron')
@@ -25,7 +26,12 @@ const REAL_FILES = {
 
 const QUICK = process.env.BENCH_QUICK === '1'
 const FOCUS = process.env.BENCH_FOCUS === '1'
-const ENGINES = process.env.BENCH_ENGINES?.split(',') ?? ['blank', 'codemirror', 'monaco']
+const ENGINES = process.env.BENCH_ENGINES?.split(',') ?? [
+  'blank',
+  'codemirror',
+  'monaco',
+  'monaco-shiki',
+]
 const RUNS = QUICK ? 1 : 5
 const KEYSTROKES = 60
 const KEY_INTERVAL_MS = 30

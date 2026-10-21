@@ -11,6 +11,8 @@ import type { ClaudeSettingsInvokeContract } from './claude-settings.contract'
 import { CLAUDE_SETTINGS_CHANNELS } from './claude-settings.contract'
 import type { ClaudeTabsEventContract, ClaudeTabsInvokeContract } from './claude-tabs.contract'
 import { CLAUDE_TABS_EVENTS, CLAUDE_TABS_CHANNELS } from './claude-tabs.contract'
+import type { EditorEventContract, EditorInvokeContract } from './editor.contract'
+import { EDITOR_EVENTS, EDITOR_CHANNELS } from './editor.contract'
 import type { FsPathsInvokeContract } from './fs-paths.contract'
 import { FS_PATHS_CHANNELS } from './fs-paths.contract'
 import type { ProjectSyncEventContract, ProjectSyncInvokeContract } from './project-sync.contract'
@@ -27,12 +29,14 @@ export type AreaInvokeContract = ClaudeTabsInvokeContract &
   ClaudePanelInvokeContract &
   ClaudeSearchInvokeContract &
   FsPathsInvokeContract &
-  ProjectSyncInvokeContract
+  ProjectSyncInvokeContract &
+  EditorInvokeContract
 
 export type AreaEventContract = ClaudeTabsEventContract &
   ClaudePanelEventContract &
   ClaudeSearchEventContract &
-  ProjectSyncEventContract
+  ProjectSyncEventContract &
+  EditorEventContract
 
 /** Каналы областей в рантайме: их разворачивает INVOKE_CHANNELS. */
 export const AREA_CHANNELS = {
@@ -43,6 +47,7 @@ export const AREA_CHANNELS = {
   ...CLAUDE_SEARCH_CHANNELS,
   ...FS_PATHS_CHANNELS,
   ...PROJECT_SYNC_CHANNELS,
+  ...EDITOR_CHANNELS,
 } satisfies Record<keyof AreaInvokeContract, true>
 
 /** События областей: их разворачивает EVENT_CHANNELS. */
@@ -51,4 +56,5 @@ export const AREA_EVENTS = {
   ...CLAUDE_PANEL_EVENTS,
   ...CLAUDE_SEARCH_EVENTS,
   ...PROJECT_SYNC_EVENTS,
+  ...EDITOR_EVENTS,
 } satisfies Record<keyof AreaEventContract, true>

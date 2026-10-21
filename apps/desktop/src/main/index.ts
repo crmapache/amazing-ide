@@ -9,6 +9,7 @@ import { installApplicationMenu } from './menu'
 import { ClaudeService } from './claude/claude-service'
 import type { StoredClaude } from './claude/claude-state'
 import { ProjectWatchers } from './fs/project-watchers'
+import { settleWrites } from './fs/text-write'
 import { GitStatusService } from './git/git-status-service'
 import { broadcast } from './ipc/broadcast'
 import { registerInvokeHandlers } from './ipc/handle'
@@ -17,6 +18,8 @@ import { SearchService } from './search/search-service'
 import { JsonFile } from './storage/json-file'
 import { UpdateService } from './updates/update-service'
 import { UPDATE_FEED_URL, UPDATE_FEED_OVERRIDE_ENV } from './updates/update.constants'
+import { saveEditorBeforeQuit } from './window/editor-save'
+import { EDITOR_SAVE_TIMEOUT_MS } from './window/editor-save.constants'
 import { createMainWindow } from './window/main-window'
 import { openExternalWeb } from './window/open-external'
 import { pickAndOpenProject } from './workspace/project-dialogs'
@@ -102,14 +105,14 @@ const bootstrap = async () => {
       workspace.getState().projects.map((project) => project.rootPath),
     )
 
-  // Слежение за диском открытых проектов: окну - что перечитать в дереве и что .git
-  // поменялся (ветка), статусу git - повод перечитаться и разослать себя, если стал другим.
+  // Слежение за диском открытых проектов: окну - что перечитать в дереве и в редакторе и
+  // что .git поменялся (ветка), статусу git - повод перечитаться и разослать себя, если стал другим.
   const gitStatus = new GitStatusService((projectId, status) =>
     broadcast('git:status', { projectId, status }),
   )
   const watchers = new ProjectWatchers((projectId, { directories, renamed, paths, git }) => {
-    if (directories === null || directories.length > 0 || git) {
-      broadcast('fs:changed', { projectId, directories, renamed, git })
+    if (paths === null || paths.length > 0 || git) {
+      broadcast('fs:changed', { projectId, directories, renamed, files: paths, git })
     }
 
     gitStatus.changed(projectId, { git, paths })
@@ -141,6 +144,26 @@ const bootstrap = async () => {
   // пока они закроются, - иначе таймер добивания умер бы вместе с главным процессом.
   let quitting: 'no' | 'waiting' | 'ready' = 'no'
 
+  // Сначала окно дописывает набранное в файлы: автосохранение ждёт паузы в наборе, а ⌘Q
+  // её не ждёт. Остались файлы, которые сохранить нельзя (конфликт с диском), - выход
+  // отменяется, окно спрашивает человека, и только потом гаснут CLI и записи.
+  const quitWhenSaved = async () => {
+    const unsaved = await saveEditorBeforeQuit(EDITOR_SAVE_TIMEOUT_MS)
+
+    if (unsaved > 0) {
+      quitting = 'no'
+      mainWindow?.show()
+
+      return
+    }
+
+    conversationSearch.dispose()
+    watchers.dispose()
+    await Promise.allSettled([claude.shutdown(), settleWrites()])
+    quitting = 'ready'
+    app.quit()
+  }
+
   app.on('before-quit', (event) => {
     if (quitting === 'ready') return
 
@@ -149,12 +172,7 @@ const bootstrap = async () => {
     if (quitting === 'waiting') return
 
     quitting = 'waiting'
-    conversationSearch.dispose()
-    watchers.dispose()
-    void claude.shutdown().finally(() => {
-      quitting = 'ready'
-      app.quit()
-    })
+    void quitWhenSaved()
   })
   // Последняя страховка: главный процесс уходит, не дождавшись (сбой, kill).
   process.on('exit', () => ProcessGroup.killAllNow())
@@ -177,6 +195,14 @@ if (!app.requestSingleInstanceLock()) {
 
   // На macOS приложение живёт без окон, пока его не закроют через Cmd+Q.
   app.on('window-all-closed', () => undefined)
+
+  // Сертификат клиента IDE не нужен никому. Без отказа Electron сам предъявил бы первый
+  // из связки ключей любому https-серверу, который его попросит, - например, сайту
+  // картинки из чужого README.
+  app.on('select-client-certificate', (event, _contents, _url, _list, callback) => {
+    event.preventDefault()
+    callback()
+  })
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) openMainWindow()

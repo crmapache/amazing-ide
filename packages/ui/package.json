@@ -12,6 +12,7 @@
     "./mixins": "./src/styles/_mixins.scss",
     "./*.types": "./src/components/*/*.types.ts",
     "./*.hooks": "./src/components/*/*.hooks.ts",
+    "./*.utils": "./src/components/*/*.utils.ts",
     "./*": "./src/components/*/*.tsx"
   },
   "scripts": {

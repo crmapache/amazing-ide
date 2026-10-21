@@ -3,7 +3,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { invoke } from '../lib/ipc'
 import { useIpcEvent } from '../lib/ipc.hooks'
+import { heldPaths, guardDiscard } from './discard-guard.store'
 import { QUERY_KEYS } from './query-keys'
+import { useSelectionStore } from './selection.store'
 
 /**
  * Открытые проекты. Владелец - главный процесс; здесь их зеркало в кэше React
@@ -24,12 +26,16 @@ export const useActiveProject = () => {
   return data?.projects.find((project) => project.id === data.activeProjectId) ?? null
 }
 
-/** Держит кэш в синхроне с главным процессом. Подключается один раз, в корне окна. */
+/**
+ * Держит кэш в синхроне с главным процессом. Подключается один раз, в корне окна.
+ * Закрытый проект уносит свои вкладки файлов: открытый заново получит новый id.
+ */
 export const useWorkspaceSync = () => {
   const queryClient = useQueryClient()
 
   useIpcEvent('workspace:changed', (state) => {
     queryClient.setQueryData(QUERY_KEYS.workspace, state)
+    useSelectionStore.getState().keepProjects(state.projects.map((project) => project.id))
   })
 }
 
@@ -57,7 +63,9 @@ export const useWorkspaceActions = () => {
     openProject: () => open.mutate(),
     newProject: () => create.mutate(),
     openRecentProject: (rootPath: string) => openRecent.mutate(rootPath),
-    closeProject: (projectId: string) => close.mutate(projectId),
+    // Несохранённое во вкладках проекта (конфликт с диском) пропадёт вместе с ним - сначала вопрос.
+    closeProject: (projectId: string) =>
+      guardDiscard('project', heldPaths(projectId), () => close.mutate(projectId)),
     activateProject: (projectId: string) => activate.mutate(projectId),
   }
 }

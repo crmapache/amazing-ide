@@ -94,7 +94,13 @@ export const COLOR_GROUPS: readonly ColorGroup[] = [
   },
   {
     titleKey: 'groups.lines',
-    tokens: ['--color-border', '--color-border-strong', '--color-focus', '--color-scrollbar'],
+    tokens: [
+      '--color-border',
+      '--color-border-strong',
+      '--color-focus',
+      '--color-scrollbar',
+      '--color-scrollbar-hover',
+    ],
   },
   {
     titleKey: 'groups.syntax',

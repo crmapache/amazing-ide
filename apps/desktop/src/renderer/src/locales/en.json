@@ -44,7 +44,103 @@
     "noProjectText": "Pick a folder - it opens as a tab at the top.",
     "noFileTitle": "No file selected",
     "noFileText": "Choose a file in the tree on the left.",
-    "stub": "The editor is not built yet. This area will show the selected file."
+    "readOnly": "This file is read-only.",
+    "binaryTitle": "Not a text file",
+    "binaryText": "This file is binary or not in UTF-8, so the editor can't show it.",
+    "tooLargeTitle": "File too large",
+    "tooLargeText": "The file is {{size}} - over the {{limit}} the editor opens.",
+    "unreadableTitle": "Can't read the file",
+    "unreadableText": {
+      "denied": "There's no permission to read this file.",
+      "outside": "The file is outside the project.",
+      "unknown": "The file didn't open. Choose it again in the tree."
+    },
+    "notice": {
+      "conflict": "This file changed on disk while you were editing it.",
+      "deleted": "This file was deleted on disk. Your text is still here.",
+      "saveFailed": {
+        "denied": "No permission to write this file - your changes aren't saved.",
+        "outside": "This file is outside the project - your changes aren't saved.",
+        "unknown": "The file couldn't be saved - your changes aren't on disk yet."
+      },
+      "takeDisk": "Load disk version",
+      "keepMine": "Keep my version",
+      "saveAgain": "Save again",
+      "close": "Close",
+      "retry": "Try again",
+      "outside": "This file is outside the project (through a link), so it isn't saved on its own.",
+      "save": "Save"
+    },
+    "tabs": {
+      "label": "Open files",
+      "close": "Close {{name}}",
+      "menu": {
+        "label": "Tab actions",
+        "close": "Close",
+        "closeOthers": "Close Other Tabs",
+        "closeRight": "Close Tabs to the Right",
+        "closeAll": "Close All Tabs",
+        "copyPath": "Copy Path"
+      }
+    },
+    "contextMenu": {
+      "label": "Code actions",
+      "show": "Show Editor Context Menu",
+      "changeAll": "Change All Occurrences",
+      "cut": "Cut",
+      "copy": "Copy",
+      "paste": "Paste",
+      "commandPalette": "Command Palette"
+    },
+    "markdown": {
+      "layout": "Markdown view",
+      "editor": "Editor only",
+      "split": "Editor and preview",
+      "preview": "Preview only",
+      "resize": "Resize editor and preview",
+      "webImages": {
+        "hidden_one": "{{count}} image from the web is hidden",
+        "hidden_other": "{{count}} images from the web are hidden",
+        "show": "Show"
+      },
+      "image": {
+        "missing": "not found",
+        "notImage": "not an image",
+        "tooLarge": "{{size}}, over the {{limit}} limit",
+        "denied": "no permission to read",
+        "outside": "outside the project",
+        "failed": "couldn't be loaded"
+      },
+      "lightbox": {
+        "loading": "Loading image…",
+        "close": "Close image"
+      }
+    },
+    "discard": {
+      "tabs": {
+        "title": "Close without saving?",
+        "confirm": "Close"
+      },
+      "project": {
+        "title": "Close the project without saving?",
+        "confirm": "Close Project"
+      },
+      "window": {
+        "title": "Close the window without saving?",
+        "confirm": "Close Window"
+      },
+      "quit": {
+        "title": "Quit without saving?",
+        "confirm": "Quit"
+      },
+      "update": {
+        "title": "Install the update without saving?",
+        "confirm": "Install"
+      },
+      "text_one": "{{name}} has changes that didn't reach the disk. They'll be lost.",
+      "text_other": "{{count}} files have changes that didn't reach the disk. They'll be lost.",
+      "cancel": "Cancel"
+    }
   },
   "scenarios": {
     "title": "Scenarios",

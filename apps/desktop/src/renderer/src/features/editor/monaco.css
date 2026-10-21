@@ -1,0 +1,34 @@
+/* Поправки к виду Monaco, которых нет в его настройках и теме. Классы - Monaco, поэтому
+   файл обычный, а не CSS Modules; грузится вместе с редактором (monaco-setup.ts). */
+
+/* Бегунок полосы прокрутки - как родной тонкий в соседних панелях (base.css): тоньше
+   дорожки, отступает от края, скруглён, под курсором светлеет. Рисуется вставкой:
+   толщину самого бегунка Monaco при любой смене настроек полосы сбрасывает на ширину
+   дорожки, а тема (monaco-theme.utils.ts) делает его прозрачным. */
+.monaco-scrollable-element > .scrollbar > .slider::before {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-scrollbar);
+  content: '';
+}
+
+.monaco-scrollable-element > .scrollbar.vertical > .slider::before {
+  inset-inline: var(--space-0-5);
+}
+
+.monaco-scrollable-element > .scrollbar.horizontal > .slider::before {
+  inset-block: var(--space-0-5);
+}
+
+.monaco-scrollable-element > .scrollbar > .slider:hover::before,
+.monaco-scrollable-element > .scrollbar > .slider.active::before {
+  background: var(--color-scrollbar-hover);
+}
+
+/* Плашка флагов поиска (Aa, ab, .*), которую Monaco на миг показывает в углу кода при ⌘D и
+   правке всех вхождений: панели поиска в IDE нет, и подсказка о её флагах - шум. Видимость,
+   а не display: display Monaco ставит плашке сам. */
+.monaco-editor .findOptionsWidget {
+  visibility: hidden;
+}

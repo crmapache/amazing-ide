@@ -1,29 +1,9 @@
-import clsx from 'clsx'
 import type { ThemedToken } from 'shiki/core'
 
-import { tokenRole } from '../highlighter'
 import { splitLinks } from '../paths.utils'
 import type { KnownFiles } from '../paths.utils'
-import { FONT_STYLE_BOLD, FONT_STYLE_ITALIC } from './CodeBlock.constants'
+import { tokenClassName } from '../../../lib/syntax-classes.utils'
 import type { CodeRun, CodePath, CodeSegment } from './CodeBlock.types'
-
-/** Класс CSS для роли shiki: `token-keyword` - `tokenKeyword`. */
-const roleClass = (role: string) =>
-  role.replace(/-([a-z])/g, (_match: string, letter: string) => letter.toUpperCase())
-
-/**
- * Классы токена: цвет роли и начертание. Цвет приходит переменной темы shiki, а не
- * числом, поэтому inline-стиль не нужен - класс берёт роль из токенов.
- */
-const tokenClassName = (token: ThemedToken, styles: Readonly<Record<string, string>>): string => {
-  const fontStyle = token.fontStyle ?? 0
-
-  return clsx(
-    styles[roleClass(tokenRole(token.color))],
-    (fontStyle & FONT_STYLE_ITALIC) !== 0 && styles['italic'],
-    (fontStyle & FONT_STYLE_BOLD) !== 0 && styles['bold'],
-  )
-}
 
 /**
  * Пути в коде со смещениями. Адреса сайтов ссылками не становятся - в блоке кода это

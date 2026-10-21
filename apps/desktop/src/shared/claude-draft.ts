@@ -54,6 +54,12 @@ export type MessageDraft = { tokens: DraftToken[]; quotes: string[] }
  * выделенные строки, если они были. Модель получает это отдельной заметкой, под
  * сообщением в ленте - строка «14 lines from Foo.ts».
  */
+/**
+ * Больше выделение модели не везётся: заметка называет только строки, и модель читает
+ * их сама. Окно по этому же пределу не тащит длинное выделение в сообщение вовсе.
+ */
+export const MAX_SELECTION_CHARS = 20_000
+
 export type EditorRef = {
   path: string
   name: string

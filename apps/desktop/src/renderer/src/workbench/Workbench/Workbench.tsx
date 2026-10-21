@@ -17,6 +17,7 @@ import { SIDE_VIEWS } from '../views/side-views'
 import { ViewStack } from '../ViewStack/ViewStack'
 import { useLayoutStore } from '../../state/layout.store'
 import { OpenFileContext } from '../../state/open-file.context'
+import { DiscardDialog } from '../../features/editor/DiscardDialog/DiscardDialog'
 import { GitNotice } from '../../features/git/GitNotice/GitNotice'
 import { ProjectTabs } from '../../features/projects/ProjectTabs/ProjectTabs'
 import { StatusBar } from '../../features/status-bar/StatusBar/StatusBar'
@@ -113,6 +114,7 @@ export const Workbench = () => {
         </div>
 
         <SearchLayer />
+        <DiscardDialog />
 
         <NotificationArea>
           <UpdateNotice />

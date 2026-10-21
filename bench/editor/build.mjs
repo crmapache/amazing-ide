@@ -7,7 +7,12 @@ import { build } from 'vite'
 // общих чанков между ними.
 const root = dirname(fileURLToPath(import.meta.url))
 
-for (const entry of process.env.BENCH_ENTRIES?.split(',') ?? ['blank', 'codemirror', 'monaco']) {
+for (const entry of process.env.BENCH_ENTRIES?.split(',') ?? [
+  'blank',
+  'codemirror',
+  'monaco',
+  'monaco-shiki',
+]) {
   await build({
     root,
     base: './',

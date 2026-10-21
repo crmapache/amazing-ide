@@ -1,0 +1,25 @@
+// Плавающие кнопки вида Markdown в правом верхнем углу файла (MarkdownLayoutSwitch): где стоят
+// и сколько места занимают. По этим же размерам полоса о картинках с сайтов в просмотре
+// оставляет справа место под панель - иначе панель легла бы на её кнопку.
+
+// Кнопок столько же, сколько видов (LAYOUT_OPTIONS): код, рядом, просмотр.
+$layout-switch-buttons: 3;
+$layout-switch-top: var(--space-2);
+$layout-switch-right: var(--space-4);
+$layout-switch-gap: var(--space-0-5);
+$layout-switch-padding: var(--space-1);
+
+// Скругление панели концентрично кнопкам: радиус кнопки (IconButton, --radius-sm) плюс
+// отступ до неё и рамка. Тогда угол выбранной кнопки идёт параллельно углу панели.
+$layout-switch-radius: calc(var(--radius-sm) + #{$layout-switch-padding} + var(--border-width));
+
+// Ширина панели: кнопки, зазоры между ними (на один меньше, чем кнопок), отступы и рамка.
+$layout-switch-buttons-width: calc(#{$layout-switch-buttons} * var(--size-control-sm));
+$layout-switch-gaps-width: calc((#{$layout-switch-buttons} - 1) * #{$layout-switch-gap});
+$layout-switch-frame-width: calc(2 * (#{$layout-switch-padding} + var(--border-width)));
+$layout-switch-width: calc(
+  #{$layout-switch-buttons-width} + #{$layout-switch-gaps-width} + #{$layout-switch-frame-width}
+);
+
+// Место справа под панель: она сама, её отступ от края и зазор до соседа слева.
+$layout-switch-room: calc(#{$layout-switch-width} + #{$layout-switch-right} + var(--space-2));

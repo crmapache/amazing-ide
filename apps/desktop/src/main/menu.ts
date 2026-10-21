@@ -9,13 +9,14 @@ type MenuActions = {
 }
 
 /**
- * ⌘W: фокус в правой панели Claude Code - закрыть вкладку разговора (решает панель:
- * под вопросом и меню клавиша молчит), иначе - окно. Меню забирает нажатие раньше
- * страницы, поэтому развилка здесь, а не в окне.
+ * ⌘W закрывает вкладку, как в WebStorm, а не окно: фокус в правой панели Claude Code -
+ * вкладку разговора (решает панель: под вопросом и меню клавиша молчит), иначе - файл в
+ * редакторе. Меню забирает нажатие раньше страницы, поэтому развилка здесь, а не в окне.
+ * Окно закрывается кнопкой в шапке, IDE - ⌘Q.
  */
-const closeTabOrWindow = () => {
+const closeTab = () => {
   if (isPanelFocused()) broadcast('claude:panelKey', 'closeTab')
-  else BrowserWindow.getFocusedWindow()?.close()
+  else broadcast('editor:command', 'closeTab')
 }
 
 /**
@@ -30,7 +31,7 @@ const reloadUnlessPanel = () => {
  * Меню приложения. Стандартные разделы macOS (правка, вид, окно) дают системные
  * сочетания: копирование, вставку, полноэкранный режим. Свои пункты - только то,
  * что относится ко всей IDE, а не к одному виду. Закрытие и перезагрузка - свои, а не
- * роли: их клавиши в правой панели значат другое (closeTabOrWindow, reloadUnlessPanel).
+ * роли: их клавиши значат другое (closeTab, reloadUnlessPanel).
  */
 export const installApplicationMenu = ({ openProject }: MenuActions) => {
   const template: MenuItemConstructorOptions[] = [
@@ -40,7 +41,7 @@ export const installApplicationMenu = ({ openProject }: MenuActions) => {
       submenu: [
         { label: 'Open Project…', accelerator: 'CmdOrCtrl+O', click: openProject },
         { type: 'separator' },
-        { label: 'Close', accelerator: 'CmdOrCtrl+W', click: closeTabOrWindow },
+        { label: 'Close Tab', accelerator: 'CmdOrCtrl+W', click: closeTab },
       ],
     },
     { role: 'editMenu' },

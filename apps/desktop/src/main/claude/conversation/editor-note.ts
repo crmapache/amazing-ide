@@ -1,3 +1,4 @@
+import { MAX_SELECTION_CHARS } from '@shared/claude-draft'
 import type { EditorRef } from '@shared/claude-draft'
 
 /**
@@ -7,9 +8,6 @@ import type { EditorRef } from '@shared/claude-draft'
  * сообщения в <system-reminder>, а не хвост текста: заголовок разговора, поиск и лента
  * берут слова человека и её не видят.
  */
-
-/** Больше этого выделение не везётся: модель получает строки и читает их сама. */
-export const MAX_SELECTION_CHARS = 20_000
 
 const MAYBE = 'This may or may not be related to the current task.'
 

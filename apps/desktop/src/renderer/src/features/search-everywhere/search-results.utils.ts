@@ -4,6 +4,7 @@ import type { TextMatch } from '@shared/search'
 import type { PreparedFile } from '../../lib/file-match.types'
 import { toNeedle, rankFiles as rankProjectFiles } from '../../lib/file-match.utils'
 import { fuzzyMatch } from '../../lib/fuzzy-match.utils'
+import type { OpenFileRequest } from '../../state/open-file.context'
 import {
   TEXT_MIN_QUERY,
   KEYWORD_ONLY_SCORE,
@@ -131,8 +132,23 @@ export const resultKey = (result: SearchResult) =>
       ? `action:${result.action.id}`
       : `text:${result.match.relativePath}:${result.match.line}`
 
-/** Выбрали строку: действие - запустить, файл или найденную строку - открыть. */
-export const openResult = (result: SearchResult, onOpenFile: (relativePath: string) => void) => {
-  if (result.kind === 'action') result.action.run()
-  else onOpenFile(result.kind === 'file' ? result.file.path : result.match.relativePath)
+/**
+ * Выбрали строку: действие - запустить, файл - открыть, найденную строку - открыть файл
+ * на ней с выделенным совпадением. Колонки поиск не знает (длинная строка в нём
+ * обрезана), поэтому совпадение редактор ищет в строке сам - по тексту.
+ */
+export const openResult = (
+  result: SearchResult,
+  onOpenFile: (request: OpenFileRequest) => void,
+) => {
+  if (result.kind === 'action') return result.action.run()
+  if (result.kind === 'file') return onOpenFile({ path: result.file.path })
+
+  const { relativePath, line, preview, matchStart, matchLength } = result.match
+
+  onOpenFile({
+    path: relativePath,
+    line,
+    find: preview.slice(matchStart, matchStart + matchLength),
+  })
 }

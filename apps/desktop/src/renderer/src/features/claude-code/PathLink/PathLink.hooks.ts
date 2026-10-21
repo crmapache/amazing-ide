@@ -1,7 +1,6 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
-import type { ToggleEvent } from 'react'
+import { useState, useCallback } from 'react'
 
-import { usePopover } from '@amazing-ide/ui/Popover.hooks'
+import { useAnchoredPopover } from '@amazing-ide/ui/Popover.hooks'
 
 import { useOpenFileAction } from '../../../state/open-file.context'
 import type { OpenFileRequest } from '../../../state/open-file.context'
@@ -14,18 +13,11 @@ import type { OpenFileRequest } from '../../../state/open-file.context'
  */
 export const usePathOpening = (request: OpenFileRequest) => {
   const openFile = useOpenFileAction()
-  const popover = usePopover()
-  const anchorRef = useRef<HTMLButtonElement>(null)
+  const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null)
   const [isMissing, setIsMissing] = useState(false)
   const [candidates, setCandidates] = useState<string[] | null>(null)
-  const { ref: popoverRef, onToggle } = popover.popoverProps
-
-  // Панель выбора смонтировалась - показать её у ссылки.
-  useEffect(() => {
-    const anchor = anchorRef.current
-
-    if (candidates && anchor) popoverRef.current?.showPopover({ source: anchor })
-  }, [candidates, popoverRef])
+  // Панель выбора есть, пока есть одноимённые: закрылась (выбор, клик мимо) - их больше нет.
+  const popoverProps = useAnchoredPopover(candidates ? anchor : null, () => setCandidates(null))
 
   const open = useCallback(
     async (target: OpenFileRequest) => {
@@ -39,17 +31,12 @@ export const usePathOpening = (request: OpenFileRequest) => {
     [openFile],
   )
 
-  const handleToggle = (event: ToggleEvent<HTMLDivElement>) => {
-    onToggle(event)
-    if (event.newState === 'closed') setCandidates(null)
-  }
-
   return {
     canOpen: openFile !== null,
     isMissing,
     candidates,
-    anchorRef,
-    popoverProps: { ...popover.popoverProps, onToggle: handleToggle },
+    anchorRef: setAnchor,
+    popoverProps,
     open: () => open(request),
     // Место (строка, find) едет и с выбранным файлом: оно про файл, а не про имя.
     choose: (relativePath: string) => open({ ...request, path: relativePath }),

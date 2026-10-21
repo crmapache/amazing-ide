@@ -12,3 +12,11 @@ declare module '*.module.scss' {
 interface ImportMetaEnv {
   readonly VITE_SHOWCASE?: string
 }
+
+// Готовые конфигурации языков Monaco (комментарии, скобки, отступы) поставляются без
+// типов. Редактор берёт из модуля только conf - подсветку даёт shiki (ADR 0018).
+declare module 'monaco-editor/languages/definitions/*' {
+  import type { languages } from 'monaco-editor/editor/editor.api.js'
+
+  export const conf: languages.LanguageConfiguration
+}

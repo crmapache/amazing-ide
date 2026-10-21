@@ -17,6 +17,16 @@ export const QUERY_KEYS = {
   ],
   /** Все каталоги проекта разом: сбросить дерево после смены ветки. */
   projectDirectories: (projectId: string) => ['fs', 'directory', projectId],
+  /** Картинка проекта в просмотре Markdown (data URL); все картинки проекта - сбросить разом. */
+  projectImage: (projectId: string, relativePath: string) => [
+    'fs',
+    'image',
+    projectId,
+    relativePath,
+  ],
+  projectImages: (projectId: string) => ['fs', 'image', projectId],
+  /** Картинка с сайта в просмотре Markdown - одна на окно, по адресу. */
+  webImage: (url: string) => ['web', 'image', url],
   /** Файлы проекта и найденный текст - для поиска везде. */
   projectFiles: (projectId: string) => ['search', 'files', projectId],
   textSearch: (projectId: string, query: string) => ['search', 'text', projectId, query],

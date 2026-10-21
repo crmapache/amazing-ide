@@ -1,0 +1,55 @@
+// Роли подсветки кода: имя класса - имя роли shiki (tokenClassName в
+// syntax-classes.utils.ts), цвет - токен дизайн-системы. Включается в модуль стилей
+// блока кода - ленты Claude Code и просмотра Markdown.
+@mixin syntax-role-classes {
+  .foreground {
+    color: var(--color-syntax-fg);
+  }
+
+  .tokenParameter {
+    color: var(--color-syntax-parameter);
+  }
+
+  .tokenKeyword {
+    color: var(--color-syntax-keyword);
+  }
+
+  .tokenString {
+    color: var(--color-syntax-string);
+  }
+
+  .tokenStringExpression {
+    color: var(--color-syntax-string-expression);
+  }
+
+  .tokenFunction {
+    color: var(--color-syntax-function);
+  }
+
+  .tokenConstant {
+    color: var(--color-syntax-constant);
+  }
+
+  .tokenPunctuation {
+    color: var(--color-syntax-punctuation);
+  }
+
+  // Комментарий - курсивом, как в редакторе (README дизайн-системы).
+  .tokenComment {
+    color: var(--color-syntax-comment);
+    font-style: italic;
+  }
+
+  .tokenLink {
+    color: var(--color-syntax-link);
+    text-decoration: underline;
+  }
+
+  .italic {
+    font-style: italic;
+  }
+
+  .bold {
+    font-weight: var(--font-weight-semibold);
+  }
+}

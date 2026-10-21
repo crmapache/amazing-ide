@@ -11,9 +11,13 @@ type ProjectRequest = { projectId: string }
 export type FsPathsInvokeContract = {
   /**
    * Куда ведёт путь, как его написали: от корня, абсолютный, «~/…», голое имя. Голое
-   * имя ищется по тем же файлам проекта, что кормят «@».
+   * имя ищется по тем же файлам проекта, что кормят «@». exact - без поиска по имени:
+   * путь из ссылки в файле, которого нет, - «нет такого», а не одноимённый файл где-то.
    */
-  'fs:locatePath': { request: ProjectRequest & { path: string }; response: PathLocation }
+  'fs:locatePath': {
+    request: ProjectRequest & { path: string; exact?: boolean }
+    response: PathLocation
+  }
   /**
    * Файл или папка вне проекта - системой: файл открывается своей программой, а папка и
    * всё исполняемое (приложение, скрипт, установщик) только показывается в Finder.

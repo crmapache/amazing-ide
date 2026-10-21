@@ -1,0 +1,31 @@
+@use '@amazing-ide/ui/mixins' as *;
+@use '../layout-switch' as *;
+
+// Плавающая панель в правом верхнем углу файла (ближайшего родителя с position): над кодом
+// или над просмотром, левее полосы прокрутки. Приглушена, чтобы читать текст под ней; под
+// курсором и с фокусом с клавиатуры - в полную силу.
+.switch {
+  @include glass-overlay;
+
+  position: absolute;
+  z-index: var(--z-sticky);
+  top: $layout-switch-top;
+  right: $layout-switch-right;
+  display: flex;
+  align-items: center;
+  gap: $layout-switch-gap;
+  padding: $layout-switch-padding;
+  border-radius: $layout-switch-radius;
+  opacity: var(--opacity-muted);
+  transition: opacity var(--duration-normal) var(--easing-standard);
+
+  @media (hover: hover) {
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &:focus-within {
+    opacity: 1;
+  }
+}

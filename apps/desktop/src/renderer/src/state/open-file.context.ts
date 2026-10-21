@@ -4,10 +4,11 @@ import type { FilePlace } from './selection.store'
 
 /**
  * Что открыть и где в нём встать. path - как написан: от корня проекта, абсолютный,
- * `~/…` или голое имя (ищется по проекту). Место (строка, колонка, диапазон, find) -
- * из FilePlace: его прочтёт редактор.
+ * `~/…` или голое имя (ищется по проекту). exact - путь ровно такой, без поиска по
+ * имени (ссылка из просмотра Markdown). Место (строка, колонка, диапазон, find) - из
+ * FilePlace: его прочтёт редактор.
  */
-export type OpenFileRequest = FilePlace & { path: string }
+export type OpenFileRequest = FilePlace & { path: string; exact?: boolean }
 
 /**
  * Чем кончилось открытие: открыто (файл выбран, папка показана, файл вне проекта отдан
@@ -22,7 +23,7 @@ export type OpenFile = (request: OpenFileRequest | string) => Promise<OpenFileOu
 
 /**
  * Как открыть файл - знает раскладка окна (выбрать для редактора, раскрыть дерево), а
- * просят об этом фичи, которые друг друга не видят: лента Claude Code, позже - другие.
+ * просят об этом фичи, которые друг друга не видят: лента Claude Code, просмотр Markdown.
  * Workbench кладёт сюда настоящее действие, фича берёт его через useOpenFileAction.
  */
 export const OpenFileContext = createContext<OpenFile | null>(null)
