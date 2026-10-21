@@ -302,6 +302,16 @@ describe('сверка с диском', () => {
     expect(mine.document.isDirty).toBe(false)
   })
 
+  it('файла нет уже при первом чтении - «нет на диске», а не вечное «читается»', async () => {
+    disk.exists = false
+    const document = new EditorDocument('p1', 'src/gone.ts', host)
+
+    await document.load()
+
+    expect(document.status).toEqual({ kind: 'missing' })
+    expect(host.onGone).toHaveBeenCalledWith(document)
+  })
+
   it('удалён: без правок - вкладка закрывается, с правками - вопрос', async () => {
     const clean = await open('x')
 

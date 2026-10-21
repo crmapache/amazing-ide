@@ -14,11 +14,13 @@ export type DocumentNotice =
 
 /**
  * Что показывает вкладка: файл ещё читается, текст (только для чтения или с вопросом),
- * не текст, слишком большой или не прочитался (нет прав, проект закрыли, диск отвалился).
+ * не текст, слишком большой, не прочитался (нет прав, проект закрыли, диск отвалился) или
+ * его нет на диске (удалили; вкладка файла закрывается сама, разница показывает удаление).
  */
 export type DocumentStatus =
   | { kind: 'loading' }
-  | { kind: 'text'; readOnly: boolean; notice: DocumentNotice | null }
+  | { kind: 'missing' }
+  | { kind: 'text'; readOnly: boolean; notice: DocumentNotice | null; bom: boolean }
   | { kind: 'binary' }
   | { kind: 'tooLarge'; size: number; limit: number }
   | { kind: 'unreadable'; reason: FileFailure }
@@ -28,3 +30,12 @@ export type DocumentStatus =
  * (split), только просмотр (preview). У других файлов - всегда код.
  */
 export type MarkdownLayout = 'editor' | 'split' | 'preview'
+
+/** Разница файла: две колонки рядом или одна, где удалённое стоит над добавленным. */
+export type DiffLayout = 'sideBySide' | 'unified'
+
+/** Отмена или повтор правки - команды Monaco с этими именами. */
+export type HistoryCommand = 'undo' | 'redo'
+
+/** Как показана разница - выбор человека, один на все файлы. */
+export type DiffViewOptions = { layout: DiffLayout; collapsed: boolean }

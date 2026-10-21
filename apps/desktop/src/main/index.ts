@@ -106,10 +106,12 @@ const bootstrap = async () => {
     )
 
   // Слежение за диском открытых проектов: окну - что перечитать в дереве и в редакторе и
-  // что .git поменялся (ветка), статусу git - повод перечитаться и разослать себя, если стал другим.
-  const gitStatus = new GitStatusService((projectId, status) =>
-    broadcast('git:status', { projectId, status }),
-  )
+  // что .git поменялся (ветка), статусу git и списку изменений - повод перечитаться и
+  // разослать себя, если стали другими.
+  const gitStatus = new GitStatusService({
+    status: (projectId, status) => broadcast('git:status', { projectId, status }),
+    changes: (projectId, changes) => broadcast('git:changes', { projectId, changes }),
+  })
   const watchers = new ProjectWatchers((projectId, { directories, renamed, paths, git }) => {
     if (paths === null || paths.length > 0 || git) {
       broadcast('fs:changed', { projectId, directories, renamed, files: paths, git })

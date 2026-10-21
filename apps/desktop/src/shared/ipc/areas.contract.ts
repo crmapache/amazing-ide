@@ -15,6 +15,8 @@ import type { EditorEventContract, EditorInvokeContract } from './editor.contrac
 import { EDITOR_EVENTS, EDITOR_CHANNELS } from './editor.contract'
 import type { FsPathsInvokeContract } from './fs-paths.contract'
 import { FS_PATHS_CHANNELS } from './fs-paths.contract'
+import type { GitChangesEventContract, GitChangesInvokeContract } from './git-changes.contract'
+import { GIT_CHANGES_EVENTS, GIT_CHANGES_CHANNELS } from './git-changes.contract'
 import type { ProjectSyncEventContract, ProjectSyncInvokeContract } from './project-sync.contract'
 import { PROJECT_SYNC_EVENTS, PROJECT_SYNC_CHANNELS } from './project-sync.contract'
 
@@ -30,12 +32,14 @@ export type AreaInvokeContract = ClaudeTabsInvokeContract &
   ClaudeSearchInvokeContract &
   FsPathsInvokeContract &
   ProjectSyncInvokeContract &
+  GitChangesInvokeContract &
   EditorInvokeContract
 
 export type AreaEventContract = ClaudeTabsEventContract &
   ClaudePanelEventContract &
   ClaudeSearchEventContract &
   ProjectSyncEventContract &
+  GitChangesEventContract &
   EditorEventContract
 
 /** Каналы областей в рантайме: их разворачивает INVOKE_CHANNELS. */
@@ -47,6 +51,7 @@ export const AREA_CHANNELS = {
   ...CLAUDE_SEARCH_CHANNELS,
   ...FS_PATHS_CHANNELS,
   ...PROJECT_SYNC_CHANNELS,
+  ...GIT_CHANGES_CHANNELS,
   ...EDITOR_CHANNELS,
 } satisfies Record<keyof AreaInvokeContract, true>
 
@@ -56,5 +61,6 @@ export const AREA_EVENTS = {
   ...CLAUDE_PANEL_EVENTS,
   ...CLAUDE_SEARCH_EVENTS,
   ...PROJECT_SYNC_EVENTS,
+  ...GIT_CHANGES_EVENTS,
   ...EDITOR_EVENTS,
 } satisfies Record<keyof AreaEventContract, true>

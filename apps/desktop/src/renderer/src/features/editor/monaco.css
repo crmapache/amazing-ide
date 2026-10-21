@@ -32,3 +32,55 @@
 .monaco-editor .findOptionsWidget {
   visibility: hidden;
 }
+
+/* Разница: стороны прокручиваются вместе, и полоса левой стороны рядом с разделителем только
+   двоила бы правую. Место под ней остаётся - зазор до разделителя. */
+.monaco-diff-editor.side-by-side .editor.original .scrollbar.vertical {
+  visibility: hidden;
+}
+
+/* Видимая часть файла на полосе отметок разницы справа - тихой плашкой, как бегунок: тема
+   делает бегунки прозрачными, их рисует вставка выше, а у этой полосы вставки нет. */
+.monaco-diff-editor .diffViewport {
+  border-radius: var(--radius-xs);
+  background: var(--color-bg-hover);
+}
+
+.monaco-diff-editor .diffViewport:hover,
+.monaco-diff-editor .diffViewport:active {
+  background: var(--color-bg-active);
+}
+
+/* Стрелка «вернуть кусок из коммита» - кнопкой, как IconButton: тихая, под курсором плашка
+   и светлее, при нажатии плашка плотнее. У изменённых строк она в поле значков (коробка
+   строки высотой), у удалённых - в зазоре на месте строк (только значок): отступ делает обе
+   одной коробкой со значком посередине. */
+.monaco-diff-editor .revertButton,
+.monaco-diff-editor .arrow-revert-change {
+  box-sizing: border-box;
+  padding: var(--space-0-5);
+  border-radius: var(--radius-xs);
+  color: var(--color-fg-subtle);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-normal) var(--easing-standard),
+    color var(--duration-normal) var(--easing-standard);
+}
+
+.monaco-diff-editor .arrow-revert-change {
+  box-sizing: content-box;
+}
+
+@media (hover: hover) {
+  .monaco-diff-editor .revertButton:hover,
+  .monaco-diff-editor .arrow-revert-change:hover {
+    background-color: var(--color-bg-hover);
+    color: var(--color-fg);
+  }
+}
+
+.monaco-diff-editor .revertButton:active,
+.monaco-diff-editor .arrow-revert-change:active {
+  background-color: var(--color-bg-active);
+  transition-duration: var(--duration-fast);
+}

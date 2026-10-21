@@ -40,7 +40,7 @@ node apps/desktop/scripts/cdp.mjs click '<css-селектор>'
 node apps/desktop/scripts/cdp.mjs click-at <x> <y>     # клик мимо, в пустое место
 node apps/desktop/scripts/cdp.mjs hover '<css-селектор>'
 node apps/desktop/scripts/cdp.mjs type 'текст'          # в элемент с фокусом
-node apps/desktop/scripts/cdp.mjs key ArrowDown          # Enter, Tab, Escape, Shift...
+node apps/desktop/scripts/cdp.mjs key ArrowDown          # Enter, Tab, Escape, Shift, F1-F12...
 node apps/desktop/scripts/cdp.mjs key KeyF meta+shift    # сочетание, буква - по клавише
 ```
 
@@ -76,6 +76,11 @@ swift apps/desktop/scripts/real-mouse.swift drag 800,20 900,20     # печат�
 прямо из страницы: `window.ide.invoke('workspace:get')`.
 
 Скриншот через CDP - это содержимое окна: «светофора» macOS на нём нет.
+
+Копия обычно стоит за окнами человека. Закрытое окно Chromium не рисует, и
+`requestAnimationFrame` в нём молчит. Поэтому `agent-window.sh` запускает её с
+`--disable-backgrounding-occluded-windows`: покадровые замеры и показ того, что ждёт
+кадра, идут и в фоне. Проверить: `eval "document.visibilityState"` - `visible`.
 
 ### Окно целиком и эталон - Graphite
 

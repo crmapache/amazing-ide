@@ -6,21 +6,30 @@ import { Button } from '@amazing-ide/ui/Button'
 import { EmptyState } from '@amazing-ide/ui/EmptyState'
 
 import { EditorTabs } from '../EditorTabs/EditorTabs'
-import { useEditorTabs, useSelectedFile, useSelectedPlace } from '../../../state/selection.store'
+import { tabTarget } from '../../../state/editor-tabs.utils'
+import {
+  useActiveTab,
+  useRecentTab,
+  useEditorTabs,
+  useSelectedPlace,
+} from '../../../state/selection.store'
 import { useActiveProject, useWorkspaceActions } from '../../../state/workspace.queries'
-import { CodeEditor } from './EditorArea.constants'
+import { CodeEditor, DiffEditor } from './EditorArea.constants'
 import styles from './EditorArea.module.scss'
 
 /**
- * Зона 6, вид «файл»: вкладки открытых файлов проекта и редактор активной, у файла
- * Markdown - и просмотр. Без проекта - приглашение открыть, без вкладок -
- * выбрать файл в дереве.
+ * Зона 6, вид «файл»: вкладки проекта, под ними - редактор файла или разница файла с
+ * последним коммитом, смотря какая вкладка активна. Оба, раз показанные, остаются на
+ * месте и прячутся: переход между файлом и разницей не создаёт Monaco заново и не теряет
+ * прокрутку. Без проекта - приглашение открыть, без вкладок - выбрать файл в дереве.
  */
 export const EditorArea = () => {
   const { t } = useTranslation()
   const project = useActiveProject()
   const tabs = useEditorTabs(project?.id)
-  const selectedFile = useSelectedFile(project?.id)
+  const activeKey = useActiveTab(project?.id)
+  const file = useRecentTab(project?.id, 'file')
+  const diff = useRecentTab(project?.id, 'diff')
   const place = useSelectedPlace(project?.id)
   const { openProject } = useWorkspaceActions()
 
@@ -39,7 +48,7 @@ export const EditorArea = () => {
     )
   }
 
-  if (!selectedFile) {
+  if (!activeKey) {
     return (
       <EmptyState
         icon={MousePointerClick}
@@ -49,12 +58,30 @@ export const EditorArea = () => {
     )
   }
 
+  const shown = tabTarget(activeKey).kind
+
   return (
     <div className={styles.editorArea}>
-      <EditorTabs projectId={project.id} paths={tabs} active={selectedFile} />
-      <Suspense fallback={null}>
-        <CodeEditor projectId={project.id} path={selectedFile} place={place} />
-      </Suspense>
+      <EditorTabs projectId={project.id} keys={tabs} active={activeKey} />
+      {file !== undefined && (
+        <div className={styles.view} hidden={shown !== 'file'}>
+          <Suspense fallback={null}>
+            <CodeEditor
+              projectId={project.id}
+              path={file}
+              place={place}
+              isActive={shown === 'file'}
+            />
+          </Suspense>
+        </div>
+      )}
+      {diff !== undefined && (
+        <div className={styles.view} hidden={shown !== 'diff'}>
+          <Suspense fallback={null}>
+            <DiffEditor projectId={project.id} path={diff} isActive={shown === 'diff'} />
+          </Suspense>
+        </div>
+      )}
     </div>
   )
 }

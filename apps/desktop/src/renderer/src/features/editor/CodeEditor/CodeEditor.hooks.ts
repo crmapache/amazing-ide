@@ -3,69 +3,35 @@ import type { RefObject } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { editor } from 'monaco-editor/editor/editor.api.js'
 
-import { MAX_SELECTION_CHARS } from '@shared/claude-draft'
-
 import { documents } from '../documents'
 import { documentKey } from '../documents.utils'
 import type { EditorDocument } from '../editor-document'
+import { takeFocus, hideFindFromPalette, remeasureWhenLoaded } from '../editor-instance'
 import { editorOptions, scrollbarOptions } from '../editor-options'
-import { SAVE_COMMAND, MONACO_FIND_COMMANDS, SELECTION_PUBLISH_DELAY_MS } from '../editor.constants'
+import { watchSelection } from '../editor-selection'
+import type { SelectionWatch } from '../editor-selection'
 import { useEditorStore } from '../editor.store'
 import type { DocumentStatus, MarkdownLayout } from '../editor.types'
 import { useMarkdownLayoutStore } from '../markdown-layout.store'
 import { usePreviewScrollSync } from '../markdown-scroll.hooks'
 import { monaco } from '../monaco-setup'
-import { editorTypography } from '../monaco-theme'
-import { useEditorSelectionStore } from '../../../state/editor-selection.store'
-import type { FilePlace } from '../../../state/selection.store'
-import { placeRange, selectionLines, hasClassicScrollbars } from './CodeEditor.utils'
+import type { CodeEditorProps } from './CodeEditor.types'
+import { placeRange, hasClassicScrollbars } from './CodeEditor.utils'
 
 type Editor = editor.IStandaloneCodeEditor
 
-/** Выделение в редакторе - полю ввода Claude Code: строки и текст, если он не длинный. */
-const publishSelection = (instance: Editor, document: EditorDocument | null) => {
-  const { setSelection } = useEditorSelectionStore.getState()
-  const model = instance.getModel()
-  const range = instance.getSelection()
-
-  if (!document || !model || !range || range.isEmpty()) return setSelection(null)
-
-  const text =
-    model.getValueLengthInRange(range) <= MAX_SELECTION_CHARS
-      ? model.getValueInRange(range)
-      : undefined
-
-  setSelection({
-    projectId: document.projectId,
-    path: document.path,
-    ...selectionLines(range),
-    text,
-  })
-}
-
 /**
- * Шрифт кода подгружается, когда им впервые пишут, а Monaco меряет буквы при создании:
- * без перемера после загрузки курсор встал бы мимо букв.
- */
-const remeasureWhenLoaded = () => {
-  const { fontFamily, fontSize } = editorTypography()
-
-  void document.fonts
-    .load(`${fontSize}px ${fontFamily}`)
-    .then(() => monaco.editor.remeasureFonts())
-    .catch(() => undefined)
-}
-
-/**
- * Один редактор Monaco на всё окно (ADR 0005): создаётся вместе с компонентом, файлы
- * меняются моделями. Уход из редактора пишет файл сразу, ⌘S - тоже. Выделение после
- * короткой паузы уходит полю ввода Claude Code. Полосы прокрутки повторяют системные:
+ * Редактор файла (ADR 0005, рядом с ним в середине живёт разница - ADR 0020): создаётся
+ * вместе с компонентом, файлы меняются моделями. Уход из редактора пишет файл сразу (⌘S -
+ * documents.ts). Выделение после короткой паузы уходит полю ввода Claude Code, пока
+ * вкладка файла на виду. Полосы прокрутки повторяют системные:
  * их вид macOS меняет на ходу, и проба замечает это по своему размеру.
  */
-const useMonacoEditor = (shown: RefObject<EditorDocument | null>) => {
+const useMonacoEditor = (shown: RefObject<EditorDocument | null>, isShown: RefObject<boolean>) => {
   const hostRef = useRef<HTMLDivElement>(null)
   const probeRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef<Editor | null>(null)
+  const selectionRef = useRef<SelectionWatch | null>(null)
 
   useEffect(() => {
     const host = hostRef.current
@@ -82,48 +48,31 @@ const useMonacoEditor = (shown: RefObject<EditorDocument | null>) => {
 
     editorRef.current = instance
 
-    // Палитра команд Monaco строится из этого списка: без поиска, его панели в IDE нет.
-    const supportedActions = instance.getSupportedActions.bind(instance)
-
-    instance.getSupportedActions = () =>
-      supportedActions().filter((action) => !MONACO_FIND_COMMANDS.has(action.id))
+    hideFindFromPalette(instance)
     instance.onDidBlurEditorText(() => void shown.current?.save())
-    // ⌘S - явная просьба: пишет и файл за проектом, и после отказа записи. Команда и
-    // сочетание снимаются вместе с редактором: реестр Monaco общий на окно.
-    const save = [
-      monaco.editor.registerCommand(SAVE_COMMAND, () => void shown.current?.saveAsked()),
-      monaco.editor.addKeybindingRule({
-        keybinding: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
-        command: SAVE_COMMAND,
-      }),
-    ]
-
     remeasureWhenLoaded()
 
-    let selectionTimer: number | undefined
+    const selection = watchSelection(
+      instance,
+      () => shown.current,
+      () => isShown.current,
+    )
 
-    instance.onDidChangeCursorSelection(() => {
-      window.clearTimeout(selectionTimer)
-      selectionTimer = window.setTimeout(
-        () => publishSelection(instance, shown.current),
-        SELECTION_PUBLISH_DELAY_MS,
-      )
-    })
+    selectionRef.current = selection
 
     return () => {
-      for (const registration of save) registration.dispose()
       scrollbars.disconnect()
-      window.clearTimeout(selectionTimer)
-      useEditorSelectionStore.getState().setSelection(null)
+      selection.dispose()
+      selectionRef.current = null
       if (shown.current) shown.current.viewState = instance.saveViewState()
 
       shown.current = null
       instance.dispose()
       editorRef.current = null
     }
-  }, [shown])
+  }, [shown, isShown])
 
-  return { hostRef, probeRef, editorRef }
+  return { hostRef, probeRef, editorRef, selectionRef }
 }
 
 /**
@@ -131,20 +80,22 @@ const useMonacoEditor = (shown: RefObject<EditorDocument | null>) => {
  * прокруткой, на которых файл оставили, место из ссылки и клавиатура по просьбе вкладки.
  * Рядом с просмотром Markdown - прокрутка вместе с ним.
  */
-export const useCodeEditor = (
-  projectId: string,
-  path: string,
-  place: FilePlace | undefined,
-  status: DocumentStatus,
-  layout: MarkdownLayout,
-) => {
+export const useCodeEditor = ({
+  projectId,
+  path,
+  place,
+  isActive,
+  status,
+  layout,
+}: CodeEditorProps & { status: DocumentStatus; layout: MarkdownLayout }) => {
   const { t } = useTranslation()
   const shown = useRef<EditorDocument | null>(null)
   const previewRef = useRef<HTMLDivElement>(null)
   const focusSerial = useEditorStore((state) => state.focusSerial)
   // Просьбы до появления редактора - не к нему: открыл файл из дерева - клавиатура в дереве.
   const focusSeen = useRef(focusSerial)
-  const { hostRef, probeRef, editorRef } = useMonacoEditor(shown)
+  const isShown = useRef(isActive)
+  const { hostRef, probeRef, editorRef, selectionRef } = useMonacoEditor(shown, isShown)
   const readOnly = status.kind === 'text' && status.readOnly
 
   // Модель файла - в редактор, как только файл прочитан. Прежний файл запоминает, где
@@ -210,12 +161,19 @@ export const useCodeEditor = (
     instance.focus()
   }, [editorRef, projectId, path, place, status.kind, layout])
 
+  // Вкладка файла снова активна - полю Claude Code её выделение, а не то, что было в разнице.
+  useEffect(() => {
+    isShown.current = isActive
+    if (isActive) selectionRef.current?.publish()
+  }, [selectionRef, isActive])
+
+  // Просьба отдать клавиатуру - редактору активной вкладки: спрятанный за разницей её не берёт.
   useEffect(() => {
     if (focusSerial === focusSeen.current) return
 
     focusSeen.current = focusSerial
-    editorRef.current?.focus()
-  }, [editorRef, focusSerial])
+    if (isActive) takeFocus(editorRef.current)
+  }, [editorRef, focusSerial, isActive])
 
   return { hostRef, probeRef, previewRef, editorRef }
 }

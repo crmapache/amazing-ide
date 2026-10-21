@@ -7,7 +7,7 @@ import {
   ROLE_FONT_STYLE,
   FONT_STYLE_COMBINATIONS,
 } from './monaco-theme.constants'
-import type { Rgba, ThemeColors } from './monaco-theme.types'
+import type { Rgba, ThemeTints, ThemeColors } from './monaco-theme.types'
 
 const channel = (value: number) =>
   Math.round(Math.min(255, Math.max(0, value)))
@@ -174,5 +174,38 @@ export const editorColors = (colors: ThemeColors): editor.IColors => {
     'pickerGroup.border': hex('border'),
     'progressBar.background': hex('accent'),
     'textLink.foreground': hex('syntaxLink'),
+  }
+}
+
+/** Тон с долей прозрачности: подложка или метка цвета состояния. */
+const tinted = (color: Rgba, share: number): string => toHex({ ...color, a: color.a * share })
+
+/**
+ * Цвета разницы файла: добавленное - зелёным, удалённое - красным, подложкой той же доли,
+ * что строки диффа в ленте Claude Code (--tint-soft). Слово внутри строки - тот же слой
+ * поверх строки, поэтому ярче её. Пустота напротив вставки - штриховкой цветом линий,
+ * свёрнутое неизменённое - слоем наведения, без теней (ADR 0006).
+ */
+export const diffColors = (colors: ThemeColors, tints: ThemeTints): editor.IColors => {
+  const inserted = tinted(colors.success, tints.soft)
+  const removed = tinted(colors.danger, tints.soft)
+
+  return {
+    'diffEditor.insertedLineBackground': inserted,
+    'diffEditor.removedLineBackground': removed,
+    'diffEditor.insertedTextBackground': inserted,
+    'diffEditor.removedTextBackground': removed,
+    'diffEditorGutter.insertedLineBackground': inserted,
+    'diffEditorGutter.removedLineBackground': removed,
+    'diffEditorOverview.insertedForeground': tinted(colors.success, tints.border),
+    'diffEditorOverview.removedForeground': tinted(colors.danger, tints.border),
+    'diffEditor.diagonalFill': toHex(colors.border),
+    'diffEditor.border': toHex(colors.border),
+    'diffEditor.unchangedRegionBackground': toHex(colors.hover),
+    'diffEditor.unchangedRegionForeground': toHex(colors.fgSubtle),
+    'diffEditor.unchangedRegionShadow': TRANSPARENT,
+    'diffEditor.unchangedCodeBackground': TRANSPARENT,
+    'diffEditor.move.border': toHex(colors.borderStrong),
+    'diffEditor.moveActive.border': toHex(colors.accent),
   }
 }

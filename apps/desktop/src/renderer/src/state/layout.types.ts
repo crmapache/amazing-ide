@@ -1,5 +1,5 @@
 /** Виды зоны 5 (левая панель), переключаются иконками зоны 2. */
-export type SideViewId = 'files'
+export type SideViewId = 'files' | 'changes'
 
 /** Виды зоны 6 (середина окна), переключаются иконками полосы слева от неё. */
 export type MainViewId = 'file' | 'scenarios' | 'statistics'

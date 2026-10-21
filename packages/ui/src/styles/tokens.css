@@ -203,6 +203,10 @@
   );
   --color-vcs-conflict: var(--palette-red-300);
 
+  /* Удалён - серый, как в WebStorm: файла на диске уже нет, строка о нём - справка, а не
+     тревога. Нужен только списку изменений: в дереве удалённых файлов нет. */
+  --color-vcs-deleted: var(--palette-graphite-400);
+
   /* Роли: линии */
   --color-border: rgb(255 255 255 / 7%);
   --color-border-strong: rgb(255 255 255 / 12%);

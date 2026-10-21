@@ -33,6 +33,12 @@ export const QUERY_KEYS = {
   gitHead: (projectId: string) => ['git', 'head', projectId],
   /** Статусы файлов по git - цвета имён в дереве; свежие присылает главный процесс. */
   gitStatus: (projectId: string) => ['git', 'status', projectId],
+  /** Список изменений относительно HEAD (вид Changes); свежий присылает главный процесс. */
+  gitChanges: (projectId: string) => ['git', 'changes', projectId],
+  /** Файл, каким он лежит в последнем коммите, - левая сторона разницы. */
+  gitHeadFile: (projectId: string, path: string) => ['git', 'head-file', projectId, path],
+  /** Все файлы проекта из HEAD разом: сбросить после коммита или смены ветки. */
+  gitHeadFiles: (projectId: string) => ['git', 'head-file', projectId],
   gitBranches: (projectId: string) => ['git', 'branches', projectId],
   gitPushInfo: (projectId: string) => ['git', 'push-info', projectId],
   /** PR ветки: другая ветка - другой ключ, ответ gh для старой не подставится. */

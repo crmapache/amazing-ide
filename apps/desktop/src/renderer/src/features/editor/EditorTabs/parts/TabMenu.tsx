@@ -9,33 +9,34 @@ import { useAnchoredPopover } from '@amazing-ide/ui/Popover.hooks'
 
 import type { TabMenuProps } from '../EditorTabs.types'
 import { requestCloseTabs } from '../../editor-close'
+import { tabTarget } from '../../../../state/editor-tabs.utils'
 
 /**
- * Меню правой кнопки на вкладке файла, как в WebStorm: закрыть эту, остальные, все
- * справа или все сразу; скопировать путь от корня проекта. Встаёт под вкладкой.
+ * Меню правой кнопки на вкладке файла или разницы, как в WebStorm: закрыть эту, остальные,
+ * все справа или все сразу; скопировать путь файла от корня проекта. Встаёт под вкладкой.
  */
-export const TabMenu = ({ projectId, paths, target, onClose }: TabMenuProps) => {
+export const TabMenu = ({ projectId, keys, target, onClose }: TabMenuProps) => {
   const { t } = useTranslation()
   const { id, ref, onToggle } = useAnchoredPopover(target?.anchor ?? null, onClose)
-  const path = target?.path ?? ''
-  const index = paths.indexOf(path)
+  const key = target?.key ?? ''
+  const index = keys.indexOf(key)
 
   const close = (closing: readonly string[]) => {
     ref.current?.hidePopover()
     if (closing.length > 0) requestCloseTabs(projectId, closing)
   }
 
-  const handleClose = () => close([path])
+  const handleClose = () => close([key])
 
-  const handleCloseOthers = () => close(paths.filter((open) => open !== path))
+  const handleCloseOthers = () => close(keys.filter((open) => open !== key))
 
-  const handleCloseRight = () => close(paths.slice(index + 1))
+  const handleCloseRight = () => close(keys.slice(index + 1))
 
-  const handleCloseAll = () => close(paths)
+  const handleCloseAll = () => close(keys)
 
   const handleCopy = () => {
     ref.current?.hidePopover()
-    void navigator.clipboard.writeText(path)
+    void navigator.clipboard.writeText(tabTarget(key).path)
   }
 
   return (

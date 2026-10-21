@@ -112,9 +112,15 @@ const pressKey = async (send, name, modifierList = '') => {
     .filter(Boolean)
     .reduce((bits, modifier) => bits | (MODIFIER_BITS[modifier] ?? 0), 0)
   const isLetter = /^Key[A-Z]$/.test(name)
+  // F1-F12: код клавиши Windows - 112 и дальше по порядку.
+  const functionKey = /^F([1-9]|1[0-2])$/.exec(name)
   const key = isLetter ? name.slice(3).toLowerCase() : name
   const code = name === 'Shift' ? 'ShiftLeft' : name
-  const virtual = isLetter ? name.charCodeAt(3) : KEY_CODES[name]
+  const virtual = isLetter
+    ? name.charCodeAt(3)
+    : functionKey
+      ? 111 + Number(functionKey[1])
+      : KEY_CODES[name]
   const event = {
     key,
     code,

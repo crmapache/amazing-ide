@@ -1,6 +1,18 @@
-// Вкладки сверху, под ними код на всю оставшуюся высоту.
+// Вкладки сверху, под ними код или разница на всю оставшуюся высоту.
 .editorArea {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+// Редактор кода и разница: показан один, второй спрятан, но жив.
+.view {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+
+  &[hidden] {
+    display: none;
+  }
 }

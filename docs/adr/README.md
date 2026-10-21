@@ -31,3 +31,4 @@
 | [0017](0017-disk-watch-and-git-status.md)         | Слежение за диском и статусы git в главном процессе, цвета как в WebStorm                  | Принято                                          |
 | [0018](0018-editor-tabs-autosave-highlighting.md) | Редактор: вкладки файлов, автосохранение как в WebStorm, подсветка shiki                   | Принято                                          |
 | [0019](0019-markdown-preview.md)                  | Просмотр Markdown: три вида как в WebStorm, HTML файла - элементами React по списку GitHub | Принято                                          |
+| [0020](0020-changes-view-and-diff.md)             | Изменения - видом левой панели, разница файла - вкладкой в середине на Monaco              | Принято                                          |

@@ -1,0 +1,124 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+.diffEditor {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+// Панель над разницей: файл слева, счёт и кнопки справа - группами, между группами зазор
+// шире, чем внутри: так группы читаются без разделителей.
+.toolbar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+  font-size: var(--font-size-sm);
+}
+
+.file {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-1-5);
+  min-width: 0;
+}
+
+.name {
+  @include truncate;
+
+  flex: 0 1 auto;
+  min-width: 0;
+  color: var(--color-fg);
+  font-size: var(--font-size-md);
+}
+
+// Длинный путь теряет папки с начала, а не ближнюю к файлу, как в списке изменений.
+.folder {
+  @include truncate;
+
+  flex: 0 1 auto;
+  min-width: 0;
+  color: var(--color-fg-subtle);
+  direction: rtl;
+  text-align: left;
+}
+
+.folderText {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.origin {
+  @include truncate;
+
+  flex: 0 10 auto;
+  min-width: 0;
+  color: var(--color-fg-disabled);
+}
+
+.count {
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+  white-space: nowrap;
+}
+
+.group {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-0-5);
+}
+
+// Имя файла - цветом вида изменения, как в дереве и в списке изменений (ADR 0017).
+.modified,
+.renamed {
+  color: var(--color-vcs-modified);
+}
+
+.added {
+  color: var(--color-vcs-added);
+}
+
+.untracked {
+  color: var(--color-vcs-untracked);
+}
+
+.conflict {
+  color: var(--color-vcs-conflict);
+}
+
+.deleted {
+  color: var(--color-vcs-deleted);
+}
+
+// Рамка разницы: от её угла меряется точка меню правой кнопки (якорь меню внутри).
+.frame {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+// Код выделяется мышью - в отличие от хрома окна (base.css выключает выделение).
+.host {
+  flex: 1;
+  min-width: 0;
+  user-select: text;
+
+  // Monaco ещё сравнивает новую пару (diff-reveal.ts): не видна и не ловит мышь, но размер
+  // держит - Monaco меряет и раскладывает её как видимую. Прозрачность, а не visibility:
+  // сторонам Monaco сам пишет visibility: visible, и она перебила бы скрытие обёртки.
+  &[data-comparing] {
+    opacity: 0;
+    pointer-events: none;
+  }
+}

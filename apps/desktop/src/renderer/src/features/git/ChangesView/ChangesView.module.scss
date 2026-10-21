@@ -1,0 +1,124 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Список стоит с теми же отступами от краёв листа, что и дерево файлов: выбранная строка -
+// плашка внутри панели, а не полоса от края до края.
+.changes {
+  height: 100%;
+  padding: var(--space-1-5) var(--space-1-5) var(--space-4);
+  overflow: auto;
+}
+
+.groupTitle {
+  color: var(--color-fg);
+  font-size: var(--font-size-md);
+}
+
+.count {
+  flex-shrink: 0;
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-sm);
+}
+
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// Строка под шапкой группы: иконка встаёт под подпись шапки - после её стрелки.
+.row {
+  @include button-reset;
+  @include interactive-surface;
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  width: 100%;
+  height: var(--size-tree-row);
+  padding: 0 var(--space-2) 0 calc(var(--space-1-5) * 2 + var(--size-icon-sm));
+  border-radius: var(--radius-sm);
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-md);
+  text-align: left;
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: calc(var(--focus-ring-width) * -1);
+  }
+}
+
+// Файл в разнице сейчас - залитая строка, как выбранный файл в дереве.
+.selected {
+  background-color: var(--color-bg-selected);
+}
+
+.name {
+  @include truncate;
+
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+// Длинный путь теряет папки с начала, а не ближнюю к файлу: она говорит больше корня.
+// Многоточие встаёт в начало коробки, а справа налево это начало пути.
+.folder {
+  @include truncate;
+
+  flex: 0 1 auto;
+  min-width: 0;
+  color: var(--color-fg-subtle);
+  font-size: var(--font-size-sm);
+  direction: rtl;
+  text-align: left;
+}
+
+// Сам путь - слева направо: иначе слеши и точки встали бы по краям наоборот.
+.folderText {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.origin {
+  @include truncate;
+
+  flex: 0 10 auto;
+  min-width: 0;
+  color: var(--color-fg-disabled);
+  font-size: var(--font-size-sm);
+}
+
+.letter {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding-left: var(--space-1);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+}
+
+// Вид изменения - цветом имени и буквы, как статус в дереве файлов (ADR 0017).
+.modified,
+.renamed {
+  color: var(--color-vcs-modified);
+}
+
+.added {
+  color: var(--color-vcs-added);
+}
+
+.untracked {
+  color: var(--color-vcs-untracked);
+}
+
+.conflict {
+  color: var(--color-vcs-conflict);
+}
+
+.deleted {
+  color: var(--color-vcs-deleted);
+}
+
+.truncated {
+  margin: var(--space-2) var(--space-2) 0;
+  color: var(--color-fg-disabled);
+  font-size: var(--font-size-sm);
+}

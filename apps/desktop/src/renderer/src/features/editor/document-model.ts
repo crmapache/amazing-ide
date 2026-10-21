@@ -4,12 +4,17 @@ import { languageOfPath } from '../../lib/syntax-languages.utils'
 import { eolOf, withEol, changedSpan } from './documents.utils'
 import { monaco } from './monaco-setup'
 
-/** Модель файла проекта: язык - по имени файла, адрес - проект и путь. */
+/**
+ * Модель файла проекта: язык - по имени файла, адрес - проект и путь. Схема file, как у
+ * файлов в VS Code: закрытой модели Monaco хранит историю отмены и отдаёт её модели с тем же
+ * адресом и тем же текстом. Разница перешла к другому файлу и вернулась, вкладку закрыли и
+ * открыли - ⌘Z возвращает правки; файл за это время поменяли - история уже не к нему.
+ */
 export const createDocumentModel = (projectId: string, path: string, text: string) =>
   monaco.editor.createModel(
     text,
     languageOfPath(path) ?? 'plaintext',
-    monaco.Uri.from({ scheme: 'project', authority: projectId, path: `/${path}` }),
+    monaco.Uri.from({ scheme: 'file', authority: projectId, path: `/${path}` }),
   )
 
 /** Тот же ли текст в модели, что на диске, - с поправкой на перевод строк модели. */
@@ -17,11 +22,12 @@ export const holdsText = (model: editor.ITextModel, text: string): boolean =>
   model.getValue() === withEol(text, model.getEOL())
 
 /**
- * Текст с диска - в модель. Перевод строк файла меняется вместе с ним (prettier перевёл
- * CRLF в LF - и модель тоже), иначе первая же правка вернула бы старые во весь файл.
- * Меняется только середина и отдельным шагом отмены: курсор выше и ниже правки на месте.
+ * Новый текст - в модель: с диска - в документ, из нового коммита - в левую сторону
+ * разницы. Перевод строк меняется вместе с текстом (prettier перевёл CRLF в LF - и модель
+ * тоже), иначе первая же правка вернула бы старые во весь файл. Меняется только середина и
+ * отдельным шагом отмены: курсор, свёрнутое и метки Monaco выше и ниже правки на месте.
  */
-export const putDiskText = (model: editor.ITextModel, text: string): void => {
+export const putText = (model: editor.ITextModel, text: string): void => {
   const eol = eolOf(text)
 
   model.pushStackElement()

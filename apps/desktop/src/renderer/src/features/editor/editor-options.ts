@@ -1,6 +1,7 @@
 import type { editor } from 'monaco-editor/editor/editor.api.js'
 
-import { SCROLLBAR_SIZE } from './editor.constants'
+import { SCROLLBAR_SIZE, DIFF_REVEAL_LINES, DIFF_CONTEXT_LINES } from './editor.constants'
+import type { DiffViewOptions } from './editor.types'
 import { editorTypography } from './monaco-theme'
 import { EDITOR_THEME } from './monaco-theme.constants'
 
@@ -26,20 +27,17 @@ export const scrollbarOptions = (classic: boolean): editor.IEditorScrollbarOptio
 }
 
 /**
- * Настройки редактора середины окна. Шрифт и тема - из токенов. Миникарты нет, как в
- * WebStorm; липких заголовков тоже: строки внешних блоков поверх кода владелец просил
- * убрать. Подсказки по словам и цветные скобки выключены: подсказки дадут языковые
- * серверы, а радуга скобок спорит с подсветкой ролей.
+ * Настройки кода середины окна - и у редактора файла, и у обеих сторон разницы. Шрифт и
+ * тема - из токенов. Миникарты нет, как в WebStorm; липких заголовков тоже: строки внешних
+ * блоков поверх кода владелец просил убрать. Подсказки по словам и цветные скобки
+ * выключены: подсказки дадут языковые серверы, а радуга скобок спорит с подсветкой ролей.
  */
-export const editorOptions = (
-  classicScrollbars: boolean,
-): editor.IStandaloneEditorConstructionOptions => {
+const codeOptions = (classicScrollbars: boolean) => {
   const padding = Number.parseFloat(
     getComputedStyle(document.documentElement).getPropertyValue(PADDING_ROLE),
   )
 
   return {
-    model: null,
     theme: EDITOR_THEME,
     ...editorTypography(),
     automaticLayout: true,
@@ -71,5 +69,55 @@ export const editorOptions = (
     // кириллицы это каждая с, у, а, о в русском тексте и комментариях - шум, а не находка.
     // Невидимые символы (широкий пробел и подобные) рамкой по-прежнему: глазом их не отличить.
     unicodeHighlight: { ambiguousCharacters: false },
-  }
+  } satisfies editor.IStandaloneEditorConstructionOptions
 }
+
+/** Редактор файла: модель ставится, когда файл прочитан. */
+export const editorOptions = (
+  classicScrollbars: boolean,
+): editor.IStandaloneEditorConstructionOptions => ({
+  model: null,
+  ...codeOptions(classicScrollbars),
+})
+
+/**
+ * Что из настроек разницы выбирает человек: две колонки или одна, свёрнуто ли
+ * неизменённое (вокруг правки остаются три строки, как в WebStorm).
+ */
+export const diffViewOptions = ({
+  layout,
+  collapsed,
+}: DiffViewOptions): editor.IDiffEditorOptions => ({
+  renderSideBySide: layout === 'sideBySide',
+  hideUnchangedRegions: {
+    enabled: collapsed,
+    contextLineCount: DIFF_CONTEXT_LINES,
+    minimumLineCount: DIFF_CONTEXT_LINES,
+    revealLineCount: DIFF_REVEAL_LINES,
+  },
+})
+
+/**
+ * Разница файла с последним коммитом, как в WebStorm: вид (две колонки или одна) и
+ * сворачивание неизменённого выбирает человек, и выбор не подменяется сам - узкая середина
+ * не переводит две колонки в одну. Пробелы не игнорируются: файл в списке изменений из-за
+ * отступов должен показать отступы. Левая сторона (коммит) не правится, правая - сам файл,
+ * стрелки между ними возвращают кусок из коммита, как » в WebStorm.
+ */
+export const diffEditorOptions = (
+  classicScrollbars: boolean,
+  view: DiffViewOptions,
+): editor.IStandaloneDiffEditorConstructionOptions => ({
+  ...codeOptions(classicScrollbars),
+  ...diffViewOptions(view),
+  originalEditable: false,
+  ignoreTrimWhitespace: false,
+  useInlineViewWhenSpaceIsLimited: false,
+  renderMarginRevertIcon: true,
+  renderGutterMenu: false,
+  // Поле значков справа - место стрелки «вернуть кусок из коммита» у изменённых строк.
+  glyphMargin: true,
+  renderOverviewRuler: true,
+  enableSplitViewResizing: true,
+  diffWordWrap: 'off',
+})

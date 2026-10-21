@@ -1,3 +1,4 @@
+import { useGitChangesSync } from '../../state/git-changes.queries'
 import { useUpdateStatusSync } from '../../state/updates.queries'
 import { useWorkspaceSync } from '../../state/workspace.queries'
 import { useAsideSync } from '../../features/claude-code/aside.queries'
@@ -23,6 +24,7 @@ export const MainProcessSync = () => {
   useClaudeSearchSync()
   useDirectorySync()
   useGitStatusSync()
+  useGitChangesSync()
   useGitHeadSync()
   useEditorSync()
 

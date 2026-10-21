@@ -1,20 +1,27 @@
+import type { editor } from 'monaco-editor/editor/editor.api.js'
+
 import type { ProjectDiskChange } from '@shared/fs'
 
 import type { EditorTabs } from '../../state/editor-tabs.types'
+import { tabTarget } from '../../state/editor-tabs.utils'
 import { useSelectionStore } from '../../state/selection.store'
 import { isTouched, documentKey } from './documents.utils'
 import { connectDocuments } from './editor-bus'
 import { EditorDocument } from './editor-document'
 import type { DocumentHost } from './editor-document'
+import { SAVE_COMMAND } from './editor.constants'
 import { useEditorStore } from './editor.store'
+import { monaco } from './monaco-setup'
 
+/** Файл нужен середине: открыт вкладкой или вкладкой разницы - там он правая сторона. */
 const isOpenTab = (tabs: Readonly<Record<string, EditorTabs>>, document: EditorDocument) =>
-  tabs[document.projectId]?.paths.includes(document.path) ?? false
+  tabs[document.projectId]?.keys.some((key) => tabTarget(key).path === document.path) ?? false
 
 /**
- * Открытые файлы всех проектов - по документу на вкладку, модели живут, пока вкладка
- * открыта (ADR 0005: один редактор, модель на файл). Документ появляется, когда вкладку
- * впервые показали: тридцать восстановленных вкладок не читают тридцать файлов на старте.
+ * Открытые файлы всех проектов - по документу на файл, модели живут, пока файл открыт
+ * вкладкой или его разница (ADR 0005: модель на файл; ADR 0020). Документ появляется, когда
+ * вкладку впервые показали: тридцать восстановленных вкладок не читают тридцать файлов на
+ * старте.
  * Закрытая вкладка - документ дописывает несохранённое и уходит; не дописалось
  * (конфликт в ту же секунду) - вкладка возвращается с вопросом, правка не теряется.
  */
@@ -51,6 +58,11 @@ class Documents {
   /** Документ файла, если он уже есть; не создаёт новый. */
   find(projectId: string, path: string): EditorDocument | undefined {
     return this.open.get(documentKey(projectId, path))
+  }
+
+  /** Документ, чья модель стоит в редакторе: ⌘S пишет файл того редактора, где фокус. */
+  findByModel(model: editor.ITextModel | null): EditorDocument | undefined {
+    return model ? [...this.open.values()].find((document) => document.model === model) : undefined
   }
 
   /** Вкладки поменялись: документы закрытых дописываются и уходят, открытых снова - остаются. */
@@ -138,4 +150,17 @@ connectDocuments({
   checkAll: () => documents.checkAll(),
   discard: (projectId, paths) => documents.discard(projectId, paths),
   saveAll: () => documents.saveAll(),
+})
+
+// ⌘S - явная просьба: пишет файл того редактора, где фокус (код файла или правая сторона
+// разницы), - и файл за проектом, и после отказа записи. Одна команда на окно: реестр
+// команд и сочетаний Monaco общий для всех редакторов.
+monaco.editor.registerCommand(SAVE_COMMAND, () => {
+  const focused = monaco.editor.getEditors().find((instance) => instance.hasTextFocus())
+
+  void documents.findByModel(focused?.getModel() ?? null)?.saveAsked()
+})
+monaco.editor.addKeybindingRule({
+  keybinding: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
+  command: SAVE_COMMAND,
 })

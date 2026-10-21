@@ -11,6 +11,22 @@ export const AUTOSAVE_DELAY_MS = 1_000
  */
 export const SELECTION_PUBLISH_DELAY_MS = 150
 
+/** Строк неизменённого вокруг правки в свёрнутой разнице - как у WebStorm и git diff. */
+export const DIFF_CONTEXT_LINES = 3
+
+/** Сколько строк свёрнутого раскрывает одно нажатие по его полосе. */
+export const DIFF_REVEAL_LINES = 20
+
+/**
+ * Сколько разница ждёт сравнения сторон невидимой (DiffEditor): дольше - показывается как
+ * есть и сворачивается, когда досчитает. Столько же ждёт и сам Monaco, прежде чем показать,
+ * что считает.
+ */
+export const DIFF_COMPARE_WAIT_MS = 1_000
+
+/** Признак на разнице, пока Monaco сравнивает новую пару: не видна, но место держит. */
+export const DIFF_COMPARING_ATTRIBUTE = 'data-comparing'
+
 /** Команда Monaco за ⌘S в редакторе: записать файл по явной просьбе. */
 export const SAVE_COMMAND = 'amazingIde.saveFile'
 

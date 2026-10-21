@@ -1,7 +1,7 @@
 import type { PanelSide, MainViewId, SideViewId, ProviderViewId } from './layout.types'
 
 /** Виды, которые есть сейчас. Сохранённый вид не из списка - удалённый, его не открыть. */
-export const SIDE_VIEW_IDS: readonly SideViewId[] = ['files']
+export const SIDE_VIEW_IDS: readonly SideViewId[] = ['files', 'changes']
 export const MAIN_VIEW_IDS: readonly MainViewId[] = ['file', 'scenarios', 'statistics']
 export const PROVIDER_VIEW_IDS: readonly ProviderViewId[] = ['claude-code']
 

@@ -2,15 +2,26 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 import { EDITOR_TABS_LIMIT } from './editor-tabs.constants'
-import type { EditorTabs } from './editor-tabs.types'
-import { NO_TABS, openTab, activeTab, closeTabs, restoreTabs } from './editor-tabs.utils'
+import type { TabTarget, EditorTabs } from './editor-tabs.types'
+import {
+  NO_TABS,
+  openTab,
+  activeTab,
+  closeTabs,
+  tabTarget,
+  openDiffTab,
+  restoreTabs,
+} from './editor-tabs.utils'
 
 const SELECTION_STORAGE_KEY = 'amazing-ide.selection.v1'
 
-/** Вторая версия - вкладки; первая помнила один выбранный файл проекта. */
-const SELECTION_STORAGE_VERSION = 2
+/**
+ * Третья версия - ключи вкладок (файл или разница файла); вторая звала их путями (paths),
+ * первая помнила один выбранный файл проекта.
+ */
+const SELECTION_STORAGE_VERSION = 3
 
-const NO_PATHS: readonly string[] = []
+const NO_KEYS: readonly string[] = []
 
 /**
  * Где в файле встать, когда его открыли не из дерева: всё с 1, как считает человек.
@@ -27,7 +38,7 @@ export type FilePlace = {
 }
 
 type SelectionStore = {
-  /** Вкладки файлов каждого проекта: переключил проект - вернулся к своим. */
+  /** Вкладки середины каждого проекта: переключил проект - вернулся к своим. */
   tabsByProject: Record<string, EditorTabs>
   /** Где встать в выбранном файле; нет - открыть как есть. */
   selectedPlaceByProject: Record<string, FilePlace | undefined>
@@ -36,10 +47,16 @@ type SelectionStore = {
    * отказ записи). Пишет редактор, переполнение полосы их пропускает.
    */
   heldByProject: Record<string, readonly string[]>
-  /** Растёт на каждый выбор файла, и повторный того же: по нему середина показывает файл. */
+  /**
+   * Растёт на каждый выбор файла или его разницы, и повторный того же: по нему середина
+   * показывает вид «файл».
+   */
   selectSerial: number
   selectFile: (projectId: string, relativePath: string, place?: FilePlace) => void
-  closeTabs: (projectId: string, relativePaths: readonly string[]) => void
+  /** Разница файла с последним коммитом - во вкладке разницы проекта (она одна). */
+  openDiff: (projectId: string, relativePath: string) => void
+  /** Закрыть вкладки по ключам: путь файла или ключ разницы (diffTabKey). */
+  closeTabs: (projectId: string, keys: readonly string[]) => void
   setHeld: (projectId: string, relativePaths: readonly string[]) => void
   /** Проекты закрыли - их вкладки больше не нужны: id у открытого заново будет новым. */
   keepProjects: (projectIds: readonly string[]) => void
@@ -74,12 +91,24 @@ export const useSelectionStore = create<SelectionStore>()(
           selectedPlaceByProject: { ...state.selectedPlaceByProject, [projectId]: place },
           selectSerial: state.selectSerial + 1,
         })),
-      // Место прошлого выбора к открывшейся вместо закрытой вкладке не относится.
-      closeTabs: (projectId, relativePaths) =>
+      openDiff: (projectId, relativePath) =>
         set((state) => ({
           tabsByProject: {
             ...state.tabsByProject,
-            [projectId]: closeTabs(state.tabsByProject[projectId] ?? NO_TABS, relativePaths),
+            [projectId]: openDiffTab(state.tabsByProject[projectId] ?? NO_TABS, relativePath, {
+              limit: EDITOR_TABS_LIMIT,
+              held: new Set(state.heldByProject[projectId]),
+            }),
+          },
+          selectedPlaceByProject: { ...state.selectedPlaceByProject, [projectId]: undefined },
+          selectSerial: state.selectSerial + 1,
+        })),
+      // Место прошлого выбора к открывшейся вместо закрытой вкладке не относится.
+      closeTabs: (projectId, keys) =>
+        set((state) => ({
+          tabsByProject: {
+            ...state.tabsByProject,
+            [projectId]: closeTabs(state.tabsByProject[projectId] ?? NO_TABS, keys),
           },
           selectedPlaceByProject: { ...state.selectedPlaceByProject, [projectId]: undefined },
         })),
@@ -102,16 +131,29 @@ export const useSelectionStore = create<SelectionStore>()(
       version: SELECTION_STORAGE_VERSION,
       partialize: ({ tabsByProject }) => ({ tabsByProject }),
       // Первая версия помнила один выбранный файл - он становится единственной вкладкой.
+      // Вторая звала ключи вкладок путями: тогда все вкладки и были файлами.
       migrate: (persisted, version) => {
         const saved = (persisted ?? {}) as Record<string, Record<string, unknown> | undefined>
 
         if (version >= SELECTION_STORAGE_VERSION) return saved
 
+        if (version === 2) {
+          return {
+            tabsByProject: Object.fromEntries(
+              Object.entries(saved['tabsByProject'] ?? {}).map(([projectId, tabs]) => {
+                const { paths, recent } = (tabs ?? {}) as Record<string, unknown>
+
+                return [projectId, { keys: paths, recent }]
+              }),
+            ),
+          }
+        }
+
         return {
           tabsByProject: Object.fromEntries(
             Object.entries(saved['selectedFileByProject'] ?? {})
               .filter((entry): entry is [string, string] => typeof entry[1] === 'string')
-              .map(([projectId, path]) => [projectId, { paths: [path], recent: [path] }]),
+              .map(([projectId, path]) => [projectId, { keys: [path], recent: [path] }]),
           ),
         }
       },
@@ -130,14 +172,36 @@ export const useSelectionStore = create<SelectionStore>()(
   ),
 )
 
-/** Файл в редакторе проекта - активная вкладка. undefined - вкладок нет. */
-export const useSelectedFile = (projectId: string | undefined) =>
+/** Ключ активной вкладки проекта (файл или разница). undefined - вкладок нет. */
+export const useActiveTab = (projectId: string | undefined) =>
   useSelectionStore((state) => (projectId ? activeTab(state.tabsByProject[projectId]) : undefined))
 
-/** Вкладки проекта в порядке на полосе. */
+/**
+ * Файл активной вкладки проекта - его ли это код или разница с ним. Его видят дерево
+ * (подсветка), строка состояния (путь) и Claude Code (открытый файл). undefined - вкладок нет.
+ */
+export const useSelectedFile = (projectId: string | undefined) => {
+  const key = useActiveTab(projectId)
+
+  return key === undefined ? undefined : tabTarget(key).path
+}
+
+/**
+ * Файл последней выбранной вкладки этого вида: какой файл стоит в редакторе кода и какой - в
+ * разнице, даже когда активна вкладка другого вида. undefined - таких вкладок нет.
+ */
+export const useRecentTab = (projectId: string | undefined, kind: TabTarget['kind']) =>
+  useSelectionStore((state) => {
+    const recent = (projectId && state.tabsByProject[projectId]?.recent) || NO_KEYS
+    const key = recent.findLast((open) => tabTarget(open).kind === kind)
+
+    return key === undefined ? undefined : tabTarget(key).path
+  })
+
+/** Ключи вкладок проекта в порядке на полосе. */
 export const useEditorTabs = (projectId: string | undefined): readonly string[] =>
   useSelectionStore((state) =>
-    projectId ? (state.tabsByProject[projectId]?.paths ?? NO_PATHS) : NO_PATHS,
+    projectId ? (state.tabsByProject[projectId]?.keys ?? NO_KEYS) : NO_KEYS,
   )
 
 /** Где встать в выбранном файле проекта - для редактора. */

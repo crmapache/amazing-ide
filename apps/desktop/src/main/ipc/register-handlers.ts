@@ -15,6 +15,7 @@ import { createClaudeToolsHandlers } from './claude-tools-handlers'
 import { createComposerHandlers } from './composer-handlers'
 import { createEditorHandlers } from './editor-handlers'
 import { createFsHandlers } from './fs-handlers'
+import { createGitChangesHandlers } from './git-changes-handlers'
 import { createGitHandlers } from './git-handlers'
 import type { InvokeHandlers } from './handle'
 import { createProjectSyncHandlers } from './project-sync-handlers'
@@ -46,6 +47,7 @@ export const createInvokeHandlers = (services: Services): InvokeHandlers => {
     ...createFsHandlers(workspace, search),
     ...createEditorHandlers(workspace),
     ...createProjectSyncHandlers(workspace, services.gitStatus),
+    ...createGitChangesHandlers(workspace, services.gitStatus),
     ...createClaudeHandlers(workspace, claude),
     ...createClaudeToolsHandlers(workspace, claude),
     ...createComposerHandlers(workspace, claude, services.getWindow),

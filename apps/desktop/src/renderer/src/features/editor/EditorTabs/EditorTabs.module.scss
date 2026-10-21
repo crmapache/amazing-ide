@@ -16,3 +16,12 @@
   gap: var(--space-0-5);
   min-width: 0;
 }
+
+// Значок вкладки разницы - на месте иконки типа файла и её размера, цветом изменённого в
+// git: та же вкладка рядом с вкладкой самого файла читается как «его правки».
+.diffIcon {
+  flex-shrink: 0;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--color-vcs-modified);
+}

@@ -52,6 +52,12 @@ export const THEME_ROLES = {
   modified: '--color-vcs-modified',
 } as const
 
+/**
+ * Доли тона из токенов плашек: подложка (--tint-soft) - у строк и слов разницы, как у строк
+ * диффа в ленте Claude Code; метка (--tint-border) - у отметок разницы на полосе прокрутки.
+ */
+export const TINT_ROLES = { soft: '--tint-soft', border: '--tint-border' } as const
+
 /** Шрифт кода и его размеры - тоже токены: редактор пишет тем же шрифтом, что блоки кода. */
 export const TYPE_ROLES = {
   family: '--font-code',

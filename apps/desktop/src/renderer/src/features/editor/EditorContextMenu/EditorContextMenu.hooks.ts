@@ -14,10 +14,10 @@ type Editor = editor.IStandaloneCodeEditor
 
 /**
  * Правый клик по коду - то, что делало включённое меню Monaco: фокус в код, каретка под мышь,
- * если клик мимо всех выделений (мультикурсор не схлопывается), и точка для меню. На
- * номерах строк и полосах - ничего.
+ * если клик мимо всех выделений (мультикурсор не схлопывается), и точка для меню от угла
+ * рамки. На номерах строк и полосах - ничего.
  */
-const pointedMenu = (instance: Editor, event: MouseEvent): MenuPoint | null => {
+const pointedMenu = (instance: Editor, frame: HTMLElement, event: MouseEvent): MenuPoint | null => {
   const target = instance.getTargetAtClientPoint(event.clientX, event.clientY)
 
   event.preventDefault()
@@ -30,20 +30,21 @@ const pointedMenu = (instance: Editor, event: MouseEvent): MenuPoint | null => {
     instance.setPosition(position)
   }
 
-  return pointInEditor(
-    { x: event.clientX, y: event.clientY },
-    instance.getContainerDomNode().getBoundingClientRect(),
-  )
+  return pointInEditor({ x: event.clientX, y: event.clientY }, frame.getBoundingClientRect())
 }
 
 /**
  * Где открыто меню правой кнопки в коде. Клик ловится на захвате, раньше Monaco: с
  * выключенным меню он сам ставил бы каретку под мышь и забирал фокус при любом правом
  * клике - и в поле ввода виджета, и на номерах строк. Меню открывается, когда кнопку отпустят;
- * клавиша меню и Shift+F10 - под кареткой, как у Monaco. Редактор к вызову уже создан:
- * хук стоит после useCodeEditor, а эффекты идут по порядку.
+ * клавиша меню и Shift+F10 - под кареткой, как у Monaco. Точка - от угла рамки, где стоит
+ * якорь меню: у редактора файла это он сам, у стороны разницы - вся разница. Редактор к
+ * вызову уже создан: хук стоит после хука, который его создаёт, а эффекты идут по порядку.
  */
-export const useEditorContextMenu = (editorRef: RefObject<Editor | null>) => {
+export const useEditorContextMenu = (
+  editorRef: RefObject<Editor | null>,
+  frameRef?: RefObject<HTMLElement | null>,
+) => {
   const { t } = useTranslation()
   const [at, setAt] = useState<MenuPoint | null>(null)
 
@@ -53,6 +54,7 @@ export const useEditorContextMenu = (editorRef: RefObject<Editor | null>) => {
     if (!instance) return
 
     const host = instance.getContainerDomNode()
+    const frame = frameRef?.current ?? host
 
     // Каретка могла уехать за край прокруткой - сначала показать её, как делает Monaco: иначе
     // меню встало бы за краем, невидимое, но с фокусом на пункте.
@@ -64,9 +66,10 @@ export const useEditorContextMenu = (editorRef: RefObject<Editor | null>) => {
       instance.revealPosition(position, monaco.editor.ScrollType.Immediate)
       instance.render()
 
-      const point = pointUnderCaret(instance.getScrolledVisiblePosition(position))
+      const caret = pointUnderCaret(instance.getScrolledVisiblePosition(position))
+      const offset = pointInEditor(host.getBoundingClientRect(), frame.getBoundingClientRect())
 
-      if (point) setAt(point)
+      if (caret) setAt({ x: caret.x + offset.x, y: caret.y + offset.y })
     }
 
     const handleContextMenu = (event: MouseEvent) => {
@@ -83,7 +86,7 @@ export const useEditorContextMenu = (editorRef: RefObject<Editor | null>) => {
       // фокус остаётся в поле, вставка идёт в него, а не в код.
       if (event.target instanceof Element && event.target.closest(WIDGET_LAYERS)) return
 
-      const point = pointedMenu(instance, event)
+      const point = pointedMenu(instance, frame, event)
 
       if (point) openWhenReleased(event, () => setAt(point))
     }
@@ -107,7 +110,7 @@ export const useEditorContextMenu = (editorRef: RefObject<Editor | null>) => {
       switching.dispose()
       keyboard.dispose()
     }
-  }, [editorRef, t])
+  }, [editorRef, frameRef, t])
 
   const close = () => setAt(null)
 

@@ -62,3 +62,46 @@ export type GitStatus = {
   truncated: boolean
   ignoreCase: boolean
 }
+
+/**
+ * Что случилось с файлом по сравнению с последним коммитом (HEAD), как в списке
+ * изменений WebStorm: изменён, добавлен в git, удалён, переименован (в индексе), новый и
+ * не добавленный в git, конфликт слияния.
+ */
+export type GitChangeKind = 'modified' | 'added' | 'deleted' | 'renamed' | 'untracked' | 'conflict'
+
+/**
+ * Строка списка изменений: путь от корня проекта через «/», в NFC и с регистром как на
+ * диске. origin - прежний путь переименованного файла (в HEAD он лежит там), у остальных
+ * null. modeChanged - поменялись права файла (`chmod +x`): в строках этого не видно.
+ */
+export type GitChange = {
+  path: string
+  kind: GitChangeKind
+  origin: string | null
+  modeChanged?: boolean
+}
+
+/**
+ * Изменённые файлы проекта в порядке git: сначала то, что git знает, потом новые файлы,
+ * каждый отдельно, и внутри новых папок. truncated - записей больше предела: список не
+ * весь. notGit - папка не в git (или в ней всё игнорируется, или git не установлен);
+ * failed - репозиторий есть, но git не ответил (отказ, сбой, не успел).
+ */
+export type GitChanges = GitChangeList | { kind: 'notGit' } | { kind: 'failed' }
+
+/** Прочитанный список изменений (GitChanges): файлы и обрезан ли он пределом. */
+export type GitChangeList = { kind: 'listed'; files: GitChange[]; truncated: boolean }
+
+/**
+ * Файл, каким он лежит в последнем коммите, - левая сторона разницы. bom - была ли метка
+ * порядка байтов (её снимают с текста, как у файла на диске). missing - в HEAD его нет
+ * (новый файл или коммитов ещё нет). Не текст и слишком большой - словами, как в
+ * редакторе; size null - фильтр git развернул файл за предел, и сколько вышло, неизвестно.
+ */
+export type GitHeadFile =
+  | { kind: 'text'; text: string; bom: boolean }
+  | { kind: 'missing' }
+  | { kind: 'binary' }
+  | { kind: 'tooLarge'; size: number | null; limit: number }
+  | { kind: 'failed' }

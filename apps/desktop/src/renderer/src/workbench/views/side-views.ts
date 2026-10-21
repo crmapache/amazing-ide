@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { Files } from 'lucide-react'
+import { Files, FileDiff } from 'lucide-react'
 
 import type { SideViewId } from '../../state/layout.types'
 import type { ViewDescriptor } from './views.types'
@@ -17,6 +17,16 @@ export const SIDE_VIEWS: readonly ViewDescriptor<SideViewId>[] = [
     Component: lazy(() =>
       import('../../features/file-tree/FileTreeView/FileTreeView').then((module) => ({
         default: module.FileTreeView,
+      })),
+    ),
+  },
+  {
+    id: 'changes',
+    icon: FileDiff,
+    labelKey: 'sideViews.changes',
+    Component: lazy(() =>
+      import('../../features/git/ChangesView/ChangesView').then((module) => ({
+        default: module.ChangesView,
       })),
     ),
   },

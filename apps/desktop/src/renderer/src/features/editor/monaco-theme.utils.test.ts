@@ -2,7 +2,14 @@ import { it, expect, describe } from 'vitest'
 
 import { THEME_ROLES } from './monaco-theme.constants'
 import type { ThemeColors } from './monaco-theme.types'
-import { over, toHex, tokenRules, editorColors, fontStyleName } from './monaco-theme.utils'
+import {
+  over,
+  toHex,
+  diffColors,
+  tokenRules,
+  editorColors,
+  fontStyleName,
+} from './monaco-theme.utils'
 
 const GREY = { r: 128, g: 128, b: 128, a: 1 }
 const colors = Object.fromEntries(Object.keys(THEME_ROLES).map((key) => [key, GREY])) as ThemeColors
@@ -29,6 +36,19 @@ describe('цвета темы', () => {
       ),
     ).toEqual([])
     expect(theme['editorWidget.background']).toMatch(/^#[0-9a-f]{6}$/)
+  })
+})
+
+describe('цвета разницы', () => {
+  it('строки - подложкой своего тона, отметки на полосе - ярче, теней нет', () => {
+    const theme = diffColors(
+      { ...colors, success: { r: 143, g: 211, b: 106, a: 1 } },
+      { soft: 0.16, border: 0.45 },
+    )
+
+    expect(theme['diffEditor.insertedLineBackground']).toBe('#8fd36a29')
+    expect(theme['diffEditorOverview.insertedForeground']).toBe('#8fd36a73')
+    expect(theme['diffEditor.unchangedRegionShadow']).toBe('#00000000')
   })
 })
 

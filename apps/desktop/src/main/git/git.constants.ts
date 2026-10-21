@@ -32,6 +32,12 @@ export const GH_FALLBACK_DIRS: readonly string[] = ['/opt/homebrew/bin', '/usr/l
  */
 export const GIT_STATUS_ENTRIES_LIMIT = 20_000
 
+/**
+ * Больше строк в списке изменений не отдаём: с новыми файлами по одному (без
+ * .gitignore на сгенерированной папке) их бывают десятки тысяч, а список рисуется весь.
+ */
+export const GIT_CHANGES_LIMIT = 5_000
+
 /** Статус огромного репозитория - секунды; дольше - отдаём, что успели, обрезанным. */
 export const GIT_STATUS_TIMEOUT_MS = 10_000
 

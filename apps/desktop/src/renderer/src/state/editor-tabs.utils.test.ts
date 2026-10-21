@@ -1,7 +1,17 @@
 import { it, expect, describe } from 'vitest'
 
 import type { EditorTabs } from './editor-tabs.types'
-import { NO_TABS, openTab, activeTab, closeTabs, restoreTabs } from './editor-tabs.utils'
+import {
+  NO_TABS,
+  openTab,
+  activeTab,
+  closeTabs,
+  tabTarget,
+  diffTabKey,
+  openDiffTab,
+  restoreTabs,
+  pathsLeaving,
+} from './editor-tabs.utils'
 
 const NONE = new Set<string>()
 
@@ -12,14 +22,14 @@ describe('openTab', () => {
   it('новый файл - в конец и активный; открытый - активный на своём месте', () => {
     const tabs = openAll(['a.ts', 'b.ts', 'c.ts', 'a.ts'])
 
-    expect(tabs.paths).toEqual(['a.ts', 'b.ts', 'c.ts'])
+    expect(tabs.keys).toEqual(['a.ts', 'b.ts', 'c.ts'])
     expect(activeTab(tabs)).toBe('a.ts')
   })
 
   it('сверх предела закрывается самый первый открытый, а не давно не выбиранный', () => {
     const tabs = openAll(['a.ts', 'b.ts', 'c.ts', 'a.ts', 'd.ts'], 3)
 
-    expect(tabs.paths).toEqual(['b.ts', 'c.ts', 'd.ts'])
+    expect(tabs.keys).toEqual(['b.ts', 'c.ts', 'd.ts'])
     expect(tabs.recent).toEqual(['b.ts', 'c.ts', 'd.ts'])
   })
 
@@ -27,8 +37,8 @@ describe('openTab', () => {
     const paths = Array.from({ length: 31 }, (_, index) => `file${index + 1}.ts`)
     const tabs = openAll(paths)
 
-    expect(tabs.paths).toHaveLength(30)
-    expect(tabs.paths[0]).toBe('file2.ts')
+    expect(tabs.keys).toHaveLength(30)
+    expect(tabs.keys[0]).toBe('file2.ts')
     expect(activeTab(tabs)).toBe('file31.ts')
   })
 
@@ -36,14 +46,43 @@ describe('openTab', () => {
     const held = new Set(['a.ts'])
     const tabs = openTab(openAll(['a.ts', 'b.ts', 'c.ts']), 'd.ts', { limit: 3, held })
 
-    expect(tabs.paths).toEqual(['a.ts', 'c.ts', 'd.ts'])
+    expect(tabs.keys).toEqual(['a.ts', 'c.ts', 'd.ts'])
   })
 
   it('удерживаются все - полоса временно длиннее предела', () => {
     const held = new Set(['a.ts', 'b.ts'])
     const tabs = openTab(openAll(['a.ts', 'b.ts']), 'c.ts', { limit: 2, held })
 
-    expect(tabs.paths).toEqual(['a.ts', 'b.ts', 'c.ts'])
+    expect(tabs.keys).toEqual(['a.ts', 'b.ts', 'c.ts'])
+  })
+})
+
+describe('openDiffTab', () => {
+  const options = { limit: 30, held: NONE }
+
+  it('разница другого файла встаёт на место прежней и становится активной', () => {
+    const first = openDiffTab(openAll(['a.ts', 'b.ts']), 'a.ts', options)
+    const tabs = openDiffTab(openTab(first, 'c.ts', options), 'b.ts', options)
+
+    expect(tabs.keys).toEqual(['a.ts', 'b.ts', diffTabKey('b.ts'), 'c.ts'])
+    expect(activeTab(tabs)).toBe(diffTabKey('b.ts'))
+    expect(tabs.recent).toEqual(['a.ts', 'b.ts', 'c.ts', diffTabKey('b.ts')])
+  })
+
+  it('разницу с несохранённым файлом переполнение тоже пропускает', () => {
+    const held = new Set(['a.ts'])
+    const withDiff = openDiffTab(NO_TABS, 'a.ts', options)
+    const tabs = openAll(['b.ts', 'c.ts']).keys.reduce(
+      (open, key) => openTab(open, key, { limit: 2, held }),
+      withDiff,
+    )
+
+    expect(tabs.keys).toEqual([diffTabKey('a.ts'), 'c.ts'])
+  })
+
+  it('ключ разницы не путается с файлом, путь из него достаётся целиком', () => {
+    expect(tabTarget(diffTabKey('src/diff'))).toEqual({ kind: 'diff', path: 'src/diff' })
+    expect(tabTarget('src/diff')).toEqual({ kind: 'file', path: 'src/diff' })
   })
 })
 
@@ -63,11 +102,20 @@ describe('closeTabs', () => {
   })
 })
 
+describe('pathsLeaving', () => {
+  it('файл уходит, только если не остаётся ни его вкладки, ни разницы с ним', () => {
+    const tabs = openDiffTab(openAll(['a.ts', 'b.ts']), 'a.ts', { limit: 30, held: NONE })
+
+    expect(pathsLeaving(tabs, ['a.ts'])).toEqual([])
+    expect(pathsLeaving(tabs, ['a.ts', diffTabKey('a.ts'), 'b.ts'])).toEqual(['a.ts', 'b.ts'])
+  })
+})
+
 describe('restoreTabs', () => {
   it('мусор - пустая полоса; recent чинится по открытым', () => {
     expect(restoreTabs(null)).toEqual(NO_TABS)
-    expect(
-      restoreTabs({ paths: ['a.ts', 'b.ts', 'b.ts', 3], recent: ['b.ts', 'gone.ts'] }),
-    ).toEqual({ paths: ['a.ts', 'b.ts'], recent: ['a.ts', 'b.ts'] })
+    expect(restoreTabs({ keys: ['a.ts', 'b.ts', 'b.ts', 3], recent: ['b.ts', 'gone.ts'] })).toEqual(
+      { keys: ['a.ts', 'b.ts'], recent: ['a.ts', 'b.ts'] },
+    )
   })
 })

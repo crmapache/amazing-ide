@@ -6,6 +6,7 @@ import { Button } from '@amazing-ide/ui/Button'
 import styles from '../CodeEditor.module.scss'
 import type { DocumentNoticeProps } from '../CodeEditor.types'
 import { documents } from '../../documents'
+import { diffTabKey } from '../../../../state/editor-tabs.utils'
 import { useSelectionStore } from '../../../../state/selection.store'
 
 /**
@@ -28,9 +29,10 @@ export const DocumentNotice = ({ projectId, path, notice }: DocumentNoticeProps)
 
   const handleSave = () => void documents.find(projectId, path)?.saveAsked()
 
+  // Закрыть - значит отпустить файл совсем: и его вкладку, и разницу с ним.
   const handleClose = () => {
     documents.discard(projectId, [path])
-    closeTabs(projectId, [path])
+    closeTabs(projectId, [path, diffTabKey(path)])
   }
 
   return (

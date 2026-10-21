@@ -1,4 +1,4 @@
-import { FileX, FileWarning, FileQuestion } from 'lucide-react'
+import { FileX, FileMinus, FileWarning, FileQuestion } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { EmptyState } from '@amazing-ide/ui/EmptyState'
@@ -7,8 +7,8 @@ import type { DocumentPlaceholderProps } from '../CodeEditor.types'
 import { formatSize } from '../../editor.utils'
 
 /**
- * Вместо кода - почему его нет: не текст, слишком большой, не прочитался. Пока файл
- * читается - пусто: мгновение пустоты лучше мигнувшей надписи.
+ * Вместо кода - почему его нет: файла нет на диске, не текст, слишком большой, не
+ * прочитался. Пока файл читается - пусто: мгновение пустоты лучше мигнувшей надписи.
  */
 export const DocumentPlaceholder = ({ status }: DocumentPlaceholderProps) => {
   const { t } = useTranslation()
@@ -16,6 +16,14 @@ export const DocumentPlaceholder = ({ status }: DocumentPlaceholderProps) => {
   switch (status.kind) {
     case 'loading':
       return null
+    case 'missing':
+      return (
+        <EmptyState
+          icon={FileMinus}
+          title={t('editor.missingTitle')}
+          description={t('editor.missingText')}
+        />
+      )
     case 'binary':
       return (
         <EmptyState

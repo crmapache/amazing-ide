@@ -12,6 +12,19 @@ const run = promisify(execFile)
 export const git = (cwd: string, args: string[], timeout = GIT_LOCAL_TIMEOUT_MS) =>
   run('git', args, { cwd, timeout, env: { ...process.env, ...GIT_ENV_OVERRIDES } })
 
+/**
+ * Команда git, вывод которой - байты файла, а не ответ: без перекодировки и не больше
+ * maxBuffer (дальше execFile бросает ERR_CHILD_PROCESS_STDIO_MAXBUFFER).
+ */
+export const gitBytes = (cwd: string, args: string[], maxBuffer: number) =>
+  run('git', args, {
+    cwd,
+    timeout: GIT_LOCAL_TIMEOUT_MS,
+    maxBuffer,
+    encoding: 'buffer',
+    env: { ...process.env, ...GIT_ENV_OVERRIDES },
+  })
+
 /** То же, но итог - для человека: первая строка ответа или то, что сказал git. */
 export const gitAction = async (
   cwd: string,

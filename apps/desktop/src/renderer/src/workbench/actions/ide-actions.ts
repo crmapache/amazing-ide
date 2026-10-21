@@ -1,8 +1,9 @@
-import { X, Files, History, Palette, Sparkles, ArrowRightLeft } from 'lucide-react'
+import { X, History, Palette, Sparkles, ArrowRightLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { MAIN_VIEWS } from '../views/main-views'
 import { toggleShowcase } from '../views/showcase-view'
+import { SIDE_VIEWS } from '../views/side-views'
 import { useLayoutStore } from '../../state/layout.store'
 import { useWorkspace, useActiveProject, useWorkspaceActions } from '../../state/workspace.queries'
 import { OPEN_PANEL_KEY } from '../../features/claude-code/panel-keys.constants'
@@ -81,16 +82,16 @@ export const useIdeActions = (): SearchAction[] => {
       : []
 
   const viewActions: SearchAction[] = [
-    {
-      id: 'view.files',
-      label: t('searchEverywhere.actions.toggleFiles'),
-      icon: Files,
-      run: () => selectSideView('files'),
-    },
-    // Виды середины берутся из реестра полосы: подпись и иконка не разойдутся.
+    // Виды левой панели и середины берутся из реестров полос: подпись и иконка не разойдутся.
+    ...SIDE_VIEWS.map((view) => ({
+      id: `view.side.${view.id}`,
+      label: t('searchEverywhere.actions.toggleView', { name: t(view.labelKey) }),
+      icon: view.icon,
+      run: () => selectSideView(view.id),
+    })),
     ...MAIN_VIEWS.map((view) => ({
       id: `view.main.${view.id}`,
-      label: t('searchEverywhere.actions.toggleMainView', { name: t(view.labelKey) }),
+      label: t('searchEverywhere.actions.toggleView', { name: t(view.labelKey) }),
       icon: view.icon,
       run: () => selectMainView(view.id),
     })),

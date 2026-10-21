@@ -7,3 +7,8 @@ import { lazy } from 'react'
 export const CodeEditor = lazy(() =>
   import('../CodeEditor/CodeEditor').then((module) => ({ default: module.CodeEditor })),
 )
+
+/** Разница файла с последним коммитом - тоже на Monaco, своим куском к первой разнице. */
+export const DiffEditor = lazy(() =>
+  import('../DiffEditor/DiffEditor').then((module) => ({ default: module.DiffEditor })),
+)

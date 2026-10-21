@@ -23,17 +23,18 @@ import { DocumentPlaceholder } from './parts/DocumentPlaceholder'
  * Monaco, он грузится к первому открытому файлу (ADR 0005). Над кодом - вопрос, если файл
  * нельзя молча сохранить; вместо кода - почему его нет.
  */
-export const CodeEditor = ({ projectId, path, place }: CodeEditorProps) => {
+export const CodeEditor = ({ projectId, path, place, isActive }: CodeEditorProps) => {
   const { t } = useTranslation()
   const status = useDocumentStatus(projectId, path)
   const layout = useMarkdownLayout(projectId, path)
-  const { hostRef, probeRef, previewRef, editorRef } = useCodeEditor(
+  const { hostRef, probeRef, previewRef, editorRef } = useCodeEditor({
     projectId,
     path,
     place,
+    isActive,
     status,
     layout,
-  )
+  })
   const menu = useEditorContextMenu(editorRef)
   const { panesRef, splitRatio, handleResize } = useSplitResize()
   const isText = status.kind === 'text'

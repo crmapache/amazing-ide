@@ -141,6 +141,7 @@ export const COLOR_GROUPS: readonly ColorGroup[] = [
       '--color-vcs-untracked',
       '--color-vcs-ignored',
       '--color-vcs-conflict',
+      '--color-vcs-deleted',
     ],
   },
 ]

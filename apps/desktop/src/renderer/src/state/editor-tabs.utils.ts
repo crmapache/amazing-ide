@@ -1,44 +1,96 @@
-import type { EditorTabs } from './editor-tabs.types'
+import type { TabTarget, EditorTabs } from './editor-tabs.types'
 
-export const NO_TABS: EditorTabs = { paths: [], recent: [] }
+export const NO_TABS: EditorTabs = { keys: [], recent: [] }
+
+/**
+ * Начало ключа вкладки разницы. Нуля в пути файла не бывает ни на одной файловой системе:
+ * ключ разницы не спутать ни с каким файлом, даже с файлом «diff».
+ */
+const DIFF_PREFIX = '\u0000diff\u0000'
+
+/** Ключ вкладки разницы файла. */
+export const diffTabKey = (path: string): string => `${DIFF_PREFIX}${path}`
+
+/** Что за вкладкой с этим ключом: файл или разница файла. */
+export const tabTarget = (key: string): TabTarget =>
+  key.startsWith(DIFF_PREFIX)
+    ? { kind: 'diff', path: key.slice(DIFF_PREFIX.length) }
+    : { kind: 'file', path: key }
 
 /** Активная вкладка - последняя выбранная. undefined - вкладок нет. */
 export const activeTab = (tabs: EditorTabs | undefined): string | undefined => tabs?.recent.at(-1)
 
-const without = (paths: readonly string[], drop: ReadonlySet<string>) =>
-  paths.filter((path) => !drop.has(path))
+const without = (keys: readonly string[], drop: ReadonlySet<string>) =>
+  keys.filter((key) => !drop.has(key))
 
 /**
- * Выбрать файл: открытый - сделать активным на его месте в полосе, новый - открыть в
+ * Открыть вкладку: открытую - сделать активной на её месте в полосе, новую - открыть в
  * конце. Вкладок стало больше предела - закрываются самые давние из открытых, кроме
- * удерживаемых (held: несохранённое, которое молча не закрыть). Все удерживаются -
- * полоса временно длиннее предела: потерять правку хуже лишней вкладки.
+ * удерживаемых (held - пути файлов с несохранённым, которое молча не закрыть; держат и
+ * вкладку файла, и разницу с ним). Все удерживаются - полоса временно длиннее предела:
+ * потерять правку хуже лишней вкладки.
  */
 export const openTab = (
   tabs: EditorTabs,
-  path: string,
+  key: string,
   { limit, held }: { limit: number; held: ReadonlySet<string> },
 ): EditorTabs => {
-  const recent = [...tabs.recent.filter((open) => open !== path), path]
+  const recent = [...tabs.recent.filter((open) => open !== key), key]
 
-  if (tabs.paths.includes(path)) return { paths: tabs.paths, recent }
+  if (tabs.keys.includes(key)) return { keys: tabs.keys, recent }
 
-  const paths = [...tabs.paths, path]
+  const keys = [...tabs.keys, key]
   const evicted = new Set<string>()
 
-  for (const candidate of paths) {
-    if (paths.length - evicted.size <= limit) break
-    if (candidate !== path && !held.has(candidate)) evicted.add(candidate)
+  for (const candidate of keys) {
+    if (keys.length - evicted.size <= limit) break
+    if (candidate !== key && !held.has(tabTarget(candidate).path)) evicted.add(candidate)
   }
 
-  return { paths: without(paths, evicted), recent: without(recent, evicted) }
+  return { keys: without(keys, evicted), recent: without(recent, evicted) }
+}
+
+/**
+ * Открыть разницу файла. Вкладка разницы в проекте одна, как «Commit: файл» в WebStorm:
+ * разница другого файла встаёт на её место в полосе, а не новой вкладкой - листая
+ * изменения, полосу не засыпаешь. Нет такой вкладки - открывается как обычная.
+ */
+export const openDiffTab = (
+  tabs: EditorTabs,
+  path: string,
+  options: { limit: number; held: ReadonlySet<string> },
+): EditorTabs => {
+  const key = diffTabKey(path)
+  const previous = tabs.keys.find((open) => open !== key && tabTarget(open).kind === 'diff')
+
+  if (previous === undefined) return openTab(tabs, key, options)
+
+  const replace = (keys: readonly string[]) => keys.map((open) => (open === previous ? key : open))
+
+  return openTab({ keys: replace(tabs.keys), recent: replace(tabs.recent) }, key, options)
 }
 
 /** Закрыть вкладки. Закрылась активная - активной становится выбранная до неё. */
 export const closeTabs = (tabs: EditorTabs, closing: readonly string[]): EditorTabs => {
   const drop = new Set(closing)
 
-  return { paths: without(tabs.paths, drop), recent: without(tabs.recent, drop) }
+  return { keys: without(tabs.keys, drop), recent: without(tabs.recent, drop) }
+}
+
+/**
+ * Файлы, которые уходят из середины совсем, если закрыть эти вкладки: ни вкладки файла,
+ * ни разницы с ним не остаётся. Только про них есть смысл спрашивать о несохранённом -
+ * файл, открытый ещё и другой вкладкой, своё несохранённое не теряет.
+ */
+export const pathsLeaving = (tabs: EditorTabs, closing: readonly string[]): string[] => {
+  const drop = new Set(closing)
+  const staying = new Set(
+    tabs.keys.filter((key) => !drop.has(key)).map((key) => tabTarget(key).path),
+  )
+
+  return [
+    ...new Set(closing.map((key) => tabTarget(key).path).filter((path) => !staying.has(path))),
+  ]
 }
 
 /**
@@ -47,7 +99,7 @@ export const closeTabs = (tabs: EditorTabs, closing: readonly string[]): EditorT
  * в начале, как самые давние). Иначе закрытие активной вело бы в никуда.
  */
 export const restoreTabs = (saved: unknown): EditorTabs => {
-  const { paths, recent } = (typeof saved === 'object' && saved !== null ? saved : {}) as Record<
+  const { keys, recent } = (typeof saved === 'object' && saved !== null ? saved : {}) as Record<
     string,
     unknown
   >
@@ -55,8 +107,8 @@ export const restoreTabs = (saved: unknown): EditorTabs => {
     Array.isArray(value)
       ? [...new Set(value.filter((item): item is string => typeof item === 'string'))]
       : []
-  const open = strings(paths)
-  const chosen = strings(recent).filter((path) => open.includes(path))
+  const open = strings(keys)
+  const chosen = strings(recent).filter((key) => open.includes(key))
 
-  return { paths: open, recent: [...open.filter((path) => !chosen.includes(path)), ...chosen] }
+  return { keys: open, recent: [...open.filter((key) => !chosen.includes(key)), ...chosen] }
 }

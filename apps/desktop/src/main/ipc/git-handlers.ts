@@ -1,4 +1,5 @@
 import type { GitBranchKind } from '@shared/git'
+import type { GitChangesInvokeContract } from '@shared/ipc/git-changes.contract'
 
 import { createBranch, listBranches, switchBranch, checkoutRevision } from '../git/git-branches'
 import { readHead } from '../git/git-head'
@@ -9,8 +10,14 @@ import type { InvokeHandlers } from './handle'
 import { assertOneOf, assertString } from './validate'
 import { projectRootOf } from './workspace-handlers'
 
-/** Статус git - не здесь: его держит сервис слежения (project-sync-handlers). */
-type GitChannels = Exclude<Extract<keyof InvokeHandlers, `git:${string}`>, 'git:getStatus'>
+/**
+ * Статус git и список изменений - не здесь: их держит сервис слежения
+ * (project-sync-handlers, git-changes-handlers).
+ */
+type GitChannels = Exclude<
+  Extract<keyof InvokeHandlers, `git:${string}`>,
+  'git:getStatus' | keyof GitChangesInvokeContract
+>
 
 const BRANCH_KINDS: readonly GitBranchKind[] = ['local', 'remote']
 

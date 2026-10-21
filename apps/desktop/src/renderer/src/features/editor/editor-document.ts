@@ -6,7 +6,7 @@ import { preloadLanguage } from '../../lib/highlighter'
 import { invoke } from '../../lib/ipc'
 import { languageOfPath } from '../../lib/syntax-languages.utils'
 import type { FilePlace } from '../../state/selection.store'
-import { holdsText, putDiskText, createDocumentModel } from './document-model'
+import { putText, holdsText, createDocumentModel } from './document-model'
 import { documentKey } from './documents.utils'
 import { AUTOSAVE_DELAY_MS } from './editor.constants'
 import type { DocumentNotice, DocumentStatus } from './editor.types'
@@ -191,7 +191,13 @@ export class EditorDocument {
   /** Прочитанное с диска без своих правок: показать как есть. */
   private accept(read: FileRead): void {
     if (this.disposed || read.kind === 'unchanged') return
-    if (read.kind === 'missing') return this.host.onGone(this)
+    // Файла нет: вкладка файла закроется сама, а разница с ним увидит удаление, а не вечное
+    // «читается». Модель остаётся: вернётся файл - текст встанет в неё же.
+    if (read.kind === 'missing') {
+      this.setStatus({ kind: 'missing' })
+
+      return this.host.onGone(this)
+    }
     // Файл не читается, а текст уже есть - оставить его: сбой скорее всего на мгновение.
     if (read.kind === 'failed' && this.model) return
 
@@ -208,7 +214,7 @@ export class EditorDocument {
     this.model = createDocumentModel(this.projectId, this.path, read.text)
     this.model.onDidChangeContent(() => this.handleEdit())
     this.markSaved(read)
-    this.setStatus({ kind: 'text', readOnly: read.readOnly, notice: null })
+    this.setStatus({ kind: 'text', readOnly: read.readOnly, notice: null, bom: read.bom })
   }
 
   /** Текст с диска - в модель (только середина, отдельным шагом отмены). */
@@ -216,10 +222,10 @@ export class EditorDocument {
     if (!this.model) return
 
     this.applyingDisk = true
-    putDiskText(this.model, read.text)
+    putText(this.model, read.text)
     this.applyingDisk = false
     this.markSaved(read)
-    this.setStatus({ kind: 'text', readOnly: read.readOnly, notice: null })
+    this.setStatus({ kind: 'text', readOnly: read.readOnly, notice: null, bom: read.bom })
   }
 
   /**

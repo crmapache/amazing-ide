@@ -1,14 +1,18 @@
 import { useEffect } from 'react'
 
+import { useQueryClient } from '@tanstack/react-query'
+
 import { invoke } from '../../lib/ipc'
 import { useIpcEvent } from '../../lib/ipc.hooks'
 import { heldPaths, guardDiscard, useDiscardGuard } from '../../state/discard-guard.store'
 import { activeTab } from '../../state/editor-tabs.utils'
 import { useLayoutStore } from '../../state/layout.store'
+import { QUERY_KEYS } from '../../state/query-keys'
 import { useSelectionStore } from '../../state/selection.store'
 import { useActiveProject } from '../../state/workspace.queries'
 import { editorDocuments } from './editor-bus'
 import { requestCloseTabs } from './editor-close'
+import { useEditorStore } from './editor.store'
 import { usePreviewImageSync } from './markdown-preview.queries'
 
 const saveAll = () => editorDocuments()?.saveAll() ?? Promise.resolve()
@@ -46,17 +50,61 @@ const handleBeforeUnload = (event: BeforeUnloadEvent) => {
   })
 }
 
+/** Где у ⌘Z своя отмена: поля ввода, а в открытых диалогах и панелях - их собственная. */
+const OWN_HISTORY = 'input, textarea, select, [contenteditable], dialog, [popover]'
+
+/**
+ * ⌘Z и ⇧⌘Z вне кода и полей ввода - отмена и повтор в файле середины: фокус уходит в его
+ * редактор (у разницы - в правую сторону), и команда выполняется там. Иначе после возврата
+ * куска и клика по списку изменений ⌘Z молчал бы, пока не щёлкнешь в код. Monaco свои
+ * клавиши гасит сам, поэтому сюда доходят только нажатия мимо него.
+ */
+const historyKeyHandler = (projectId: string) => (event: KeyboardEvent) => {
+  const isHistoryKey = event.metaKey && !event.altKey && !event.ctrlKey && event.code === 'KeyZ'
+  const target = event.target instanceof Element ? event.target : null
+
+  if (!isHistoryKey || event.defaultPrevented || target?.closest(OWN_HISTORY)) return
+
+  const { main } = useLayoutStore.getState()
+  const active = activeTab(useSelectionStore.getState().tabsByProject[projectId])
+
+  if (!active || !main.isOpen || main.activeViewId !== 'file') return
+
+  event.preventDefault()
+  useEditorStore.getState().requestFocus(event.shiftKey ? 'redo' : 'undo')
+}
+
 /**
  * Редактор и главный процесс: изменения на диске - открытым файлам и картинкам
- * просмотра Markdown, ⌘W из меню - закрыть активную вкладку (если файл сейчас виден),
- * выход из IDE - дописать всё и ответить. Уход из окна пишет файлы сразу, как в
- * WebStorm, а возврат сверяет их с диском. Подключается один раз, в корне окна.
+ * просмотра Markdown, изменения в .git - левой стороне разницы, ⌘W из меню - закрыть
+ * активную вкладку (если она сейчас видна), ⌘Z вне кода - отмена в ней, выход из IDE -
+ * дописать всё и ответить. Уход
+ * из окна пишет файлы сразу, как в WebStorm, а возврат сверяет их с диском. Подключается
+ * один раз, в корне окна.
  */
 export const useEditorSync = () => {
   const project = useActiveProject()
+  const projectId = project?.id
+  const queryClient = useQueryClient()
 
-  useIpcEvent('fs:changed', (change) => editorDocuments()?.diskChanged(change))
+  // Коммит, смена ветки, reset - HEAD уже другой: файлы из него читаются заново.
+  useIpcEvent('fs:changed', (change) => {
+    editorDocuments()?.diskChanged(change)
+    if (change.git) {
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.gitHeadFiles(change.projectId) })
+    }
+  })
   usePreviewImageSync()
+
+  useEffect(() => {
+    if (!projectId) return
+
+    const handleHistoryKey = historyKeyHandler(projectId)
+
+    window.addEventListener('keydown', handleHistoryKey)
+
+    return () => window.removeEventListener('keydown', handleHistoryKey)
+  }, [projectId])
 
   useIpcEvent('editor:command', (command) => {
     if (command === 'saveAll') return void answerQuit()

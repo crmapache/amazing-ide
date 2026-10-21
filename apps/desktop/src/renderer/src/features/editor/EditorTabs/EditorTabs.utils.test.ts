@@ -27,4 +27,11 @@ describe('tabLabels', () => {
       'src/index.ts',
     ])
   })
+
+  it('файл и разница с ним - одна подпись, а не два «разных» файла', () => {
+    expect([...tabLabels(['src/index.ts', 'src/index.ts', 'a.ts']).values()]).toEqual([
+      'index.ts',
+      'a.ts',
+    ])
+  })
 })

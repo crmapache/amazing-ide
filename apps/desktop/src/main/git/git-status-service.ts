@@ -1,42 +1,56 @@
-import type { GitStatus } from '@shared/git'
+import type { GitStatus, GitChanges } from '@shared/git'
 
 import { CoalescedRun } from './coalesced-run'
-import { readGitScope, readGitStatus } from './git-status'
+import { readGitScope, readGitStatus, readGitChanges } from './git-status'
 import { isIgnoredPath } from './git-status-output'
 import type { GitScope } from './git-status-output'
 
-/** Как читать: где проект в репозитории и сам статус. Подменяется в тестах. */
+/** Как читать: где проект в репозитории, статус для дерева и список изменений. Подменяется в тестах. */
 export type GitStatusReader = {
   scope: (rootPath: string) => Promise<GitScope | null>
   status: (rootPath: string, scope: GitScope) => Promise<GitStatus | null>
+  changes: (rootPath: string, scope: GitScope) => Promise<GitChanges>
+}
+
+/** Кому сообщать, что статус или список изменений проекта стал другим. */
+export type GitStatusListeners = {
+  status: (projectId: string, status: GitStatus | null) => void
+  changes: (projectId: string, changes: GitChanges) => void
 }
 
 /** Что поменялось: в .git и где в файлах проекта (null - неизвестно где). */
 export type GitStatusTrigger = { git: boolean; paths: string[] | null }
 
+/** Последнее прочитанное и последнее разосланное строкой: то же самое второй раз окну не шлём. */
+type Mirror<T> = { last: T | null; sent: string | null }
+
 type Tracked = {
-  runner: CoalescedRun<GitStatus | null>
+  runner: CoalescedRun<void>
   rootPath: string
   /** Где проект в репозитории; undefined - ещё не узнавали или пора узнать заново. */
   scope: GitScope | null | undefined
-  last: GitStatus | null
-  /** Последний разосланный статус строкой: тот же самый второй раз окну не шлём. */
-  sent: string | null
+  status: Mirror<GitStatus | null>
+  /** Список изменений читается, только когда окно его спросило: это второй git status. */
+  changes: Mirror<GitChanges> & { wanted: boolean }
 }
 
-const READER: GitStatusReader = { scope: readGitScope, status: readGitStatus }
+const READER: GitStatusReader = {
+  scope: readGitScope,
+  status: readGitStatus,
+  changes: readGitChanges,
+}
 
 /**
- * Статусы git открытых проектов. Владелец - главный процесс: перечитывает статус, когда
- * на диске или в .git что-то поменялось, и сам сообщает окну, если он стал другим.
- * Чтения одного проекта идут по одному: пачка изменений во время чтения даёт одно
- * следующее, а не очередь из git status.
+ * Статусы git открытых проектов и их списки изменений. Владелец - главный процесс:
+ * перечитывает их, когда на диске или в .git что-то поменялось, и сам сообщает окну, если
+ * они стали другими. Чтения одного проекта идут по одному: пачка изменений во время
+ * чтения даёт одно следующее, а не очередь из git status.
  */
 export class GitStatusService {
   private readonly projects = new Map<string, Tracked>()
 
   constructor(
-    private readonly onStatus: (projectId: string, status: GitStatus | null) => void,
+    private readonly listeners: GitStatusListeners,
     private readonly reader: GitStatusReader = READER,
   ) {}
 
@@ -45,25 +59,40 @@ export class GitStatusService {
    * открытии и при возврате, а git init выше папки проекта слежение не видит. С этого
    * вопроса проект и начинает перечитываться сам.
    */
-  get(projectId: string, rootPath: string): Promise<GitStatus | null> {
+  async get(projectId: string, rootPath: string): Promise<GitStatus | null> {
     const tracked = this.track(projectId, rootPath)
 
     tracked.scope = undefined
+    await tracked.runner.run()
 
-    return tracked.runner.run()
+    return tracked.status.last
+  }
+
+  /**
+   * Свежий список изменений (вид Changes). С этого вопроса список перечитывается вместе
+   * со статусом при каждом изменении, пока проект открыт.
+   */
+  async getChanges(projectId: string, rootPath: string): Promise<GitChanges> {
+    const tracked = this.track(projectId, rootPath)
+
+    tracked.scope = undefined
+    tracked.changes.wanted = true
+    await tracked.runner.run()
+
+    return tracked.changes.last ?? { kind: 'failed' }
   }
 
   /**
    * На диске проекта что-то поменялось. Не перечитываем проект, о котором окно не
-   * спрашивало, и изменения только внутри игнорируемого (логи, сборки): статус от них
-   * не меняется, а пишут туда без перерыва.
+   * спрашивало, и изменения только внутри игнорируемого (логи, сборки): ни статус, ни
+   * список изменений от них не меняются, а пишут туда без перерыва.
    */
   changed(projectId: string, { git, paths }: GitStatusTrigger): void {
     const tracked = this.projects.get(projectId)
 
     if (!tracked) return
 
-    const { last } = tracked
+    const { last } = tracked.status
 
     if (git) tracked.scope = undefined
     else if (paths && last && paths.every((path) => isIgnoredPath(last, path))) return
@@ -86,8 +115,8 @@ export class GitStatusService {
     const tracked: Tracked = {
       rootPath,
       scope: undefined,
-      last: null,
-      sent: null,
+      status: { last: null, sent: null },
+      changes: { last: null, sent: null, wanted: false },
       runner: new CoalescedRun(() => this.read(projectId, tracked)),
     }
 
@@ -96,22 +125,39 @@ export class GitStatusService {
     return tracked
   }
 
-  private async read(projectId: string, tracked: Tracked): Promise<GitStatus | null> {
+  private async read(projectId: string, tracked: Tracked): Promise<void> {
     const { rootPath } = tracked
 
     if (tracked.scope === undefined) tracked.scope = await this.reader.scope(rootPath)
 
-    const status = tracked.scope === null ? null : await this.reader.status(rootPath, tracked.scope)
-    const serialized = JSON.stringify(status)
+    const { scope } = tracked
+    const status = scope === null ? null : await this.reader.status(rootPath, scope)
 
-    tracked.last = status
+    this.publish(projectId, tracked, tracked.status, status, this.listeners.status)
 
-    // Проект успели закрыть, пока шло чтение, - окну он уже не нужен.
-    if (this.projects.get(projectId) === tracked && serialized !== tracked.sent) {
-      tracked.sent = serialized
-      this.onStatus(projectId, status)
+    if (!tracked.changes.wanted) return
+
+    const changes: GitChanges =
+      scope === null ? { kind: 'notGit' } : await this.reader.changes(rootPath, scope)
+
+    this.publish(projectId, tracked, tracked.changes, changes, this.listeners.changes)
+  }
+
+  /** Запомнить прочитанное и разослать, если оно другое. Проект успели закрыть - окну он не нужен. */
+  private publish<T>(
+    projectId: string,
+    tracked: Tracked,
+    mirror: Mirror<T>,
+    value: T,
+    send: (projectId: string, value: T) => void,
+  ): void {
+    const serialized = JSON.stringify(value)
+
+    mirror.last = value
+
+    if (this.projects.get(projectId) === tracked && serialized !== mirror.sent) {
+      mirror.sent = serialized
+      send(projectId, value)
     }
-
-    return status
   }
 }

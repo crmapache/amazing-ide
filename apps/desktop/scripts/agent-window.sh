@@ -56,9 +56,11 @@ start() {
     require("node:fs").writeFileSync(file, JSON.stringify({ projects, activeProjectId: projects[0]?.id ?? null }))
   ' "$WORK_DIR/profile/user-data/workspace.json" "$@"
 
+  # Копия живёт за окнами человека, а закрытое окно Chromium не рисует: кадры стоят, страница
+  # считает себя скрытой, и всё, что ждёт кадра (показ разницы, покадровые замеры), молчит.
   AMAZING_IDE_PROFILE_DIR="$WORK_DIR/profile" AMAZING_IDE_CDP_PORT="$CDP_PORT" \
     nohup ./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron "$WORK_DIR/out" \
-    >"$WORK_DIR/app.log" 2>&1 &
+    --disable-backgrounding-occluded-windows >"$WORK_DIR/app.log" 2>&1 &
 
   for _ in $(seq 1 60); do
     curl -s "http://127.0.0.1:$CDP_PORT/json" >/dev/null 2>&1 && { sleep 2; echo "Окно готово, порт $CDP_PORT"; return; }

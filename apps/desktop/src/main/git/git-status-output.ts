@@ -6,10 +6,10 @@ import { toWindowPath } from '../fs/project-paths'
 type PathChange = GitPathStatus | 'deleted'
 
 /** Сколько полей через пробел стоит перед путём в записях porcelain v2. */
-const FIELDS_BEFORE_PATH: Record<string, number> = { '1': 8, '2': 9, u: 10 }
+export const FIELDS_BEFORE_PATH: Record<string, number> = { '1': 8, '2': 9, u: 10 }
 
 /** Путь после заданного числа полей: в самом пути пробелы бывают. */
-const pathAfterFields = (record: string, count: number): string | null => {
+export const pathAfterFields = (record: string, count: number): string | null => {
   let start = 0
 
   for (let field = 0; field < count; field += 1) {

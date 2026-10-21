@@ -20,6 +20,7 @@
   "sideViews": {
     "label": "Side panel views",
     "files": "Files",
+    "changes": "Changes",
     "resize": "Resize side panel"
   },
   "mainViews": {
@@ -39,12 +40,47 @@
     "emptyFolder": "Empty folder",
     "readError": "Could not read this folder"
   },
+  "changes": {
+    "noProjectTitle": "No project open",
+    "noProjectText": "Open a folder to see what changed in it.",
+    "notGitTitle": "Not a Git repository",
+    "notGitText": "This folder isn't under Git, so there's no commit to compare with.",
+    "failedTitle": "Git didn't answer",
+    "failedText": "Git couldn't list the changes in this folder. Check that git works here in the Terminal.",
+    "cleanTitle": "No changes",
+    "cleanText": "Every file matches the last commit.",
+    "groups": {
+      "tracked": "Changes",
+      "untracked": "Unversioned Files"
+    },
+    "files_one": "{{count}} file",
+    "files_other": "{{count}} files",
+    "truncated": "Only the first {{count}} changes are shown.",
+    "renamedFrom": "from {{path}}",
+    "rowLabel": "{{path}}, {{kind}}",
+    "kinds": {
+      "modified": "modified",
+      "added": "added",
+      "deleted": "deleted",
+      "renamed": "renamed",
+      "untracked": "unversioned",
+      "conflict": "conflict"
+    },
+    "menu": {
+      "label": "Change actions",
+      "showDiff": "Show Diff",
+      "openFile": "Open File",
+      "copyPath": "Copy Path"
+    }
+  },
   "editor": {
     "noProjectTitle": "Open a project to start",
     "noProjectText": "Pick a folder - it opens as a tab at the top.",
     "noFileTitle": "No file selected",
     "noFileText": "Choose a file in the tree on the left.",
     "readOnly": "This file is read-only.",
+    "missingTitle": "File not on disk",
+    "missingText": "This file was deleted on disk.",
     "binaryTitle": "Not a text file",
     "binaryText": "This file is binary or not in UTF-8, so the editor can't show it.",
     "tooLargeTitle": "File too large",
@@ -81,7 +117,8 @@
         "closeRight": "Close Tabs to the Right",
         "closeAll": "Close All Tabs",
         "copyPath": "Copy Path"
-      }
+      },
+      "diffHint": "Changes in {{path}} since the last commit"
     },
     "contextMenu": {
       "label": "Code actions",
@@ -115,6 +152,34 @@
         "loading": "Loading image…",
         "close": "Close image"
       }
+    },
+    "diff": {
+      "toolbar": "Diff actions",
+      "renamedFrom": "renamed from {{path}}",
+      "counting": "Comparing…",
+      "noDifferences": "No differences",
+      "noTextDifferences": "No text differences",
+      "differences_one": "{{count}} difference",
+      "differences_other": "{{count}} differences",
+      "notes": {
+        "eol": "line endings changed",
+        "bom": "byte order mark changed",
+        "mode": "file mode changed"
+      },
+      "previousChange": "Previous Difference",
+      "nextChange": "Next Difference",
+      "previousFile": "Previous File",
+      "nextFile": "Next File",
+      "openFile": "Jump to Source",
+      "undo": "Undo",
+      "redo": "Redo",
+      "collapse": "Collapse Unchanged Fragments",
+      "layout": "Diff view",
+      "sideBySide": "Side-by-side Viewer",
+      "unified": "Unified Viewer",
+      "headFailedTitle": "Can't read the committed version",
+      "headFailedText": "Git didn't return this file from the last commit.",
+      "headTooLargeText": "The committed version is over the {{limit}} the editor opens."
     },
     "discard": {
       "tabs": {
@@ -1834,9 +1899,8 @@
       "closeProject": "Close Project {{name}}",
       "switchProject": "Switch to Project {{name}}",
       "openRecent": "Open Recent Project {{name}}",
-      "toggleFiles": "Show or Hide Files",
       "toggleClaudeCode": "Show or Hide Claude Code",
-      "toggleMainView": "Show or Hide {{name}}",
+      "toggleView": "Show or Hide {{name}}",
       "toggleDesignSystem": "Show or Hide Design System"
     },
     "longQuery": "The text is too long: search takes up to {{count}} characters."

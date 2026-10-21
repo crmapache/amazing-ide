@@ -34,4 +34,12 @@ monaco.editor.addKeybindingRules(
   [...MONACO_FIND_COMMANDS].map((command) => ({ keybinding: 0, command: `-${command}` })),
 )
 
+// F7 и Shift+F7 в разнице - к следующей и предыдущей правке, как в WebStorm (DiffEditor), а
+// не окно доступного просмотра разницы Monaco: оно остаётся в палитре команд.
+monaco.editor.addKeybindingRules(
+  ['editor.action.accessibleDiffViewer.next', 'editor.action.accessibleDiffViewer.prev'].map(
+    (command) => ({ keybinding: 0, command: `-${command}` }),
+  ),
+)
+
 export { monaco }
