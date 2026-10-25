@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 
 import { useClaudeCodeStore } from '../claude-code.store'
-import { usePanelPrefs, useConversationFeed } from '../claude.queries'
+import { useConversationFeed } from '../claude.queries'
 import { PaneKeysContext } from '../pane-keys.context'
 import { usePaneKeys } from '../pane-keys.hooks'
 import { Composer } from '../Composer/Composer'
@@ -16,8 +16,8 @@ import type { ConversationPaneProps } from './ConversationPane.types'
 
 /**
  * Один разговор: лента (или приветствие, пока в ней пусто), над полем - то, что ждёт
- * человека, внизу - поле ввода и строка под ним (модель, усилие, режим, лимиты; в
- * ужатой раскладке они в самом поле). Лента грузится запросом и дальше живёт событиями.
+ * человека, внизу - поле ввода и строка под ним (модель, усилие, режим, лимиты). Лента
+ * грузится запросом и дальше живёт событиями.
  * Клавиши панели (Esc, Shift+Tab, цифры карточек) слушает вся панель, меню у
  * выделенного - поверх ленты.
  */
@@ -27,7 +27,6 @@ export const ConversationPane = ({ project, conversation }: ConversationPaneProp
   const rewindTarget = useClaudeCodeStore((store) => store.rewindTarget)
   const items = feed?.items ?? []
   const isEmpty = !conversation || (!isPending && items.length === 0)
-  const { composerLayout } = usePanelPrefs()
   const feedRef = useRef<HTMLDivElement>(null)
   const { keys, handleKeyDown } = usePaneKeys(project, conversation, draftKey)
 
@@ -36,7 +35,7 @@ export const ConversationPane = ({ project, conversation }: ConversationPaneProp
       {/* Нажатие в ленте отдаёт фокус панели - и клавиши панели работают и оттуда. */}
       <div className={styles.conversationPane} tabIndex={-1} onKeyDown={handleKeyDown}>
         {isEmpty ? (
-          <Welcome draftKey={draftKey} />
+          <Welcome />
         ) : conversation ? (
           <div ref={feedRef} className={styles.feedArea}>
             <Feed conversation={conversation} items={items} />
@@ -51,9 +50,7 @@ export const ConversationPane = ({ project, conversation }: ConversationPaneProp
           />
         )}
         <Composer project={project} conversation={conversation} draftKey={draftKey} />
-        {conversation && composerLayout !== 'compact' && (
-          <ComposerStatus conversation={conversation} />
-        )}
+        {conversation && <ComposerStatus conversation={conversation} />}
         {conversation && rewindTarget?.conversationId === conversation.id && (
           <RewindDialog
             key={rewindTarget.messageId}

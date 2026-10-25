@@ -1,5 +1,6 @@
 import { PREVIEW_IMAGE_TYPES } from '@shared/preview-images'
 
+import { isOutsidePath } from '../../lib/path.utils'
 import type { FilePlace } from '../../state/selection.store'
 import type { PreviewLinkTarget, PreviewImageSource } from './markdown-preview.types'
 
@@ -25,11 +26,13 @@ const decode = (text: string): string => {
 }
 
 /**
- * Путь файла проекта из ссылки в файле `filePath`: от его папки или от корня проекта
- * (`/docs/a.md`, как на GitHub). null - ссылка уходит за корень проекта.
+ * Путь файла из ссылки в файле `filePath`: от его папки или от корня проекта (`/docs/a.md`,
+ * как на GitHub). У файла вне проекта (абсолютный путь) и ответ абсолютный, а `/x` - путь от
+ * корня диска: репозитория за ним никто не знает. null - ссылка уходит за корень.
  */
 export const resolveFromFile = (filePath: string, target: string): string | null => {
-  const parts = target.startsWith('/') ? [] : filePath.split('/').slice(0, -1)
+  const outside = isOutsidePath(filePath)
+  const parts = target.startsWith('/') ? [] : filePath.split('/').slice(0, -1).filter(Boolean)
 
   for (const part of decode(target).split('/')) {
     if (part === '..') {
@@ -41,7 +44,9 @@ export const resolveFromFile = (filePath: string, target: string): string | null
     }
   }
 
-  return parts.length > 0 ? parts.join('/') : null
+  if (parts.length === 0) return null
+
+  return outside ? `/${parts.join('/')}` : parts.join('/')
 }
 
 const placeOf = (fragment: string): FilePlace | undefined => {

@@ -26,6 +26,11 @@
   }
 }
 
+.xs {
+  width: var(--size-control-xs);
+  height: var(--size-control-xs);
+}
+
 .sm {
   width: var(--size-control-sm);
   height: var(--size-control-sm);
@@ -62,9 +67,11 @@
 }
 
 // Включённый переключатель - серая плашка и белая иконка, как выбранный раздел в
-// навигации.
+// навигации. Так же горит кнопка, чья панель открыта (три точки над меню): видно, откуда
+// меню.
 .active,
-.active:not(:disabled):hover {
+.active:not(:disabled):hover,
+.iconButton[aria-expanded='true'] {
   background-color: var(--color-bg-selected);
   color: var(--color-fg-strong);
 }

@@ -16,34 +16,36 @@ import { CodeRuns } from './parts/CodeRuns'
  * углу (видна по наведению). Подсветка ролями `--color-syntax-*`, язык неизвестен - код
  * ровным цветом. Пути к файлам внутри кода - ссылки, и при подсветке тоже.
  */
-export const CodeBlock = memo(({ code, language = '', compact = false }: CodeBlockProps) => {
-  const { t } = useTranslation()
-  const { isCopied, copy } = useCopy()
-  const lines = useCodeRuns(code, language)
+export const CodeBlock = memo(
+  ({ code, language = '', compact = false, wrap = false }: CodeBlockProps) => {
+    const { t } = useTranslation()
+    const { isCopied, copy } = useCopy()
+    const lines = useCodeRuns(code, language)
 
-  const handleCopy = () => copy(code)
+    const handleCopy = () => copy(code)
 
-  return (
-    <div className={clsx(styles.codeBlock, compact && styles.compact)}>
-      <pre className={styles.pre}>
-        <code className={styles.code}>
-          {lines.map((runs, index) => (
-            <span key={index} className={styles.line}>
-              <CodeRuns runs={runs} />
-            </span>
-          ))}
-        </code>
-      </pre>
-      <div className={clsx(styles.copy, isCopied && styles.copied)}>
-        <IconButton
-          icon={isCopied ? Check : Copy}
-          size="sm"
-          label={isCopied ? t('claudeCode.markdown.copied') : t('claudeCode.markdown.copyBlock')}
-          onClick={handleCopy}
-        />
+    return (
+      <div className={clsx(styles.codeBlock, compact && styles.compact, wrap && styles.wrap)}>
+        <pre className={styles.pre}>
+          <code className={styles.code}>
+            {lines.map((runs, index) => (
+              <span key={index} className={styles.line}>
+                <CodeRuns runs={runs} />
+              </span>
+            ))}
+          </code>
+        </pre>
+        <div className={clsx(styles.copy, isCopied && styles.copied)}>
+          <IconButton
+            icon={isCopied ? Check : Copy}
+            size="sm"
+            label={isCopied ? t('claudeCode.markdown.copied') : t('claudeCode.markdown.copyBlock')}
+            onClick={handleCopy}
+          />
+        </div>
       </div>
-    </div>
-  )
-})
+    )
+  },
+)
 
 CodeBlock.displayName = 'CodeBlock'

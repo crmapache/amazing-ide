@@ -132,9 +132,9 @@ export class PluginTools {
         .control({ subtype: 'reload_plugins', hold_on_cache_impact: false })
         .catch(() => null)
 
-      if (isRecord(reply)) {
-        this.host.onCommands(runtime.meta.projectPath, commandsFromChange({ type: '', ...reply }))
-      }
+      const commands = isRecord(reply) ? commandsFromChange({ type: '', ...reply }) : null
+
+      if (commands) this.host.onCommands(runtime.meta.projectPath, commands)
     }
   }
 }

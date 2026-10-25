@@ -3,6 +3,7 @@ import { Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { ProgressBar } from '@amazing-ide/ui/ProgressBar'
+import { Spinner } from '@amazing-ide/ui/Spinner'
 import { TextField } from '@amazing-ide/ui/TextField'
 
 import { PROGRESS_SAMPLES } from '../ComponentsView.constants'
@@ -12,7 +13,7 @@ import { SearchListSpecimen } from './SearchListSpecimen'
 
 /**
  * Раздел «Поля и прогресс»: поле с иконкой, поле с ошибкой, недоступное, список
- * поиска под полем, полосы прогресса.
+ * поиска под полем, полосы прогресса, знак работы без доли.
  */
 export const FieldsSection = () => {
   const { t } = useTranslation('showcase')
@@ -55,6 +56,13 @@ export const FieldsSection = () => {
           <ProgressBar key={value} value={value} tone={tone} label={t('samples.progressLabel')} />
         ))}
         <ProgressBar label={t('samples.progressLabel')} />
+      </Specimen>
+
+      <Specimen label={t('specimens.spinner')}>
+        <Spinner label={t('samples.spinnerLabel')} />
+        <Spinner size="md" label={t('samples.spinnerLabel')} />
+        <Spinner tone="neutral" label={t('samples.spinnerLabel')} />
+        <Spinner size="md" tone="neutral" label={t('samples.spinnerLabel')} />
       </Specimen>
     </ShowcaseSection>
   )

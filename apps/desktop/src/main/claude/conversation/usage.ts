@@ -16,11 +16,13 @@ export const liveContextTokens = (assistant: CliMessage): number =>
 /**
  * Контекст и окно из `result`. Верхние поля usage - сумма по всем шагам хода, поэтому
  * занятый контекст - по последнему шагу (iterations); шагов нет, а их было несколько -
- * верхним полям не верим.
+ * верхним полям не верим. Окно - модели разговора: modelUsage несёт и модели субагентов,
+ * и у субагента на модели с окном пошире процент считался бы от чужого окна.
  */
 export const usageFromResult = (
   result: CliMessage,
   previous: ConversationUsage,
+  model: string | null,
 ): ConversationUsage => {
   const usage = recordField(result, 'usage')
   const iterations = recordsField(usage, 'iterations')
@@ -31,13 +33,15 @@ export const usageFromResult = (
     : turns <= 1
       ? promptTokens(usage)
       : previous.contextTokens
-  const models = Object.values(recordField(result, 'modelUsage')).filter(isRecord)
-  const contextWindow = Math.max(0, ...models.map((model) => numberField(model, 'contextWindow')))
+  const modelUsage = recordField(result, 'modelUsage')
+  const own = model ? numberField(recordField(modelUsage, model), 'contextWindow') : 0
+  const models = Object.values(modelUsage).filter(isRecord)
+  const contextWindow =
+    own || Math.max(0, ...models.map((entry) => numberField(entry, 'contextWindow')))
 
   return {
     contextTokens: contextTokens || previous.contextTokens,
     contextWindow: contextWindow || previous.contextWindow,
-    costUsd: previous.costUsd,
   }
 }
 

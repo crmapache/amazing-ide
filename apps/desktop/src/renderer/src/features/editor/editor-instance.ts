@@ -1,11 +1,15 @@
 import type { editor } from 'monaco-editor/editor/editor.api.js'
 
+import { onTextSizeApplied } from '../../state/text-size.store'
 import { MONACO_FIND_COMMANDS } from './editor.constants'
 import { useEditorStore } from './editor.store'
 import { monaco } from './monaco-setup'
 import { editorTypography } from './monaco-theme'
 
 type Editor = editor.IStandaloneCodeEditor
+
+/** То, у чего Monaco меняет настройки на ходу: редактор файла и редактор разницы целиком. */
+type Configurable = { updateOptions: (options: editor.IEditorOptions) => void }
 
 /**
  * Общее у редактора файла и сторон разницы: Monaco настраивается одинаково, где бы код ни
@@ -43,3 +47,11 @@ export const remeasureWhenLoaded = () => {
     .then(() => monaco.editor.remeasureFonts())
     .catch(() => undefined)
 }
+
+/**
+ * Кегль кода - за размером текста IDE (Settings → Appearance): Monaco считает буквы сам и
+ * про переменную на корне документа не знает, ему кегль передаётся числом. Возвращает
+ * отписку.
+ */
+export const followTextSize = (instance: Configurable) =>
+  onTextSizeApplied(() => instance.updateOptions(editorTypography()))

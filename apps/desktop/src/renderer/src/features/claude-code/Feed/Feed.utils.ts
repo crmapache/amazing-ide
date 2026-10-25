@@ -6,6 +6,7 @@ import type { FeedItem, RetryReason } from '@shared/claude-feed'
 import { pendingAgents } from '../agents.utils'
 import { formatDuration } from '../claude.utils'
 import { RETRY_REASON_KEYS } from '../NoticeRow/NoticeRow.constants'
+import type { StatusParts } from './Feed.types'
 
 /** Что сейчас происходит - последняя строка ленты (как streamStatus в ACC). */
 export type StreamStatus =
@@ -82,32 +83,40 @@ export const rowAtEdge = (
   return Math.max(0, found)
 }
 
-/** Строка статуса словами; now - для часов работы и отсчёта до повтора. */
-export const statusLabel = (t: TFunction, status: StreamStatus, now: number): string => {
+/**
+ * Строка статуса словами: что происходит (переливается, пока идёт работа) и рядом -
+ * цифры (часы работы, отсчёт до повтора). Цифры отдельно: они меняются каждую секунду, и
+ * перелив по ним прыгал бы вместе с шириной строки. now - для часов и отсчёта.
+ */
+export const statusParts = (t: TFunction, status: StreamStatus, now: number): StatusParts => {
   switch (status.kind) {
     case 'stopping':
-      return t('claudeCode.stream.stopping')
+      return { label: t('claudeCode.stream.stopping'), detail: '' }
     case 'waiting':
-      return t('claudeCode.stream.waitingForYou')
+      return { label: t('claudeCode.stream.waitingForYou'), detail: '' }
     case 'compacting':
-      return t('claudeCode.stream.compacting')
+      return { label: t('claudeCode.stream.compacting'), detail: '' }
     case 'agents':
-      return status.count === 1
-        ? t('claudeCode.stream.waitingForSubagent')
-        : t('claudeCode.stream.waitingForSubagents', { count: status.count })
+      return {
+        label:
+          status.count === 1
+            ? t('claudeCode.stream.waitingForSubagent')
+            : t('claudeCode.stream.waitingForSubagents', { count: status.count }),
+        detail: '',
+      }
     case 'retry':
-      return t('claudeCode.stream.retryWaiting', {
+      return {
         label: t(RETRY_REASON_KEYS[status.reason]),
-        waited: formatDuration(Math.max(0, status.retryAt - now)),
-      })
+        detail: t('claudeCode.stream.retryWaiting', {
+          waited: formatDuration(Math.max(0, status.retryAt - now)),
+        }),
+      }
     case 'thinking':
-      return status.startedAt
-        ? t('claudeCode.stream.withElapsed', {
-            label: t('claudeCode.stream.thinking'),
-            elapsed: formatDuration(now - status.startedAt - status.pausedMs),
-          })
-        : t('claudeCode.stream.thinking')
+      return {
+        label: t('claudeCode.stream.thinking'),
+        detail: status.startedAt ? formatDuration(now - status.startedAt - status.pausedMs) : '',
+      }
     default:
-      return ''
+      return { label: '', detail: '' }
   }
 }

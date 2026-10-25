@@ -1,6 +1,6 @@
 import { it, expect, describe } from 'vitest'
 
-import { eolOf, withEol, isTouched, changedSpan } from './documents.utils'
+import { eolOf, withEol, isTouched, changedSpan, fileRequest } from './documents.utils'
 
 const apply = (before: string, after: string) => {
   const { start, oldEnd, newEnd } = changedSpan(before, after)
@@ -59,5 +59,20 @@ describe('переводы строк', () => {
   it('текст приводится к переводу модели, смешанный - тоже', () => {
     expect(withEol('a\r\nb\nc', '\n')).toBe('a\nb\nc')
     expect(withEol('a\nb', '\r\n')).toBe('a\r\nb')
+  })
+})
+
+describe('fileRequest', () => {
+  it('путь от корня - relativePath, абсолютный (файл вне проекта) - absolutePath', () => {
+    expect(fileRequest('p1', 'src/app.ts')).toEqual({ projectId: 'p1', relativePath: 'src/app.ts' })
+    expect(fileRequest('p1', '/Users/max/a.md')).toEqual({
+      projectId: 'p1',
+      absolutePath: '/Users/max/a.md',
+    })
+  })
+
+  it('слежение проекта и файл вне проекта не путаются', () => {
+    expect(isTouched('/Users/max/a.md', ['Users/max/a.md'])).toBe(false)
+    expect(isTouched('/Users/max/a.md', ['/Users/max/a.md'])).toBe(true)
   })
 })

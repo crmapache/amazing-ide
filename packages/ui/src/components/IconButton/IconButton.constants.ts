@@ -1,8 +1,9 @@
 import type { IconButtonSize } from './IconButton.types'
 
 // Размер глифа в пикселях: lucide принимает число, а не CSS-переменную.
-// Совпадает с --size-icon-sm / --size-icon-md из tokens.css.
+// Совпадает с --size-icon-sm / --size-icon-md из tokens.css; xs - глиф внутри плашки.
 export const ICON_SIZE: Record<IconButtonSize, number> = {
+  xs: 12,
   sm: 14,
   md: 16,
 }

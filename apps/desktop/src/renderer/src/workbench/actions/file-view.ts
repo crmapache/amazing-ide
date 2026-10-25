@@ -1,16 +1,16 @@
 import { useEffect } from 'react'
 
-import { useLayoutStore } from '../../state/layout.store'
+import { isMainShown, useLayoutStore } from '../../state/layout.store'
 import { useSelectionStore } from '../../state/selection.store'
 
 /**
  * Показать вид «файл» в середине. Уже показанный не трогаем: повторный выбор вида
- * свернул бы середину.
+ * свернул бы середину. Свёрнутую за нехваткой места выбор разворачивает, ужимая панели.
  */
 const showFileView = () => {
-  const { main, selectMainView } = useLayoutStore.getState()
+  const state = useLayoutStore.getState()
 
-  if (main.activeViewId !== 'file' || !main.isOpen) selectMainView('file')
+  if (state.main.activeViewId !== 'file' || !isMainShown(state)) state.selectMainView('file')
 }
 
 /**

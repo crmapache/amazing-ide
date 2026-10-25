@@ -9,11 +9,14 @@
   min-width: 0;
 }
 
+// Строки шагов отдают поле своей подложки наведения влево: стрелки вызовов и текст реплик
+// встают вровень с заданием, отчётом и подписями журнала, а не уступом правее них.
 .journal {
   display: flex;
   flex-direction: column;
   gap: var(--space-0-5);
   min-width: 0;
+  margin-left: calc(var(--space-1-5) * -1);
 }
 
 .remark {

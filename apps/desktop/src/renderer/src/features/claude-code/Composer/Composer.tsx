@@ -2,7 +2,6 @@ import { useId, useRef, useMemo, useState } from 'react'
 import type { DragEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { usePanelPrefs } from '../claude.queries'
 import { FIT_SPACER, useToolsFit } from '../composer-fit.hooks'
 import { fitSteps } from '../composer-fit.utils'
 import { carriesFiles } from '../field-clipboard.utils'
@@ -14,8 +13,7 @@ import { useComposer } from './Composer.hooks'
 import styles from './Composer.module.scss'
 import type { ComposerProps } from './Composer.types'
 import { placeholderKey, suggestOptionId } from './Composer.utils'
-import { CompactSelectors } from './parts/CompactSelectors'
-import { ContextBar } from './parts/ContextBar'
+import { ContextMeter } from './parts/ContextMeter'
 import { FieldChips } from './parts/FieldChips'
 import { GhostHint } from './parts/GhostHint'
 import { SendButtons } from './parts/SendButtons'
@@ -23,15 +21,14 @@ import { SuggestList } from './parts/SuggestList'
 import { WritingTools } from './parts/WritingTools'
 
 /**
- * Поле ввода разговора, раскладка ACC: над рамкой - подсказка; в рамке - шкала контекста,
- * текст с чипами, ряд кнопок: скрепка и «/», лупа, чип открытого файла, справа Stop, Queue
- * и Send. Узкая панель ряд не переносит, а ужимает. Ужатая раскладка (Settings → Composer
- * layout) забирает в ряд MODEL, EFFORT, MODE и кольца, строки под полем нет.
+ * Поле ввода разговора, раскладка ACC: над рамкой - подсказка; в рамке - текст с чипами,
+ * ряд кнопок: скрепка и «/», лупа, кольцо контекста, чип открытого файла, справа Stop,
+ * Queue и Send. Узкая панель ряд не переносит, а ужимает. Контекст - кольцом в ряду, а не
+ * полосой над текстом: ленте остаётся строка.
  */
 export const Composer = (props: ComposerProps) => {
   const { conversation, draftKey } = props
   const { t } = useTranslation()
-  const { hiddenIndicators, composerLayout } = usePanelPrefs()
   const boxRef = useRef<HTMLDivElement>(null)
   const rowRef = useRef<HTMLDivElement>(null)
   const listId = useId()
@@ -40,9 +37,6 @@ export const Composer = (props: ComposerProps) => {
   const composer = useComposer(props)
   const { field, suggest, handlers } = composer
   const { fieldRef, registry, handleInput, handleCompositionEnd, clearChipSelection } = field
-  const isCompact = composerLayout === 'compact'
-  const showBar = !hiddenIndicators.includes('contextBar')
-  const showLabel = !hiddenIndicators.includes('contextLabel')
   const editorFit = useEditorFit(draftKey, composer.editor)
   const steps = useMemo(() => fitSteps(editorFit, ROW_SQUARES), [editorFit])
   const rowContent = `${conversation?.status ?? ''}|${composer.isShell}|${composer.isAside}`
@@ -67,7 +61,7 @@ export const Composer = (props: ComposerProps) => {
   }
 
   return (
-    <div className={styles.composer}>
+    <div className={styles.composer} data-alone={!conversation || undefined}>
       {suggest.rows.length > 0 && (
         <SuggestList
           id={listId}
@@ -86,9 +80,6 @@ export const Composer = (props: ComposerProps) => {
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}>
-        {(showBar || showLabel) && (
-          <ContextBar conversation={conversation} showBar={showBar} showLabel={showLabel} />
-        )}
         {suggest.ghost && <GhostHint hint={suggest.ghost} fieldRef={fieldRef} boxRef={boxRef} />}
         <div
           ref={fieldRef}
@@ -127,6 +118,7 @@ export const Composer = (props: ComposerProps) => {
               onSearch={() => openSearch(conversation?.id ?? null)}
               dropped={dropped}
             />
+            {conversation && <ContextMeter conversation={conversation} />}
             <EditorChip conversationKey={draftKey} editor={composer.editor} dropped={dropped} />
             <span {...FIT_SPACER} className={styles.spacer} />
             <SendButtons
@@ -139,7 +131,6 @@ export const Composer = (props: ComposerProps) => {
               onQueue={handlers.handleQueue}
             />
           </div>
-          {isCompact && conversation && <CompactSelectors conversation={conversation} />}
         </div>
       </div>
     </div>

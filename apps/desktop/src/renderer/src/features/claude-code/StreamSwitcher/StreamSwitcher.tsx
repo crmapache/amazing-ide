@@ -53,7 +53,7 @@ export const StreamSwitcher = ({ conversation, items }: StreamSwitcherProps) => 
             aria-pressed={activeId === null}
             onClick={handlePickMain}>
             {conversation.status !== 'idle' && <StatusDot status={conversation.status} />}
-            <span className={styles.label}>{t('claudeCode.agents.streams.main')}</span>
+            <span className={styles.name}>{t('claudeCode.agents.streams.main')}</span>
           </button>
         </div>
         {agents.map((tool) => (

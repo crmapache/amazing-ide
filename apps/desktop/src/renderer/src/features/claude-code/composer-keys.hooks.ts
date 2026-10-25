@@ -2,7 +2,6 @@ import { useRef } from 'react'
 import type { KeyboardEvent } from 'react'
 
 import type { DraftToken } from '@shared/claude-draft'
-import type { SendKey } from '@shared/claude-prefs'
 
 import type { Field } from './field.types'
 import { enterAction } from './send-key.utils'
@@ -12,7 +11,6 @@ type KeyOptions = {
   tokens: DraftToken[]
   /** Отправленные из вкладки сообщения, старые первыми. */
   sent: readonly DraftToken[][]
-  sendKey: SendKey
   /** Подсказка над полем забирает свои клавиши; true - клавиша её. */
   suggestKey: (event: globalThis.KeyboardEvent) => boolean
   /** Отпустить сообщение: сейчас или в очередь. */
@@ -27,8 +25,8 @@ const isLetter = (event: KeyboardEvent, letter: string) =>
 
 /**
  * Клавиши поля (как в ACC), по старшинству: набор иероглифа - не наш, подсвеченный чип,
- * своя история отмен, открытая подсказка, ↑ и ↓ по отправленному, Enter по настройке
- * отправки, ⌥Enter - в очередь.
+ * своя история отмен, открытая подсказка, ↑ и ↓ по отправленному, Enter - отправить
+ * (Shift+Enter - перенос), ⌥Enter - в очередь.
  */
 export const useComposerKeys = (options: KeyOptions) => {
   const { field } = options
@@ -99,7 +97,7 @@ export const useComposerKeys = (options: KeyOptions) => {
 
     if (event.altKey) return letGo(options.isRunning ? 'queue' : 'send')
 
-    if (enterAction(options.sendKey, event) === 'send') {
+    if (enterAction(event) === 'send') {
       return letGo(options.keyQueues && options.isRunning ? 'queue' : 'send')
     }
 

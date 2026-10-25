@@ -1,15 +1,13 @@
+import type { ConversationUsage } from '@shared/claude'
+
 import { callForResult, callFromMessage } from '../calls/call-reasons'
 import type { CliMessage } from '../cli/cli-messages'
-import { numberField, recordField, stringField } from '../cli/cli-messages'
-import { outranks } from '../tabs/tab-names'
-import {
-  mergeCommands,
-  titleFromReply,
-  modelsFromReply,
-  commandsFromInit,
-  commandsFromChange,
-} from './cli-replies'
+import { recordField, stringField } from '../cli/cli-messages'
+import { mergeCommands, modelsFromReply, commandsFromInit, commandsFromChange } from './cli-replies'
 import type { ConversationRuntime } from './conversation-runtime'
+import { COMMAND_RESULT_GRACE_MS } from './conversation.constants'
+import { forgetTitle } from './session-title'
+import { lifecycleOf, isFinalState, isStartupResult } from './turn-command'
 import { usageFromResult, liveContextTokens, usageFromContextReply } from './usage'
 
 let modelsAsked = false
@@ -32,10 +30,17 @@ const applyInit = (runtime: ConversationRuntime, init: CliMessage) => {
   })
 
   if (!runtime.turnActive) {
+    // Ход начал сам CLI: нашего сообщения за ним нет, отметки прошлого к нему не относятся.
     runtime.turnActive = true
+    runtime.turnCommand = null
     runtime.update({ turnStartedAt: Date.now() })
     runtime.syncStatus()
   }
+
+  // Окно контекста - с первого хода вкладки: итог хода принёс бы его только в конце, и
+  // весь первый ход, сколько бы он ни шёл, кольцо стояло бы на нуле. Как в ACC - на
+  // каждом init: CLI отвечает на это и посреди хода.
+  askContext(runtime)
 
   if (!modelsAsked && process) {
     modelsAsked = true
@@ -48,53 +53,26 @@ const applyInit = (runtime: ConversationRuntime, init: CliMessage) => {
   }
 }
 
-/** Заголовок от CLI по первому сообщению. Не вышло - спросим после следующего хода. */
-const askTitle = (runtime: ConversationRuntime) => {
-  const { process, titleSource } = runtime
-
-  if (!process || !titleSource) return
-
-  process
-    .control({ subtype: 'generate_session_title', description: titleSource, persist: true })
-    .then((reply) => {
-      const title = titleFromReply(reply)
-
-      if (!title) return
-
-      runtime.titleSource = null
-
-      // Имя, которое человек дал вкладке, пока модель думала, модель не перебивает.
-      if (outranks('llm', runtime.meta.titleSource)) runtime.update({ title, titleSource: 'llm' })
-    })
+/** Точные цифры контекста у CLI - занятое и окно. Не ответил - остаются прежние. */
+const askContext = (runtime: ConversationRuntime) => {
+  runtime.process
+    ?.control({ subtype: 'get_context_usage' })
+    .then((reply) => runtime.update({ usage: usageFromContextReply(reply, runtime.meta.usage) }))
     .catch(() => undefined)
 }
 
-/**
- * Конец хода: итог в ленту, цифры контекста, заголовок и очередь. Пустой ход сразу
- * после старта с --resume (ноль шагов, ни текста, ни ошибки) - не конец настоящего
- * хода, который уже идёт, а рукопожатие нового процесса.
- */
 /** Строки хода, которые после отката к нему уже не относятся к разговору. */
 const STRAY_TYPES = new Set(['result', 'assistant', 'stream_event', 'user'])
 
-const applyResult = (runtime: ConversationRuntime, result: CliMessage) => {
-  const { feed, meta, process } = runtime
-  const isEmpty =
-    numberField(result, 'num_turns') === 0 &&
-    !stringField(result, 'result') &&
-    result['is_error'] !== true
+/** Чем кончился ход: остановкой, ошибкой и с какими цифрами. */
+type TurnEnd = { interrupted: boolean; isError: boolean; usage: ConversationUsage }
 
-  if (runtime.freshProcess && isEmpty) {
-    runtime.freshProcess = false
-
-    return
-  }
-
-  const interrupted = meta.stopRequestedAt !== null
-  const isError = result['is_error'] === true
+/** Ход закрыт - по итогу CLI или без него: вкладка свободна, цифры контекста, очередь, сон. */
+const closeTurn = (runtime: ConversationRuntime, end: TurnEnd) => {
+  const { feed } = runtime
 
   runtime.freshProcess = false
-  feed.builder.finishTurn(result, interrupted)
+  runtime.turnCommand = null
   // Файлы хода - по точным правкам и сверкой с диском, пока их никто не тронул. Список
   // уточняется синхронно, до отправки окну: промежуточного окно не видит.
   runtime.turnRevert.captureEnd().catch((error: unknown) => {
@@ -102,30 +80,77 @@ const applyResult = (runtime: ConversationRuntime, result: CliMessage) => {
   })
   feed.flush()
 
+  runtime.turnActive = false
+  runtime.update({
+    turnStartedAt: null,
+    stopRequestedAt: null,
+    usage: end.usage,
+    outcome: end.isError ? 'error' : 'done',
+  })
+  // Вопросы фоновых субагентов переживают конец хода: CLI ждёт на них ответа.
+  runtime.syncStatus()
+
+  askContext(runtime)
+
+  runtime.host.onUsageHint(runtime)
+  runtime.afterTurn(!end.interrupted && !end.isError)
+}
+
+/**
+ * Конец хода: итог в ленту, цифры контекста, заголовок и очередь. Рукопожатие свежего
+ * процесса (turn-command.ts) - не конец настоящего хода, который уже идёт: false.
+ */
+const applyResult = (runtime: ConversationRuntime, result: CliMessage): boolean => {
+  const { feed, meta } = runtime
+  const interrupted = meta.stopRequestedAt !== null
+
+  if (isStartupResult(result, runtime.freshProcess, interrupted)) {
+    runtime.freshProcess = false
+
+    return false
+  }
+
+  const isError = result['is_error'] === true
+
+  feed.builder.finishTurn(result, interrupted)
+
   const stillWorking = feed.builder.hasBackgroundWork
   const call = callForResult(result, { interrupted, stillWorking })
 
   if (call) runtime.host.onCall(meta.id, call)
 
-  runtime.turnActive = false
-  runtime.update({
-    turnStartedAt: null,
-    stopRequestedAt: null,
-    usage: { ...usageFromResult(result, meta.usage), costUsd: feed.builder.totalCostUsd },
-    outcome: isError ? 'error' : 'done',
+  closeTurn(runtime, {
+    interrupted,
+    isError,
+    usage: usageFromResult(result, meta.usage, meta.activeModel),
   })
-  // Вопросы фоновых субагентов переживают конец хода: CLI ждёт на них ответа.
-  runtime.syncStatus()
 
-  process
-    ?.control({ subtype: 'get_context_usage' })
-    .then((reply) => runtime.update({ usage: usageFromContextReply(reply, runtime.meta.usage) }))
-    .catch(() => undefined)
+  return true
+}
 
-  if (!isError) askTitle(runtime)
+/**
+ * Отметка CLI о нашем сообщении. Взял в работу - процесс уже не «только поднят»: пустой
+ * итог дальше - ответ на сообщение. Команда хода кончилась - её итог приходит раньше
+ * отметки; если ход и после паузы всё ещё идёт, итог потерялся, и ход закрывается без
+ * него, а не висит «в работе» с вечным Stop.
+ */
+const applyLifecycle = (runtime: ConversationRuntime, uuid: string, state: string) => {
+  if (!uuid || runtime.turnCommand !== uuid) return
 
-  runtime.host.onUsageHint(runtime)
-  runtime.afterTurn(!interrupted && !isError)
+  if (state === 'started') runtime.freshProcess = false
+
+  if (!isFinalState(state)) return
+
+  setTimeout(() => {
+    if (runtime.isDisposed || runtime.turnCommand !== uuid || !runtime.turnActive) return
+
+    console.warn('[claude] команда хода кончилась, а итога нет - ход закрыт без него:', uuid)
+
+    const interrupted = runtime.meta.stopRequestedAt !== null
+
+    runtime.feed.builder.closeTurnWithoutResult(interrupted)
+    closeTurn(runtime, { interrupted, isError: false, usage: runtime.meta.usage })
+  }, COMMAND_RESULT_GRACE_MS).unref()
 }
 
 /**
@@ -150,11 +175,16 @@ export const routeMessage = (runtime: ConversationRuntime, message: CliMessage):
   if (host.panel?.line(runtime, message)) return
 
   if (message.type === 'result') {
-    applyResult(runtime, message)
-
     // Итог отработан (очередь, перезапуск): следующее слово - продолжение оборванной работы.
-    return host.panel?.afterResult(runtime, message)
+    // Рукопожатие свежего процесса ходом не было - панели о нём знать незачем.
+    if (applyResult(runtime, message)) host.panel?.afterResult(runtime, message)
+
+    return
   }
+
+  const lifecycle = isMain ? lifecycleOf(message) : null
+
+  if (lifecycle) return applyLifecycle(runtime, lifecycle.uuid, lifecycle.state)
 
   // Лимит и ошибка ответа зовут человека (звук, свечение вкладки).
   callFromMessage(runtime, message, isMain)
@@ -180,11 +210,14 @@ export const routeMessage = (runtime: ConversationRuntime, message: CliMessage):
   if (isMainInit) {
     applyInit(runtime, message)
   } else if (message.type === 'system' && message.subtype === 'commands_changed') {
-    host.onCommands(meta.projectPath, commandsFromChange(message))
+    const commands = commandsFromChange(message)
+
+    if (commands) host.onCommands(meta.projectPath, commands)
   } else if (message.type === 'conversation_reset') {
     // /clear: CLI начал новый разговор под новым id - вкладка продолжает уже его, а
     // контекст и цена того разговора к этому отношения не имеют.
     feed.forgetEarlier()
+    forgetTitle(runtime)
     runtime.update({
       sessionId: stringField(message, 'new_conversation_id') || meta.sessionId,
       usage: { ...meta.usage, contextTokens: 0 },

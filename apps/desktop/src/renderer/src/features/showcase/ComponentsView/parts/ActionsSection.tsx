@@ -1,8 +1,10 @@
 import {
   Bot,
+  Zap,
   Play,
   Search,
   ArrowUp,
+  Ellipsis,
   Settings,
   GitBranch,
   SquareTerminal,
@@ -66,6 +68,8 @@ export const ActionsSection = () => {
         <IconButton icon={Settings} label={t('samples.unavailable')} aria-disabled />
         <IconButton icon={Search} size="sm" label={t('samples.search')} />
         <IconButton icon={SquareTerminal} size="sm" label={t('samples.terminal')} active />
+        <IconButton icon={Ellipsis} size="sm" label={t('samples.more')} aria-expanded />
+        <IconButton icon={Search} size="xs" label={t('samples.search')} />
         <IconButton icon={ArrowUp} variant="primary" label={t('samples.send')} />
         <IconButton icon={ArrowUp} variant="primary" label={t('samples.send')} disabled />
       </Specimen>
@@ -90,6 +94,25 @@ export const ActionsSection = () => {
             <Bot size={SAMPLE_ICON_SIZE} strokeWidth={SAMPLE_ICON_STROKE_WIDTH} aria-hidden />
           }
           menuLabel={t('samples.modelMenu')}
+        />
+        <DropdownButton
+          size="sm"
+          label={t('samples.setupLabel')}
+          labelContent={
+            <>
+              {t('samples.setupValue')}
+              <span className={styles.accentText}>{t('samples.setupMode')}</span>
+            </>
+          }
+          leading={
+            <Zap
+              className={styles.accentText}
+              size={SAMPLE_ICON_SIZE}
+              strokeWidth={SAMPLE_ICON_STROKE_WIDTH}
+              aria-hidden
+            />
+          }
+          menuLabel={t('samples.setupMenu')}
         />
       </Specimen>
 

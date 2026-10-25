@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import { PINS_STORAGE_KEY } from './pins.constants'
+import { PIN_LIMIT, PINS_STORAGE_KEY } from './pins.constants'
 import { togglePin } from './pins.utils'
 
 type PinsStore = {
@@ -61,3 +61,19 @@ export const usePinsStore = create<PinsStore>()(
 /** Закреплённые разговора; нет - один и тот же пустой список (без лишних перерисовок). */
 export const usePins = (conversationId: string): readonly string[] =>
   usePinsStore((store) => store.pins[conversationId] ?? NO_PINS)
+
+/**
+ * Булавка одного элемента ленты: закреплён ли, полна ли полка для него (закрепить нельзя,
+ * пока не открепят другое) и переключатель. Одна на горящую кнопку в углу и пункт меню.
+ */
+export const usePin = (conversationId: string, itemId: string) => {
+  const pins = usePins(conversationId)
+  const toggle = usePinsStore((store) => store.toggle)
+  const isPinned = pins.includes(itemId)
+
+  return {
+    isPinned,
+    isCrowded: !isPinned && pins.length >= PIN_LIMIT,
+    toggle: () => toggle(conversationId, itemId),
+  }
+}

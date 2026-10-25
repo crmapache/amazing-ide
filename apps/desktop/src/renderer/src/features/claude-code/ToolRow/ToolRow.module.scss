@@ -1,17 +1,23 @@
-// Карточка вызова: шапка и под ней тело с отступом под стрелку - вывод читается как
+@use '@amazing-ide/ui/mixins' as *;
+
+// Карточка вызова: шапка и под ней тело с линией под стрелкой - вывод читается как
 // продолжение строки, а не отдельный блок.
 .toolRow {
   min-width: 0;
 }
 
 .details {
+  @include disclosure-body;
+
   display: flex;
   flex-direction: column;
-  margin: var(--space-0-5) 0 var(--space-1) var(--space-6);
-  padding: var(--space-1-5) var(--space-2);
-  border-left: var(--border-width) solid var(--color-border);
+  margin-top: var(--space-0-5);
+  margin-bottom: var(--space-1);
+  padding-top: var(--space-1-5);
+  padding-right: var(--space-2);
+  padding-bottom: var(--space-1-5);
   font-family: var(--font-code);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   line-height: var(--line-height-normal);
   user-select: text;
 }
@@ -33,4 +39,5 @@
 .note {
   color: var(--color-fg-disabled);
   font-family: var(--font-ui);
+  font-size: var(--font-size-xs);
 }

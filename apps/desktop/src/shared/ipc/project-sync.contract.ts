@@ -12,10 +12,18 @@ export type ProjectSyncInvokeContract = {
    * игнорируется) или git не ответил: тогда дерево просто без цветов.
    */
   'git:getStatus': { request: { projectId: string }; response: GitStatus | null }
+  /**
+   * Файлы вне проекта, открытые вкладками редактора, - весь набор, прежний заменяется. Их
+   * правки на диске приходят тем же fs:changed проекта вкладки, абсолютными путями в files.
+   */
+  'fs:watchOutside': { request: { files: { projectId: string; path: string }[] }; response: void }
 }
 
 export type ProjectSyncEventContract = {
-  /** На диске проекта появилось, пропало или переименовалось; или поменялся .git. */
+  /**
+   * На диске проекта появилось, пропало или переименовалось; или поменялся .git. Или
+   * поменялся файл вне проекта, открытый вкладкой (fs:watchOutside).
+   */
   'fs:changed': ProjectDiskChange
   /** Статусы git проекта стали другими - после изменений на диске или в .git. */
   'git:status': { projectId: string; status: GitStatus | null }
@@ -24,6 +32,7 @@ export type ProjectSyncEventContract = {
 /** Каналы этой части в рантайме: их разворачивает INVOKE_CHANNELS. */
 export const PROJECT_SYNC_CHANNELS = {
   'git:getStatus': true,
+  'fs:watchOutside': true,
 } satisfies Record<keyof ProjectSyncInvokeContract, true>
 
 /** События этой части: их разворачивает EVENT_CHANNELS. */

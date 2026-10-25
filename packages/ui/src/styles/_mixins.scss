@@ -94,6 +94,16 @@
   color: $tone;
 }
 
+// Тело под строкой-раскрывашкой (Disclosure sm и шапки вызовов той же раскладки): линия
+// слева - ровно под стрелкой шапки, содержимое - на шаг правее линии. Вложенное читается
+// продолжением строки, а отступ не растёт лесенкой: каждая ступень - ширина стрелки.
+// Верх и низ задаёт тот, кто подключил, - longhand-ами, иначе margin затрёт левый край.
+@mixin disclosure-body($line: var(--color-border)) {
+  margin-left: calc(var(--space-1-5) + var(--size-icon-sm) / 2 - var(--border-width));
+  padding-left: var(--space-2);
+  border-left: var(--border-width) solid $line;
+}
+
 // Подпись раздела или статуса капсом с разрядкой: «SELECTED», «RECENT».
 @mixin caps-label {
   font-size: var(--font-size-xs);
@@ -147,19 +157,6 @@
   @keyframes breathing {
     50% {
       opacity: var(--opacity-breathe);
-    }
-  }
-}
-
-// Вращение значка загрузки. Кадры - spinning-keyframes в корне модуля.
-@mixin spinning {
-  animation: spinning var(--duration-spin) linear infinite;
-}
-
-@mixin spinning-keyframes {
-  @keyframes spinning {
-    to {
-      rotate: 360deg;
     }
   }
 }

@@ -27,4 +27,27 @@ describe('модели для меню', () => {
     expect(modelLabel('opus', models)).toBe('Opus')
     expect(modelLabel('proxy/fast', models)).toBe('proxy/fast')
   })
+
+  it('основные - сильнейшая первой, старые версии - за ними в порядке CLI', () => {
+    const models = pickableModels(
+      [
+        { value: 'opus', displayName: 'Opus', description: '' },
+        { value: 'fable', displayName: 'Fable', description: '' },
+        { value: 'sonnet', displayName: 'Sonnet', description: '' },
+        { value: 'haiku', displayName: 'Haiku', description: '' },
+        { value: 'claude-sonnet-4-5', displayName: 'Sonnet 4.5', description: '' },
+        { value: 'claude-opus-4-1', displayName: 'Opus 4.1', description: '' },
+      ],
+      [],
+    )
+
+    expect(models.map((model) => model.value)).toEqual([
+      'fable',
+      'opus',
+      'sonnet',
+      'haiku',
+      'claude-sonnet-4-5',
+      'claude-opus-4-1',
+    ])
+  })
 })

@@ -60,11 +60,6 @@
   &::placeholder {
     color: var(--color-fg-disabled);
   }
-
-  // Рамку фокуса рисует .box, у самого поля она лишняя.
-  &:focus-visible {
-    outline: none;
-  }
 }
 
 .error {

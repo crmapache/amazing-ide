@@ -34,6 +34,20 @@ const locate = async (projectId: string, path: string, exact: boolean): Promise<
 }
 
 /**
+ * Отдать системе то, что вне проекта и не текст: файл откроет своя программа, папку и всё
+ * исполняемое главный процесс только покажет в Finder. Отказ - «нет такого».
+ */
+const openOutside = async (
+  projectId: string,
+  path: string,
+  reveal: boolean,
+): Promise<OpenFileOutcome> => {
+  const shown = await invoke('fs:openOutside', { projectId, path, reveal }).catch(() => false)
+
+  return shown ? OPENED : MISSING
+}
+
+/**
  * Показать папку - значит открыть левую панель с деревом: просьба, выполненная за
  * спрятанной панелью, не выполнена. Уже открытую не трогаем - повторный выбор вида
  * её бы свернул.
@@ -47,9 +61,10 @@ const showFileTree = () => {
 /**
  * Открыть путь, названный не в дереве (поиском, лентой Claude Code): файл проекта -
  * выбрать для редактора с местом и раскрыть дерево до него; папку проекта - раскрыть
- * и показать в дереве; что-то вне проекта - отдать системе (fs:openOutside); голое
- * имя в нескольких местах - вернуть кандидатов на выбор. Каталоги дерева
- * перечитываются: файл мог появиться после того, как дерево прочитало папку.
+ * и показать в дереве; текст вне проекта - вкладкой редактора по абсолютному пути; папку
+ * и не текст вне проекта - отдать системе (fs:openOutside); голое имя в нескольких местах -
+ * вернуть кандидатов на выбор. Каталоги дерева перечитываются: файл мог появиться после
+ * того, как дерево прочитало папку.
  */
 export const useOpenFile = (): OpenFile => {
   const queryClient = useQueryClient()
@@ -85,16 +100,16 @@ export const useOpenFile = (): OpenFile => {
           showFileTree()
 
           return OPENED
+        // Текст вне проекта - вкладкой своего редактора, как в JetBrains: ни дерева, ни git
+        // у него нет, ключ вкладки - абсолютный путь. Картинку, PDF, архив - их программе.
         case 'outsideFile':
-        case 'outsideFolder': {
-          const shown = await invoke('fs:openOutside', {
-            projectId: project.id,
-            path: location.absolutePath,
-            reveal: location.kind === 'outsideFolder',
-          }).catch(() => false)
+          if (!location.editable) return openOutside(project.id, location.absolutePath, false)
 
-          return shown ? OPENED : MISSING
-        }
+          selectFile(project.id, location.absolutePath, placeOrNothing(place))
+
+          return OPENED
+        case 'outsideFolder':
+          return openOutside(project.id, location.absolutePath, true)
         case 'choose':
           return { kind: 'choose', candidates: location.candidates }
         case 'missing':

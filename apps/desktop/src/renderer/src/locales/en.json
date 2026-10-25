@@ -4,6 +4,17 @@
     "cancel": "Cancel",
     "notBuiltYet": "not built yet"
   },
+  "settings": {
+    "title": "Settings",
+    "done": "Done",
+    "appearance": "Appearance",
+    "textSize": {
+      "label": "Text size",
+      "value": "{{percent}}%",
+      "hint": "Every font in the IDE grows and shrinks together: panels, editor and Claude Code. ⌘+, ⌘− and ⌘0 work from anywhere.",
+      "reset": "Reset to 100%"
+    }
+  },
   "projects": {
     "open": "Open project",
     "close": "Close {{name}}",
@@ -89,7 +100,7 @@
     "unreadableText": {
       "denied": "There's no permission to read this file.",
       "outside": "The file is outside the project.",
-      "unknown": "The file didn't open. Choose it again in the tree."
+      "unknown": "The file didn't open. Try opening it again."
     },
     "notice": {
       "conflict": "This file changed on disk while you were editing it.",
@@ -105,6 +116,7 @@
       "close": "Close",
       "retry": "Try again",
       "outside": "This file is outside the project (through a link), so it isn't saved on its own.",
+      "outsideFile": "This file is outside the project, so it isn't saved on its own.",
       "save": "Save"
     },
     "tabs": {
@@ -118,7 +130,8 @@
         "closeAll": "Close All Tabs",
         "copyPath": "Copy Path"
       },
-      "diffHint": "Changes in {{path}} since the last commit"
+      "diffHint": "Changes in {{path}} since the last commit",
+      "outsideHint": "{{path}} · outside the project"
     },
     "contextMenu": {
       "label": "Code actions",
@@ -271,6 +284,7 @@
         "label": "Agent streams",
         "main": "main",
         "background": "bg",
+        "commandTitle": "Background command",
         "workflow": "workflow:{{count}}",
         "stopAgent": "Stop this agent",
         "stopAgentTitle": "Stop this agent?",
@@ -397,108 +411,6 @@
         "next": "Next match in this chat"
       }
     },
-    "keys": {
-      "note": "The keys work while the focus is in the panel, except Open the panel.",
-      "or": "or",
-      "groups": {
-        "tabs": "Tabs",
-        "message": "Message field",
-        "agent": "Agent",
-        "panel": "Panel",
-        "search": "Search window"
-      },
-      "rows": {
-        "nextTab": {
-          "label": "Next tab",
-          "when": "in the search window, its tabs"
-        },
-        "previousTab": {
-          "label": "Previous tab",
-          "when": "in the search window, its tabs"
-        },
-        "newTab": {
-          "label": "New tab"
-        },
-        "closeTab": {
-          "label": "Close tab",
-          "when": "asks first if the agent is working"
-        },
-        "reopenTab": {
-          "label": "Reopen closed tab",
-          "when": "the last 20, also in History"
-        },
-        "openPanel": {
-          "label": "Open the panel",
-          "when": "from anywhere in the IDE; again to hide it"
-        },
-        "send": {
-          "label": "Send"
-        },
-        "newLine": {
-          "label": "New line"
-        },
-        "queue": {
-          "label": "Queue",
-          "when": "sent once the agent finishes"
-        },
-        "history": {
-          "label": "Browse sent messages",
-          "when": "in an empty field"
-        },
-        "commands": {
-          "label": "Commands"
-        },
-        "files": {
-          "label": "Files"
-        },
-        "shell": {
-          "label": "Shell command",
-          "when": "at the start of a message"
-        },
-        "deleteWord": {
-          "label": "Delete a word"
-        },
-        "undo": {
-          "label": "Undo"
-        },
-        "redo": {
-          "label": "Redo"
-        },
-        "stop": {
-          "label": "Stop",
-          "when": "while the agent works"
-        },
-        "mode": {
-          "label": "Next permission mode"
-        },
-        "answer": {
-          "label": "Answer by number",
-          "when": "a permission or a question, with the field empty"
-        },
-        "search": {
-          "label": "Search conversations"
-        },
-        "fork": {
-          "label": "Fork from the selection",
-          "when": "with text selected in the feed"
-        },
-        "searchChat": {
-          "label": "This chat"
-        },
-        "searchAll": {
-          "label": "All chats"
-        },
-        "searchAsk": {
-          "label": "Ask Claude"
-        },
-        "matchCase": {
-          "label": "Match case"
-        },
-        "wholeWords": {
-          "label": "Whole words"
-        }
-      }
-    },
     "closeChat": "Close {{title}}",
     "history": "Past conversations",
     "historySearch": "Search past conversations",
@@ -513,17 +425,7 @@
     "checkAgain": "Check again",
     "welcome": {
       "title": "Ask Claude about this project",
-      "text": "@ for files · / for commands",
-      "suggestionsLabel": "Ideas to start with",
-      "suggestions": {
-        "explain": "Explain how this project is organized",
-        "bug": "Find a bug and fix it",
-        "review": "Review my uncommitted changes",
-        "tests": "Write tests for the code I'm changing"
-      },
-      "send": "send",
-      "newLine": "new line",
-      "commands": "commands"
+      "text": "@ for files · / for commands"
     },
     "composer": {
       "label": "Message to Claude",
@@ -550,6 +452,13 @@
         "plan": "Plan mode",
         "auto": "Auto",
         "bypassPermissions": "Bypass permissions"
+      },
+      "short": {
+        "default": "Ask",
+        "acceptEdits": "Accept",
+        "plan": "Plan",
+        "auto": "Auto",
+        "bypassPermissions": "Bypass"
       },
       "hints": {
         "default": "Claude asks before editing files or running commands",
@@ -587,17 +496,15 @@
     "context": {
       "label": "Context used",
       "percent": "{{value}}%",
-      "hint": "{{used}} of {{total}} tokens in context · {{cost}} spent in this chat",
-      "empty": "Context fills up as the conversation goes",
-      "short": "ctx {{value}}%"
+      "hint": "{{used}} of {{total}} tokens in context",
+      "empty": "Context fills up as the conversation goes"
     },
     "stream": {
       "thinking": "Claude is thinking",
-      "withElapsed": "{{label}} · {{elapsed}}",
       "waitingForYou": "Waiting for you",
       "waitingForSubagent": "Waiting for subagent",
       "waitingForSubagents": "Waiting for {{count}} subagents",
-      "retryWaiting": "{{label}} · waiting {{waited}}",
+      "retryWaiting": "waiting {{waited}}",
       "compacting": "Compacting conversation…",
       "stopping": "Stopping…"
     },
@@ -607,7 +514,10 @@
       "modeCaption": "Mode",
       "modelHint": "Model: {{value}}",
       "effortHint": "Reasoning effort: {{value}}",
-      "modeHint": "Permission mode: {{value}}"
+      "modeHint": "Permission mode: {{value}}",
+      "setup": "Model, effort and mode",
+      "defaultModel": "Default model",
+      "effortValue": "{{value}} effort"
     },
     "feed": {
       "label": "Conversation",
@@ -775,8 +685,7 @@
       },
       "outranked": {
         "label": "SETTINGS",
-        "text": "This repository overrides the account chosen here:",
-        "open": "Settings sources"
+        "text": "This repository overrides the account chosen here:"
       },
       "sampling": "The newest models no longer accept a sampling parameter, and this request carried one. Claude Code adds none of its own, so it comes from whatever the requests are routed through - usually a gateway or proxy set by an address in the settings.",
       "crash": {
@@ -934,10 +843,14 @@
       "copy": "Copy this message, with the paths of what was attached",
       "copied": "Copied",
       "copyReply": "Copy the whole reply",
-      "reuse": "Put this message back into the input field, to edit and send again",
+      "more": "More",
+      "menu": "Message actions",
+      "menuTitle": "This message",
+      "reuse": "Edit and send again",
       "reuseLostImages_one": "Back into the input field - but the pasted image cannot come with it, attach it again",
       "reuseLostImages_other": "Back into the input field - but the {{count}} pasted images cannot come with it, attach them again",
-      "rewind": "Rewind to here: this message and everything after it leave the conversation",
+      "rewind": "Rewind to here",
+      "rewindSub": "This message and everything after it leave the conversation",
       "rewindSteering": "Written while Claude was working - rewind to the message that started that turn",
       "pastedLines_one": "{{count}} line pasted",
       "pastedLines_other": "{{count}} lines pasted",
@@ -987,6 +900,9 @@
     },
     "changes": {
       "label": "Files changed in this turn",
+      "files_one": "{{count}} file",
+      "files_other": "{{count}} files",
+      "totals": "{{added}} lines added, {{removed}} removed",
       "open": "Open in the editor",
       "openPath": "Open {{path}} in the editor",
       "revert": "Revert this file",
@@ -1165,7 +1081,6 @@
       }
     },
     "usage": {
-      "title": "Plan limits",
       "session": "5-hour",
       "weekly": "Week",
       "weeklyModel": "Week · {{model}}",
@@ -1175,7 +1090,6 @@
       "extraPercent": "Extra usage is on: {{value}}% of the monthly cap spent.",
       "backIn": "Limit reached. Available again in {{time}}.",
       "updated": "Updated {{time}} ago.",
-      "manage": "Accounts",
       "ringHint": "{{label}}: {{value}}%",
       "paceBudget": "even pace: {{value}}% by today",
       "todayTokens": "Tokens used today across all projects"
@@ -1211,10 +1125,6 @@
           "title": "Settings",
           "hint": "how the panel behaves and sounds"
         },
-        "appearance": {
-          "title": "Appearance",
-          "hint": "text size"
-        },
         "sounds": {
           "title": "Sound alerts",
           "hint": "when the panel calls you"
@@ -1222,10 +1132,6 @@
         "calmColors": {
           "title": "No-stress colors",
           "hint": "how the gauges are painted"
-        },
-        "indicators": {
-          "title": "Indicators",
-          "hint": "what stays around the field"
         },
         "newChat": {
           "title": "New chats",
@@ -1243,37 +1149,13 @@
           "title": "Default mode",
           "hint": "what new tabs start in"
         },
-        "restoreTabs": {
-          "title": "Tabs on start",
-          "hint": "what comes back after a restart"
-        },
         "shareEditor": {
           "title": "Editor in messages",
           "hint": "what goes along with a message"
         },
-        "composerLayout": {
-          "title": "Composer layout",
-          "hint": "where the input sits"
-        },
         "pasteCollapse": {
           "title": "Pasted text",
           "hint": "when a paste folds into a chip"
-        },
-        "spellcheck": {
-          "title": "Spell check",
-          "hint": "underlines under misspelled words"
-        },
-        "sendKey": {
-          "title": "Sending a message",
-          "hint": "which key sends it"
-        },
-        "keys": {
-          "title": "Keyboard shortcuts",
-          "hint": "every key the panel answers to"
-        },
-        "settingSources": {
-          "title": "Where settings come from",
-          "hint": "which layers Claude Code loads"
         },
         "claudeConfig": {
           "title": "Claude Code settings",
@@ -1303,16 +1185,12 @@
         },
         "settings": {
           "label": "Settings",
-          "sub": "Text size, sounds, new chats"
+          "sub": "Sounds, colours, new chats"
         }
       }
     },
     "settings": {
       "rows": {
-        "appearance": {
-          "label": "Appearance",
-          "sub": "Text size of the panel"
-        },
         "sounds": {
           "label": "Sound alerts",
           "sub": "When the panel calls you"
@@ -1321,45 +1199,17 @@
           "label": "No-stress colors",
           "sub": "How much colour the gauges keep"
         },
-        "indicators": {
-          "label": "Indicators",
-          "sub": "Which readings stay around the field"
-        },
         "newChat": {
           "label": "New chats",
           "sub": "Model, effort and permission mode"
-        },
-        "restoreTabs": {
-          "label": "Tabs on start",
-          "sub": "Reopen what was open, drafts included"
         },
         "shareEditor": {
           "label": "Open file and selection",
           "sub": "What goes along with each message"
         },
-        "composerLayout": {
-          "label": "Composer layout",
-          "sub": "Where the input sits"
-        },
         "pasteCollapse": {
           "label": "Pasted text",
           "sub": "When a paste folds into a chip"
-        },
-        "spellcheck": {
-          "label": "Spell check",
-          "sub": "Underline misspelled words"
-        },
-        "sendKey": {
-          "label": "Sending a message",
-          "sub": "Which key sends it"
-        },
-        "keys": {
-          "label": "Keyboard shortcuts",
-          "sub": "Tabs, queue, search and the rest"
-        },
-        "settingSources": {
-          "label": "Settings sources",
-          "sub": "Which of Claude Code's layers load here"
         },
         "claudeConfig": {
           "label": "Claude Code settings",
@@ -1373,42 +1223,15 @@
       "values": {
         "on": "On",
         "off": "Off",
-        "default": "Default",
         "none": "None",
         "never": "Never",
-        "points": "{{size}} pt",
         "countOn": "{{count}} on",
         "fullColor": "Full colour",
         "calm": "One tone",
         "percent": "{{value}}%",
         "fromLines_one": "From {{count}} line",
-        "fromLines_other": "From {{count}} lines",
-        "layouts": {
-          "bottom": "Default",
-          "compact": "Compact",
-          "left": "Left",
-          "right": "Right"
-        },
-        "sendKeys": {
-          "enter": "Enter",
-          "modEnter": "⌘ Enter"
-        },
-        "sources": {
-          "all": "Everything",
-          "noLocal": "Without local",
-          "user": "Only mine"
-        }
+        "fromLines_other": "From {{count}} lines"
       }
-    },
-    "appearance": {
-      "size": "Text size",
-      "follow": "As in the IDE",
-      "followSub": "Follow the IDE's text - {{size}} right now",
-      "own": "A size of its own",
-      "ownSub": "The panel alone - the editor and the file tree stay as they are",
-      "smaller": "Smaller",
-      "larger": "Larger",
-      "points": "{{size}} pt"
     },
     "sounds": {
       "events": {
@@ -1453,37 +1276,6 @@
       "percent": "{{value}}%",
       "keeps": "Nothing else changes: an error stays red, a permission stays what it is. Those are things that happened, not a mood."
     },
-    "indicators": {
-      "above": "Above the field",
-      "below": "Under the field",
-      "items": {
-        "contextBar": {
-          "label": "Context bar",
-          "hint": "The strip over the field that fills as the conversation grows"
-        },
-        "contextLabel": {
-          "label": "Context figure",
-          "hint": "“ctx 42%” at the end of the bar"
-        },
-        "ring5h": {
-          "label": "5-hour limit",
-          "hint": "The ring for the plan’s five-hour window"
-        },
-        "ringWeek": {
-          "label": "Weekly limit",
-          "hint": "The ring for the plan’s weekly window"
-        },
-        "ringModel": {
-          "label": "A model’s weekly limit",
-          "hint": "A model’s own week, as on the account page - shown only while the plan keeps one"
-        },
-        "tokensToday": {
-          "label": "Tokens today",
-          "hint": "Spent today, across every project"
-        }
-      },
-      "modelNamed": "{{model}} weekly limit"
-    },
     "newChats": {
       "rows": {
         "model": {
@@ -1503,33 +1295,6 @@
       "lastUsedNow": "Follows the last pick - {{value}}",
       "custom": "Added by you",
       "bypassOff": "Bypass permissions is not offered: this project's or your organization's settings switch it off."
-    },
-    "restoreTabs": {
-      "label": "Bring the tabs back",
-      "hint": "The tabs, their conversations and what was being typed in them come back after the IDE restarts - after a crash too",
-      "note": "Nothing is started again: an agent comes up only when its tab is opened or written into. Drafts are kept on this machine, in the IDE's own data, and nowhere else."
-    },
-    "settingSources": {
-      "note": "Claude Code reads its settings from several files, and a repository's own win over yours: an env block committed to it decides the address and the key every request goes out with. Leaving a layer out drops its permissions, hooks and MCP servers along with it. Managed settings from your organization apply either way.",
-      "options": {
-        "all": {
-          "label": "Everything",
-          "sub": "Yours, the repository's and its local file - what Claude Code does by itself"
-        },
-        "noLocal": {
-          "label": "Without the local file",
-          "sub": "Skips settings.local.json, keeps the repository's shared settings"
-        },
-        "user": {
-          "label": "Only my own",
-          "sub": "Skips both files in the repository - your sign-in and your settings decide"
-        }
-      },
-      "repositorySets": "This repository sets",
-      "repositoryMeans": "While its layers load, these win over the account and the address chosen here.",
-      "repositoryQuiet": "This repository sets nothing that would override your account or your address.",
-      "needsNewer": "This Claude Code does not know the flag this needs - every layer loads whatever is chosen here. Update it.",
-      "restarts": "Open conversations of this project restart with the new layers as soon as their turn ends."
     },
     "claudeConfig": {
       "intro": "Claude Code's own settings - the ones /config changes in a terminal, and they apply there too. Claude Code writes every change itself.",
@@ -1648,33 +1413,6 @@
       "label": "Send the open file along",
       "hint": "Each message carries the file open in the editor - the way Claude Code does it in a terminal",
       "note": "The file’s chip under the field has this same switch, and there a single message can go without it, or with it. A slash command never carries it."
-    },
-    "spellcheck": {
-      "label": "Check spelling",
-      "hint": "Words the checker does not know get a red underline - in the message field and the panel’s other text fields",
-      "note": "Turn it off if you write in several languages and words in the others come up underlined. Right-click an underlined word for suggestions."
-    },
-    "sendKey": {
-      "note": "Which key lets a message go. The other one breaks the line - so a message written as several paragraphs is typed with the same key either way.",
-      "enter": {
-        "label": "Enter",
-        "sub": "Shift+Enter breaks the line"
-      },
-      "modEnter": {
-        "label": "⌘ Enter",
-        "sub": "Enter breaks the line"
-      }
-    },
-    "composerLayout": {
-      "bottom": {
-        "label": "Default",
-        "sub": "Model, effort, mode and usage on a line under the field"
-      },
-      "compact": {
-        "label": "Compact",
-        "sub": "All of that in the field’s own row - more room for the conversation"
-      },
-      "note": "The panel always stands at the right edge of the window, so the side columns of the plugin are not offered here."
     },
     "pasteCollapse": {
       "note": "A long paste folds into a chip so that a wall of text does not fill the field. Lines are counted as they would fall in the field itself, so text pasted as one endless line folds too. Nothing is lost - a folded paste holds the text whole and unfolds back by the pencil on it.",
@@ -1901,7 +1639,11 @@
       "openRecent": "Open Recent Project {{name}}",
       "toggleClaudeCode": "Show or Hide Claude Code",
       "toggleView": "Show or Hide {{name}}",
-      "toggleDesignSystem": "Show or Hide Design System"
+      "toggleDesignSystem": "Show or Hide Design System",
+      "openSettings": "Settings…",
+      "textSizeUp": "Increase Text Size",
+      "textSizeDown": "Decrease Text Size",
+      "textSizeReset": "Reset Text Size"
     },
     "longQuery": "The text is too long: search takes up to {{count}} characters."
   }

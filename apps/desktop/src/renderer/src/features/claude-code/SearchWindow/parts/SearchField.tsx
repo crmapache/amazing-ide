@@ -1,8 +1,9 @@
 import clsx from 'clsx'
-import { X, Search, WholeWord, LoaderCircle, CaseSensitive } from 'lucide-react'
+import { X, Search, WholeWord, CaseSensitive } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { IconButton } from '@amazing-ide/ui/IconButton'
+import { Spinner } from '@amazing-ide/ui/Spinner'
 
 import styles from '../SearchWindow.module.scss'
 import type { SearchFieldProps } from '../SearchWindow.types'
@@ -49,14 +50,7 @@ export const SearchField = ({
         onChange={(event) => onQuery(event.target.value)}
       />
       <span className={styles.fieldTools}>
-        {isLoading && (
-          <LoaderCircle
-            className={styles.spinner}
-            size={SEARCH_ICON_SIZE}
-            strokeWidth={SEARCH_ICON_STROKE}
-            aria-hidden
-          />
-        )}
+        {isLoading && <Spinner tone="neutral" />}
         {query && (
           <IconButton
             icon={X}

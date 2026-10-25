@@ -8,9 +8,8 @@ import styles from '../Composer.module.scss'
 import type { SendButtonsProps } from '../Composer.types'
 import { useClaudeActions } from '../../claude-actions.hooks'
 import { TICK_MS, FORCE_STOP_AFTER_MS } from '../../claude.constants'
-import { usePanelPrefs } from '../../claude.queries'
 import { useNow } from '../../clock.hooks'
-import { sendKeyKeys } from '../../send-key.utils'
+import { SEND_KEY_HINT } from '../../composer.constants'
 import { FitLabel } from './FitLabel'
 
 /**
@@ -31,20 +30,18 @@ export const SendButtons = ({
 }: SendButtonsProps) => {
   const { t } = useTranslation()
   const { interrupt, forceStop } = useClaudeActions()
-  const { sendKey } = usePanelPrefs()
   const isRunning = conversation !== null && conversation.status !== 'idle'
   const stoppedAt = conversation?.stopRequestedAt ?? null
   const now = useNow(stoppedAt !== null, TICK_MS)
   const isStalled = stoppedAt !== null && now - stoppedAt > FORCE_STOP_AFTER_MS
-  const keys = sendKeyKeys(sendKey).join(' ')
-  const queueHint = keyQueues ? keys : t('claudeCode.composer.queueHint')
+  const queueHint = keyQueues ? SEND_KEY_HINT : t('claudeCode.composer.queueHint')
   const sendHint = isShell
     ? t('claudeCode.composer.runHint')
     : isAside
       ? t('claudeCode.aside.askAsideHint')
       : keyQueues && isRunning
         ? ''
-        : keys
+        : SEND_KEY_HINT
   const sendLabel = isShell
     ? t('claudeCode.composer.run')
     : isAside

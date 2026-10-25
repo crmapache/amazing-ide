@@ -91,3 +91,8 @@
   font-family: var(--font-code);
   font-size: var(--font-size-sm);
 }
+
+// Часть значения своим тоном - режим в значении кнопки модели, усилия и режима.
+.accentText {
+  color: var(--color-accent-strong);
+}

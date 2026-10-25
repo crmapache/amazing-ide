@@ -103,12 +103,11 @@ export type RequestResponse =
   | { kind: 'question'; answers: QuestionAnswers }
   | { kind: 'plan'; approved: boolean; acceptEdits: boolean; feedback: string }
 
-/** Сколько занято окна контекста и сколько стоил разговор. */
+/** Сколько занято окна контекста. */
 export type ConversationUsage = {
   contextTokens: number
   /** 0 - CLI ещё не сказал размер окна. */
   contextWindow: number
-  costUsd: number
 }
 
 /**
@@ -249,7 +248,16 @@ export type Conversation = {
 export type QueueHold = 'paused' | 'reopened' | 'blocked'
 
 /** Слэш-команда для подсказки в поле. */
-export type SlashCommand = { name: string; description: string; argumentHint: string }
+/**
+ * Слэш-команда от CLI. builtin - своя команда CLI (/compact, /clear, /mcp), а не скилл,
+ * команда проекта или подсказка MCP-сервера.
+ */
+export type SlashCommand = {
+  name: string
+  description: string
+  argumentHint: string
+  builtin?: boolean | undefined
+}
 
 /** Нашёлся ли Claude Code на машине. unknown - ещё ищем. */
 export type CliStatus = 'unknown' | 'found' | 'missing'
@@ -280,6 +288,12 @@ export type ClaudeState = {
   closedByProject: Record<string, ClosedConversation[]>
   /** Команды, которые CLI назвал последними, - по папке проекта. */
   commandsByProject: Record<string, SlashCommand[]>
+  /**
+   * Свои команды CLI (/compact, /clear, /mcp…) с пояснениями - служебным запросом при
+   * старте IDE, без разговора: подсказка «/» знает их и до первого хода. Пустой - CLI ещё
+   * не ответил.
+   */
+  builtinCommands: SlashCommand[]
   /** Каталог моделей от CLI. Пустой - CLI ещё не спрашивали, окно берёт свой список. */
   models: ModelInfo[]
   cli: CliStatus

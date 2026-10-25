@@ -12,11 +12,6 @@ export type CliFeatures = {
   allowSkipPermissions: boolean
   /** Есть `--safe-mode`: служебный процесс без хуков, плагинов и MCP человека. */
   safeMode: boolean
-  /**
-   * Есть `--setting-sources` (Settings sources). Старый CLI неизвестный флаг не
-   * пропускает - он просто не стартует, поэтому без него флаг не передаётся.
-   */
-  settingSources: boolean
 }
 
 /** Разбор `claude --help`. Пустая справка (CLI не ответил) - самые осторожные значения. */
@@ -24,5 +19,4 @@ export const parseCliFeatures = (help: string): CliFeatures => ({
   manualMode: /"manual"/.test(help),
   allowSkipPermissions: help.includes('--allow-dangerously-skip-permissions'),
   safeMode: help.includes('--safe-mode'),
-  settingSources: help.includes('--setting-sources'),
 })

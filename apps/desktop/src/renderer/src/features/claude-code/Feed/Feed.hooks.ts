@@ -13,13 +13,24 @@ import {
 } from './Feed.constants'
 import { rowAtEdge } from './Feed.utils'
 
-type Held = { row: Element; top: number; until: number }
+type Kept = { row: Element; top: number }
+
+type Held = Kept & { until: number }
 
 const isAtBottom = (scroller: HTMLElement) =>
   scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight <= PIN_THRESHOLD_PX
 
 const rowOf = (target: EventTarget | null) =>
   target instanceof Element ? target.closest(`[${ROW_ATTRIBUTE}]`) : null
+
+/** Строки ленты и номер той, что у верхней кромки окна прокрутки, - она читается первой. */
+const rowsAtTop = (scroller: HTMLElement) => {
+  const rows = scroller.querySelectorAll(`[${ROW_ATTRIBUTE}]`)
+  const edge = scroller.getBoundingClientRect().top
+  const index = rowAtEdge(rows.length, (at) => rows[at]?.getBoundingClientRect().bottom ?? 0, edge)
+
+  return { rows, index, edge }
+}
 
 /**
  * Прокрутка ленты, как в ACC. Держится у низа, пока человек сам не отлистал вверх. Строка,
@@ -39,6 +50,7 @@ export const useFeedScroll = (
   const lastTop = useRef(0)
   const pressed = useRef<{ row: Element; top: number } | null>(null)
   const held = useRef<Held | null>(null)
+  const kept = useRef<Kept | null>(null)
   const measured = useRef({ pages, height: 0, top: 0, pins: pinsHeight })
   const [isAway, setIsAway] = useState(false)
   const [lit, setLit] = useState<string | null>(null)
@@ -75,12 +87,8 @@ export const useFeedScroll = (
 
     if (!scroller) return
 
-    const rows = scroller.querySelectorAll(`[${ROW_ATTRIBUTE}]`)
-    const edge = scroller.getBoundingClientRect().top
-    const row =
-      rows[
-        rowAtEdge(rows.length, (index) => rows[index]?.getBoundingClientRect().bottom ?? 0, edge)
-      ]
+    const { rows, index, edge } = rowsAtTop(scroller)
+    const row = rows[index]
 
     setPlace(conversationId, {
       atEnd: stick.current,
@@ -94,6 +102,24 @@ export const useFeedScroll = (
       top: scroller.scrollTop,
     }
   }, [conversationId, setPlace])
+
+  /**
+   * Перед страницей выше: запомнить строку у верхней кромки там, где её видно сейчас.
+   * Пришедшая страница поставит её туда же - по самой строке, а не по разнице высоты ленты:
+   * высота врёт, пока строки вне экрана стоят на примерной высоте (content-visibility).
+   * Самая первая строка ленты не годится: группа вызовов склеивается с вызовами из новой
+   * страницы и встаёт новой строкой под другим id - держится следующая за ней.
+   */
+  const keepPlace = useCallback(() => {
+    const scroller = scrollerRef.current
+
+    if (!scroller) return
+
+    const { rows, index } = rowsAtTop(scroller)
+    const row = rows[index === 0 && rows.length > 1 ? 1 : index]
+
+    kept.current = row ? { row, top: row.getBoundingClientRect().top } : null
+  }, [])
 
   const jumpToBottom = useCallback(() => {
     const scroller = scrollerRef.current
@@ -178,14 +204,22 @@ export const useFeedScroll = (
     jumpToBottom()
   }, [pinKey, jumpToBottom])
 
-  // Страница выше пришла или полка сменила высоту - читаемое остаётся на месте.
+  // Страница выше пришла или полка сменила высоту - читаемое остаётся на месте. Строку,
+  // запомненную нажатием, лента и держит ещё HOLD_MS: строки новой страницы у кромки
+  // раскладываются уже после отрисовки и сдвинули бы её своей настоящей высотой.
   useLayoutEffect(() => {
     const scroller = scrollerRef.current
     const before = measured.current
+    const place = kept.current
 
     if (!scroller) return
 
-    if (!stick.current && before.pages !== pages) {
+    if (before.pages !== pages && place?.row.isConnected) {
+      kept.current = null
+      scroller.scrollTop += place.row.getBoundingClientRect().top - place.top
+      held.current = { ...place, until: performance.now() + HOLD_MS }
+      setStick(isAtBottom(scroller))
+    } else if (!stick.current && before.pages !== pages) {
       scroller.scrollTop = before.top + (scroller.scrollHeight - before.height)
     } else if (!stick.current && before.pins !== pinsHeight) {
       scroller.scrollTop += pinsHeight - before.pins
@@ -238,6 +272,7 @@ export const useFeedScroll = (
     lit,
     jumpToBottom,
     goToRow,
+    keepPlace,
     handleScroll,
     handlePointerDown,
     handleClick,

@@ -1,10 +1,10 @@
 import { stat, realpath } from 'node:fs/promises'
-import { extname, normalize, isAbsolute } from 'node:path'
+import { extname } from 'node:path'
 
 import { shell } from 'electron'
 
 import { RUNNABLE_EXTENSIONS, EXECUTABLE_MODE_BITS } from './outside-open.constants'
-import { isNetworkPath, hasControlChars } from './path-location'
+import { outsidePath } from './path-location'
 
 /**
  * Можно ли отдать файл системе «открыть»: не программа, не скрипт, не установщик, не
@@ -22,9 +22,10 @@ export const opensSafely = (names: readonly string[], mode: number): boolean =>
  * абсолютный, не сетевой, существует. false - показывать нечего.
  */
 export const openOutside = async (path: string, reveal: boolean): Promise<boolean> => {
-  if (!isAbsolute(path) || isNetworkPath(path) || hasControlChars(path)) return false
+  const target = outsidePath(path)
 
-  const target = normalize(path)
+  if (target === null) return false
+
   const info = await stat(target).catch(() => null)
 
   if (!info) return false

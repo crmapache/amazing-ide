@@ -17,6 +17,7 @@ import type { ToolsResult } from '@shared/claude-tools'
 import type { Project } from '@shared/workspace'
 
 import type { ClosableTabCall } from '@amazing-ide/ui/ClosableTab.types'
+import type { RingMeterTone } from '@amazing-ide/ui/RingMeter.types'
 
 export type ToolKind = 'hidden' | 'plain' | 'edit' | 'agent' | 'plan' | 'question'
 
@@ -41,22 +42,14 @@ export type FeedRow =
 
 /** Экран из списка Settings бокового меню. */
 export type SettingsScreen =
-  | 'appearance'
   | 'sounds'
   | 'calmColors'
-  | 'indicators'
   | 'newChat'
   | 'newChatModel'
   | 'newChatEffort'
   | 'newChatMode'
-  | 'restoreTabs'
   | 'shareEditor'
-  | 'composerLayout'
   | 'pasteCollapse'
-  | 'spellcheck'
-  | 'sendKey'
-  | 'keys'
-  | 'settingSources'
   | 'claudeConfig'
   | 'customModels'
 
@@ -93,4 +86,19 @@ export type ToolsAction<Input, Outcome extends { result: ToolsResult }> = {
   run: (input: Input) => Promise<Outcome>
   describe: (input: Input) => { target: string; success: string }
   apply: (outcome: Outcome) => void
+}
+
+/**
+ * Кольцо окна лимита: доля, бледная дуга темпа, тон, подпись («5-hour») и подсказка
+ * словами - с процентом, сбросом и темпом.
+ */
+export type UsageRing = {
+  key: string
+  label: string
+  value: number
+  pace: number | null
+  tone: RingMeterTone
+  /** Окно упёрлось, работа идёт на доплате: кольцо горит, цифры нет. */
+  burning: boolean
+  hint: string
 }

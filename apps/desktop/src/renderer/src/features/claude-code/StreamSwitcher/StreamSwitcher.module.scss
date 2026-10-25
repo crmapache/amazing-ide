@@ -1,77 +1,166 @@
 @use '@amazing-ide/ui/mixins' as *;
 
-// Ряд чипов над лентой: в одну строку, лишнее листается вбок (колесом - тоже).
+// Ряд чипов над лентой - своя полоса с линией снизу: лента под ним прокручивается, и без
+// края её верхняя строка, срезанная прокруткой, читалась залезшей под чипы. В одну строку,
+// лишнее листается вбок (колесом - тоже). Поле по бокам - как у ленты.
 .streamSwitcher {
   flex-shrink: 0;
   min-width: 0;
+  border-bottom: var(--border-width) solid var(--color-border);
 }
 
 .list {
   display: flex;
   gap: var(--space-1);
-  padding: var(--space-1) var(--space-2);
+  align-items: center;
+  padding: var(--space-1-5) var(--size-panel-gutter);
   overflow-x: auto;
   scrollbar-width: none;
 }
 
-// Чип - не кнопка, а строка с кнопками: сам чип переключает поток, крестик останавливает.
+// Чип - не кнопка, а плашка с кнопками: сам чип переключает поток, крестик останавливает.
+// Высота - контрол sm вместе с рамкой: всё внутри стоит по одной середине. Ширину задаёт
+// содержимое - ряд листается, а не сжимает чипы.
 .chip {
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  max-width: var(--size-tab-max);
+  height: var(--size-control-sm);
   border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
+  color: var(--color-fg-muted);
+  transition:
+    background-color var(--duration-normal) var(--easing-standard),
+    border-color var(--duration-normal) var(--easing-standard);
+
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--color-border-strong);
+    }
+  }
 }
 
-.active {
+.active,
+.active:hover {
   border-color: var(--color-border-strong);
   background-color: var(--color-bg-selected);
+  color: var(--color-fg);
+}
+
+// Фоновая команда - не поток: пунктирная рамка отличает её от агентов. Нажатие показывает
+// команду, и открытая панель держит чип выбранным.
+.static {
+  border-style: dashed;
+
+  &:has([aria-expanded='true']) {
+    border-color: var(--color-border-strong);
+    background-color: var(--color-bg-selected);
+    color: var(--color-fg);
+  }
+}
+
+// Сброс кнопки - раньше общего правила: его padding: 0 иначе съедал поля чипа.
+.pick {
+  @include button-reset;
+
+  border-radius: inherit;
+  color: inherit;
 }
 
 .pick,
-.static {
+.tag {
   display: flex;
   align-items: center;
   gap: var(--space-1-5);
   min-width: 0;
-  height: var(--size-control-sm);
+  height: 100%;
   padding: 0 var(--space-2);
-  border-radius: var(--radius-full);
-  color: var(--color-fg-muted);
+  font-family: var(--font-code);
   font-size: var(--font-size-xs);
+  white-space: nowrap;
 }
 
-.pick {
-  @include button-reset;
-  @include interactive-surface;
+// Справа у чипа с крестиком поле - такое же, как сверху и снизу у крестика: он не жмётся к
+// краю, а чип не прыгает по ширине, когда крестик проступает.
+.stoppable {
+  padding-right: calc((var(--size-control-sm) - var(--size-control-xs)) / 2 - var(--border-width));
 
-  &:focus-visible {
-    outline: var(--focus-ring-width) solid var(--color-focus);
-    outline-offset: calc(var(--focus-ring-width) * -1);
+  .pick,
+  .tag {
+    padding-right: var(--space-1);
   }
 }
 
-.label {
+// Крестик останавливает работу, а не закрывает чип - поэтому он проступает только под
+// курсором и в фокусе: видимый на каждом чипе, он читался бы «закрыть».
+.stop {
+  display: flex;
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--easing-standard);
+
+  .chip:hover &,
+  &:focus-within {
+    opacity: 1;
+  }
+
+  button {
+    border-radius: var(--radius-sm);
+  }
+}
+
+.name {
   flex-shrink: 0;
   color: var(--color-fg);
-  font-family: var(--font-code);
+  font-weight: var(--font-weight-medium);
 }
 
 .duration {
   flex-shrink: 0;
-  color: var(--color-fg-disabled);
-  font-family: var(--font-code);
+  color: var(--color-fg-subtle);
   font-variant-numeric: tabular-nums;
 }
 
-// Чем занят агент - узкая строка с многоточием, иначе один чип съел бы ряд.
+// Чем занят агент - своей мерой с многоточием: полное - в подсказке.
 .meta {
   @include truncate;
 
-  min-width: 0;
-  max-width: var(--size-text-narrow);
+  max-width: var(--size-stream-activity);
   color: var(--color-fg-subtle);
+}
+
+// Панель фоновой команды: шапка, описание модели, сама команда и кнопка остановки.
+// Поле - добор к полю всплывающей панели: текст стоит на шаг от её края.
+.commandView {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-0-5);
+}
+
+.commandHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+}
+
+.commandTitle {
+  @include caps-label;
+
+  color: var(--color-fg-muted);
+  font-family: var(--font-ui);
+}
+
+.commandDescription {
+  color: var(--color-fg);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+.commandActions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .subject {

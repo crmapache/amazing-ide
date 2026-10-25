@@ -8,6 +8,7 @@ import { applyAppProfile, PROFILE_DIR_ENV } from './app-profile'
 import { installApplicationMenu } from './menu'
 import { ClaudeService } from './claude/claude-service'
 import type { StoredClaude } from './claude/claude-state'
+import { OutsideWatchers } from './fs/outside-watchers'
 import { ProjectWatchers } from './fs/project-watchers'
 import { settleWrites } from './fs/text-write'
 import { GitStatusService } from './git/git-status-service'
@@ -119,6 +120,11 @@ const bootstrap = async () => {
 
     gitStatus.changed(projectId, { git, paths })
   })
+  // Файлы вне проекта, открытые вкладками, - тем же событием проекта вкладки: редактор
+  // узнаёт их по абсолютному пути.
+  const outsideWatchers = new OutsideWatchers((projectId, files) =>
+    broadcast('fs:changed', { projectId, directories: [], renamed: [], files, git: false }),
+  )
   const watchProjects = () => {
     for (const projectId of watchers.sync(workspace.getState().projects)) {
       gitStatus.forget(projectId)
@@ -138,6 +144,7 @@ const bootstrap = async () => {
     search,
     claude,
     gitStatus,
+    outsideWatchers,
     conversationSearch,
     getWindow: () => mainWindow,
   }
@@ -161,6 +168,7 @@ const bootstrap = async () => {
 
     conversationSearch.dispose()
     watchers.dispose()
+    outsideWatchers.dispose()
     await Promise.allSettled([claude.shutdown(), settleWrites()])
     quitting = 'ready'
     app.quit()

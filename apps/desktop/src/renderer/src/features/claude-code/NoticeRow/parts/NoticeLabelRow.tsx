@@ -1,23 +1,17 @@
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '@amazing-ide/ui/Button'
-
 import { FAST_REASON_KEYS } from '../NoticeRow.constants'
 import styles from '../NoticeRow.module.scss'
 import type { NoticeItemProps } from '../NoticeRow.types'
-import { useClaudeCodeStore } from '../../claude-code.store'
 import { LabelRow } from './LabelRow'
 
 /**
  * Отметки с подписью, как в ACC: SESSION - процесс упал (с кодом выхода и причиной из
  * stderr), FAST - быстрый режим не включился и почему, SETTINGS - репозиторий перебивает
- * выбранный аккаунт (кнопка ведёт к источникам настроек).
+ * выбранный аккаунт: чьи имена, без значений.
  */
 export const NoticeLabelRow = ({ item }: NoticeItemProps) => {
   const { t } = useTranslation()
-  const openMenu = useClaudeCodeStore((store) => store.openMenu)
-
-  const handleSources = () => openMenu('settingSources')
 
   if (item.code === 'fast') {
     const reason = FAST_REASON_KEYS[item.detail]
@@ -35,14 +29,7 @@ export const NoticeLabelRow = ({ item }: NoticeItemProps) => {
 
   if (item.code === 'outranked') {
     return (
-      <LabelRow
-        label={t('claudeCode.notice.outranked.label')}
-        tone="warning"
-        aside={
-          <Button size="sm" variant="ghost" onClick={handleSources}>
-            {t('claudeCode.notice.outranked.open')}
-          </Button>
-        }>
+      <LabelRow label={t('claudeCode.notice.outranked.label')} tone="warning">
         {t('claudeCode.notice.outranked.text')}{' '}
         <span className={styles.modelTo}>{item.detail}</span>
       </LabelRow>

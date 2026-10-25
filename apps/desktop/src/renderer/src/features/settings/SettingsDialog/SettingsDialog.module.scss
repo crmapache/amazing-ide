@@ -1,0 +1,23 @@
+@use '@amazing-ide/ui/mixins' as *;
+
+// Раздел настроек: подпись капсом, под ней настройка и пояснение.
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sectionTitle {
+  @include caps-label;
+
+  margin: 0;
+  color: var(--color-fg-subtle);
+}
+
+// На стекле диалога subtle не дотягивает до 4.5:1 - пояснение muted.
+.hint {
+  margin: 0;
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-snug);
+}

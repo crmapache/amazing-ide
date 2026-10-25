@@ -8,7 +8,7 @@ import type {
   ConversationOptions,
 } from '@shared/claude'
 import type { FeedPatch, StopReason, ConversationFeed } from '@shared/claude-feed'
-import type { SoundEvent, SettingSources } from '@shared/claude-prefs'
+import type { SoundEvent } from '@shared/claude-prefs'
 
 import { TurnRevert } from '../changes/turn-revert'
 import type { ClaudeCli } from '../cli/cli-locator'
@@ -16,14 +16,15 @@ import type { CliTap, CliMessage, ControlRequest } from '../cli/cli-messages'
 import type { CliProcess } from '../cli/cli-process'
 import { syncWork } from '../feed/work-clock'
 import { ShellRuns } from '../shell/shell-runs'
+import { takeControlRequest } from './control-requests'
 import { ConversationFeedSync } from './conversation-feed'
-import { IDLE_SLEEP_MS, UNSUPPORTED_REQUEST } from './conversation.constants'
+import { IDLE_SLEEP_MS } from './conversation.constants'
 import { exitNotice } from './exit-notice'
 import { applyOptions } from './options'
 import type { Outgoing } from './outbox'
 import { ConversationOutbox } from './outbox'
 import type { HeldRequest } from './pending-requests'
-import { answerFor, holdRequest, matchesRequest, modeFromAlways } from './pending-requests'
+import { answerFor, matchesRequest, modeFromAlways } from './pending-requests'
 import { routeMessage } from './process-router'
 import { spawnConversationProcess } from './spawn'
 
@@ -42,8 +43,6 @@ export type ConversationHost = CliTap & {
   accountId: () => string
   /** Ход кончился или CLI сказал о лимите: процесс знает свежий расход аккаунта. */
   onUsageHint: (runtime: ConversationRuntime) => void
-  /** Слои настроек Claude Code, с которыми поднимать процесс проекта (Settings sources). */
-  settingSources: (projectPath: string) => SettingSources
   /**
    * Разговор позвал человека: вопрос, конец хода, лимит, поломка (звук и свечение
    * вкладки). key - у повода, который CLI повторяет (лимит того же окна): зовёт раз.
@@ -67,10 +66,20 @@ export class ConversationRuntime {
   held: HeldRequest[] = []
   /** Идёт ход основного разговора (не только фоновые вопросы субагентов). */
   turnActive = false
-  /** Процесс только поднят: его первый пустой `result` (после --resume) - не ход. */
+  /**
+   * Процесс только поднят: его первый пустой `result` (после --resume), не привязанный к
+   * нашему сообщению, - не ход (turn-command.ts). Снимается, как только CLI взял сообщение.
+   */
   freshProcess = false
-  /** Первое сообщение, пока CLI не придумал заголовок (process-router). */
-  titleSource: string | null = null
+  /**
+   * uuid нашего сообщения, которым начался идущий ход: по отметкам CLI о нём видно, кончился
+   * ли ход (turn-command.ts). null - ход начал сам CLI.
+   */
+  turnCommand: string | null = null
+  /** Ждём от CLI имя вкладки (conversation/session-title.ts): второй раз не спрашиваем. */
+  titleAsking = false
+  /** Счёт /clear: имя, пришедшее после него, было о прежнем разговоре. */
+  titleEpoch = 0
   /** Имя от человека, которое уже получил этот процесс (tabs/tab-rename.ts). */
   namedAs: string | null = null
   /** Имя последнего сообщения, ушедшего в CLI: откат говорит его как последнее увиденное. */
@@ -275,33 +284,7 @@ export class ConversationRuntime {
   }
 
   handleControlRequest(process: CliProcess, request: ControlRequest): void {
-    if (process !== this.process) return
-
-    if (request.type === 'control_cancel_request') {
-      this.held = this.held.filter((held) => held.pending.requestId !== request.request_id)
-      this.syncStatus()
-      this.applyPendingRestart()
-
-      return void this.outbox.drain()
-    }
-
-    if (request.request?.subtype !== 'can_use_tool') {
-      return process.write({
-        type: 'control_response',
-        response: { subtype: 'error', request_id: request.request_id, error: UNSUPPORTED_REQUEST },
-      })
-    }
-
-    const held = holdRequest(request, this.meta.permissionMode)
-
-    if (!held) {
-      return process.respond(request.request_id, { behavior: 'deny', message: UNSUPPORTED_REQUEST })
-    }
-
-    this.held = [...this.held, held]
-    this.syncStatus()
-    // Вид вопроса и есть повод позвать: разрешение, выбор, план.
-    this.host.onCall(this.meta.id, held.pending.kind)
+    if (process === this.process) takeControlRequest(this, process, request)
   }
 
   handleExit(process: CliProcess, code: number | null, stderrTail: string): void {

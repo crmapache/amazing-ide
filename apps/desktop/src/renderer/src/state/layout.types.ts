@@ -15,7 +15,7 @@ export type ViewAreaState<ViewId extends string> = {
 
 /** Боковая панель - область с видами, у которой ещё и своя ширина. */
 export type PanelState<ViewId extends string> = ViewAreaState<ViewId> & {
-  /** Ширина в пикселях, в пределах PANEL_WIDTH_LIMITS. */
+  /** Ширина в пикселях, которую выбрал человек, - не уже PANEL_MIN_WIDTH. */
   width: number
 }
 
@@ -26,4 +26,15 @@ export type Layout = {
   side: PanelState<SideViewId>
   main: ViewAreaState<MainViewId>
   provider: PanelState<ProviderViewId>
+}
+
+/**
+ * Раскладка на экране: сколько пикселей у каждой области при нынешнем месте в окне.
+ * Сохранённые ширины - то, чего хочет человек; здесь - то, что влезло.
+ */
+export type Arrangement = Record<PanelSide, number> & {
+  /** Сколько места остаётся середине - развёрнутой или нет. */
+  main: number
+  /** Видна ли середина: развёрнута и ей хватает места (MAIN_MIN_WIDTH). */
+  isMainShown: boolean
 }

@@ -1,16 +1,9 @@
 import { EFFORT_LEVELS, PERMISSION_MODES } from '@shared/claude'
 import type { PanelPrefs, SoundEvent, PanelPrefsPatch } from '@shared/claude-prefs'
 import {
-  SEND_KEYS,
   SOUND_EVENTS,
-  INDICATOR_IDS,
-  TEXT_SIZE_MAX,
-  TEXT_SIZE_MIN,
-  SETTING_SOURCES,
-  COMPOSER_LAYOUTS,
   GAUGE_VIVID_CALM,
   GAUGE_VIVID_FULL,
-  TEXT_SIZE_FOLLOW,
   MODEL_NAME_PATTERN,
   DEFAULT_PANEL_PREFS,
 } from '@shared/claude-prefs'
@@ -61,25 +54,6 @@ const volumes = (value: unknown): Partial<Record<SoundEvent, number>> | undefine
   return Object.fromEntries(entries)
 }
 
-const sources = (value: unknown): PanelPrefs['settingSources'] | undefined => {
-  if (typeof value !== 'object' || value === null) return undefined
-
-  return Object.fromEntries(
-    Object.entries(record(value)).flatMap(([path, choice]) => {
-      const known = oneOf(choice, SETTING_SOURCES)
-
-      // По умолчанию all - его не храним, чтобы файл не рос записями «как было».
-      return path.startsWith('/') && known && known !== 'all' ? [[path, known] as const] : []
-    }),
-  )
-}
-
-const textSize = (value: unknown): number | undefined => {
-  if (value === TEXT_SIZE_FOLLOW) return TEXT_SIZE_FOLLOW
-
-  return clamp(value, TEXT_SIZE_MIN, TEXT_SIZE_MAX)
-}
-
 /**
  * Путь к CLI: пусто или абсолютный путь без переводов строк. Что это правда Claude Code,
  * проверяет поиск CLI на каждом запуске (cli/cli-path.ts), а не разбор настроек.
@@ -108,15 +82,9 @@ const parseFields = (value: unknown): PanelPrefsPatch => {
     newTabModel: input['newTabModel'] === null ? null : usableModel(input['newTabModel']),
     newTabEffort: pinned(input['newTabEffort'], EFFORT_LEVELS),
     newTabMode: pinned(input['newTabMode'], PERMISSION_MODES),
-    composerLayout: oneOf(input['composerLayout'], COMPOSER_LAYOUTS),
     pasteCollapse: clamp(input['pasteCollapse'], 0, MAX_PASTE_LINES),
-    sendKey: oneOf(input['sendKey'], SEND_KEYS),
     gaugeVivid: clamp(input['gaugeVivid'], GAUGE_VIVID_CALM, GAUGE_VIVID_FULL),
-    hiddenIndicators: subset(input['hiddenIndicators'], INDICATOR_IDS),
-    textSize: textSize(input['textSize']),
-    restoreTabs: typeof input['restoreTabs'] === 'boolean' ? input['restoreTabs'] : undefined,
     shareEditor: typeof input['shareEditor'] === 'boolean' ? input['shareEditor'] : undefined,
-    spellcheck: typeof input['spellcheck'] === 'boolean' ? input['spellcheck'] : undefined,
     customModels: Array.isArray(input['customModels'])
       ? [
           ...new Set(input['customModels'].map(usableModel).filter((name) => name !== undefined)),
@@ -124,7 +92,6 @@ const parseFields = (value: unknown): PanelPrefsPatch => {
       : undefined,
     mutedSounds: subset(input['mutedSounds'], SOUND_EVENTS),
     soundVolumes: volumes(input['soundVolumes']),
-    settingSources: sources(input['settingSources']),
     cliPath: cliPath(input['cliPath']),
   }
 
@@ -157,15 +124,3 @@ export const applyPrefsPatch = (prefs: PanelPrefs, patch: unknown): PanelPrefs =
     ? { ...next, newTabModel: null }
     : next
 }
-
-/**
- * Папки проектов, у которых сменились источники настроек: их процессы перезапускаются,
- * как освободятся, - CLI читает слои только на старте.
- */
-export const changedSourceProjects = (
-  before: PanelPrefs['settingSources'],
-  after: PanelPrefs['settingSources'],
-): string[] =>
-  [...new Set([...Object.keys(before), ...Object.keys(after)])].filter(
-    (path) => (before[path] ?? 'all') !== (after[path] ?? 'all'),
-  )

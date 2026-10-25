@@ -1,41 +1,59 @@
 import type { TFunction } from 'i18next'
+import type { LucideIcon } from 'lucide-react'
 
-import type { AccountUsage } from '@shared/claude-usage'
+import type { Conversation } from '@shared/claude'
 
-import { WEEK_MS, FIVE_HOUR_MS, USAGE_FULL_PERCENT } from '../usage.constants'
-import { paceTone, weekBudget, windowLabel, windowPercent, formatRemaining } from '../usage.utils'
-import type { UsageRing } from './ComposerStatus.types'
+import type { ModelChip } from '../model-chip.types'
+import { modelFamily } from '../model-chip.utils'
+import {
+  MODEL_ICONS,
+  SETUP_SECTIONS,
+  SETUP_SEPARATOR,
+  OTHER_MODEL_ICON,
+} from './ComposerStatus.constants'
+import type { SetupSection } from './ComposerStatus.types'
+
+/** Иконка модели в разделе Model: по семье, у модели без семьи Claude - общая. */
+export const modelIcon = (model: string): LucideIcon => {
+  const family = modelFamily(model)
+
+  return family ? MODEL_ICONS[family] : OTHER_MODEL_ICON
+}
+
+/** Соседний раздел панели индикатора по кругу: шаг -1 - влево, 1 - вправо. */
+export const nextSection = (section: SetupSection, step: 1 | -1): SetupSection => {
+  const count = SETUP_SECTIONS.length
+
+  return SETUP_SECTIONS[(SETUP_SECTIONS.indexOf(section) + step + count) % count] ?? section
+}
 
 /**
- * Кольца лимитов по порядку ACC: пять часов, неделя, неделя модели (Fable). У недель -
- * бледная дуга ровного темпа. Окно, которое упёрлось, пока идёт доплата, - горящее
- * кольцо без цифры: его процент застрял на ста и ничего не говорит.
+ * Части значения индикатора словами: «Opus 5.5», «High», «Bypass» - на самом индикаторе
+ * коротко, без «effort» и «permissions», которые ясны по месту. «По умолчанию» называется
+ * с тем, что по умолчанию, - иначе в строке стояли бы два одинаковых «Default».
+ * label - всё одной строкой для скринридера, hint - подсказка над индикатором: там слова
+ * полные, «High effort» и «Bypass permissions», потому что вне строки место не подсказывает.
  */
-export const usageRings = (usage: AccountUsage, now: number, t: TFunction): UsageRing[] =>
-  usage.windows.flatMap((window) => {
-    const isSession = window.group === 'session' && window.model === ''
-    const isWeek = window.group === 'weekly'
+export const setupValue = (conversation: Conversation, chip: ModelChip, t: TFunction) => {
+  const model =
+    conversation.model === null && !chip.warning ? t('claudeCode.status.defaultModel') : chip.label
 
-    if (!isSession && !isWeek) return []
+  const level = conversation.effort && t(`claudeCode.effort.levels.${conversation.effort}`)
+  const effort = level || t('claudeCode.effort.default')
+  const effortInFull = level ? t('claudeCode.status.effortValue', { value: level }) : effort
 
-    const value = windowPercent(window, now)
-    const pace = isWeek ? weekBudget(window.resetsAt, now) : null
-    const resetsIn = window.resetsAt !== null ? window.resetsAt - now : 0
-    const lines = [
-      t('claudeCode.usage.ringHint', { label: windowLabel(window, t), value: Math.round(value) }),
-      resetsIn > 0 ? t('claudeCode.usage.resetsIn', { time: formatRemaining(resetsIn) }) : '',
-      pace !== null ? t('claudeCode.usage.paceBudget', { value: pace }) : '',
-    ]
+  const mode = t(`claudeCode.modes.short.${conversation.permissionMode}`)
+  const modeInFull = t(`claudeCode.modes.labels.${conversation.permissionMode}`)
 
-    return [
-      {
-        key: `${window.group}:${window.model}`,
-        indicator: isSession ? 'ring5h' : window.model ? 'ringModel' : 'ringWeek',
-        value,
-        pace,
-        tone: paceTone(value, window.resetsAt, isSession ? FIVE_HOUR_MS : WEEK_MS, now),
-        burning: usage.extra !== null && value >= USAGE_FULL_PERCENT,
-        hint: lines.filter(Boolean).join(' · '),
-      },
-    ]
-  })
+  return {
+    model,
+    effort,
+    mode,
+    label: [model, effortInFull, modeInFull].join(SETUP_SEPARATOR),
+    hint: [
+      chip.hint,
+      t('claudeCode.status.effortHint', { value: effort }),
+      t('claudeCode.status.modeHint', { value: modeInFull }),
+    ].join(SETUP_SEPARATOR),
+  }
+}

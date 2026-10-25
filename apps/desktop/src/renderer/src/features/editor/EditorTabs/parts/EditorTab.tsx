@@ -11,12 +11,14 @@ import type { EditorTabProps } from '../EditorTabs.types'
 import { requestCloseTabs } from '../../editor-close'
 import { useDocumentNotice } from '../../editor.store'
 import { useEditorStore } from '../../editor.store'
+import { displayPath, isOutsidePath } from '../../../../lib/path.utils'
+import { useAppInfo } from '../../../../state/app-info.queries'
 import { useSelectionStore } from '../../../../state/selection.store'
 
 /**
  * Вкладка файла или разницы файла с последним коммитом: иконка типа или значок разницы, имя
- * (у одноимённых - с папкой), полный путь в подсказке, крестик и средняя кнопка мыши
- * закрывают, правая кнопка - меню. Файл с вопросом (конфликт с диском, не записался)
+ * (у одноимённых - с папкой), полный путь в подсказке (у файла вне проекта - через ~ и с
+ * пометкой), крестик и средняя кнопка мыши закрывают, правая кнопка - меню. Файл с вопросом (конфликт с диском, не записался)
  * светится цветом внимания, пока вопрос не решён.
  */
 export const EditorTab = ({
@@ -31,8 +33,14 @@ export const EditorTab = ({
   const selectFile = useSelectionStore((state) => state.selectFile)
   const openDiff = useSelectionStore((state) => state.openDiff)
   const requestFocus = useEditorStore((state) => state.requestFocus)
+  const { data: appInfo } = useAppInfo()
   const notice = useDocumentNotice(projectId, target.path)
   const isDiff = target.kind === 'diff'
+  const hint = isDiff
+    ? t('editor.tabs.diffHint', { path: target.path })
+    : isOutsidePath(target.path)
+      ? t('editor.tabs.outsideHint', { path: displayPath(target.path, appInfo?.homeDir) })
+      : target.path
 
   // Выбрал вкладку мышью - пишешь в этот файл: клавиатура уходит в редактор, как в WebStorm.
   const handleActivate = () => {
@@ -55,7 +63,7 @@ export const EditorTab = ({
     <ClosableTab
       width="fit"
       label={label}
-      hint={isDiff ? t('editor.tabs.diffHint', { path: target.path }) : target.path}
+      hint={hint}
       active={isActive}
       closeLabel={t('editor.tabs.close', { name: label })}
       leading={

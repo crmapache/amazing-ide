@@ -2,24 +2,38 @@ import { it, expect, describe } from 'vitest'
 
 import { DEFAULT_PANEL_PREFS } from '@shared/claude-prefs'
 
-import { applyPrefsPatch, parsePanelPrefs, changedSourceProjects } from './panel-prefs'
+import { applyPrefsPatch, parsePanelPrefs } from './panel-prefs'
 
 describe('настройки панели', () => {
   it('битое и чужое с диска - по умолчанию, поле за полем', () => {
     expect(parsePanelPrefs(null)).toEqual(DEFAULT_PANEL_PREFS)
-    expect(parsePanelPrefs({ sendKey: 'space', spellcheck: false })).toEqual({
+    expect(parsePanelPrefs({ gaugeVivid: 'calm', shareEditor: false })).toEqual({
       ...DEFAULT_PANEL_PREFS,
-      spellcheck: false,
+      shareEditor: false,
     })
   })
 
-  it('числа прижимаются к пределам', () => {
-    const prefs = parsePanelPrefs({ textSize: 99, gaugeVivid: -5, pasteCollapse: 3.4 })
+  it('убранные настройки из старой записи отбрасываются молча', () => {
+    const stored = {
+      sendKey: 'modEnter',
+      spellcheck: false,
+      textSize: 15,
+      restoreTabs: false,
+      composerLayout: 'compact',
+      hiddenIndicators: ['ringContext'],
+      settingSources: { '/p': 'user' },
+      pasteCollapse: 5,
+    }
 
-    expect(prefs.textSize).toBe(32)
+    expect(parsePanelPrefs(stored)).toEqual({ ...DEFAULT_PANEL_PREFS, pasteCollapse: 5 })
+  })
+
+  it('числа прижимаются к пределам', () => {
+    const prefs = parsePanelPrefs({ gaugeVivid: -5, pasteCollapse: 3.4 })
+
     expect(prefs.gaugeVivid).toBe(0)
     expect(prefs.pasteCollapse).toBe(3)
-    expect(parsePanelPrefs({ textSize: 0 }).textSize).toBe(0)
+    expect(parsePanelPrefs({ gaugeVivid: 140 }).gaugeVivid).toBe(100)
   })
 
   it('своя модель - только имя, годное для аргумента запуска', () => {
@@ -28,14 +42,6 @@ describe('настройки панели', () => {
     })
 
     expect(prefs.customModels).toEqual(['gpt-proxy/opus'])
-  })
-
-  it('источники настроек: по абсолютной папке, all не хранится', () => {
-    const prefs = parsePanelPrefs({
-      settingSources: { '/p/a': 'user', '/p/b': 'all', relative: 'user', '/p/c': 'nope' },
-    })
-
-    expect(prefs.settingSources).toEqual({ '/p/a': 'user' })
   })
 
   it('путь к CLI - пусто или абсолютный путь одной строкой', () => {
@@ -48,14 +54,16 @@ describe('настройки панели', () => {
   })
 
   it('патч меняет только названное', () => {
-    const next = applyPrefsPatch(DEFAULT_PANEL_PREFS, { sendKey: 'modEnter', newTabModel: null })
+    const next = applyPrefsPatch(DEFAULT_PANEL_PREFS, { shareEditor: false, newTabModel: null })
 
-    expect(next).toEqual({ ...DEFAULT_PANEL_PREFS, sendKey: 'modEnter' })
+    expect(next).toEqual({ ...DEFAULT_PANEL_PREFS, shareEditor: false })
   })
 
   it('негодное поле в патче - отказ, а не тихий пропуск', () => {
-    expect(() => applyPrefsPatch(DEFAULT_PANEL_PREFS, { sendKey: 'space' })).toThrow()
+    expect(() => applyPrefsPatch(DEFAULT_PANEL_PREFS, { gaugeVivid: 'calm' })).toThrow()
     expect(() => applyPrefsPatch(DEFAULT_PANEL_PREFS, { unknown: true })).toThrow()
+    // Убранная настройка - тоже чужое поле: окно не должно думать, что она встала.
+    expect(() => applyPrefsPatch(DEFAULT_PANEL_PREFS, { sendKey: 'modEnter' })).toThrow()
   })
 
   it('имя модели с дефиса - не модель: CLI прочёл бы его флагом', () => {
@@ -71,13 +79,5 @@ describe('настройки панели', () => {
     expect(
       applyPrefsPatch({ ...prefs, newTabModel: 'opus' }, { customModels: [] }).newTabModel,
     ).toBe('opus')
-  })
-
-  it('сменившиеся источники - по папке, «все» и отсутствие записи - одно и то же', () => {
-    expect(changedSourceProjects({ '/a': 'user', '/b': 'noLocal' }, { '/b': 'user' })).toEqual([
-      '/a',
-      '/b',
-    ])
-    expect(changedSourceProjects({ '/a': 'user' }, { '/a': 'user' })).toEqual([])
   })
 })

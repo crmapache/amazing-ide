@@ -5,8 +5,8 @@ export const SEARCH_TABS: readonly SearchTab[] = ['chat', 'project', 'ai']
 
 /**
  * Клавиши окна поиска, одно семейство ⌥⌘: вкладки по номеру и переключатели поля C и W,
- * как у Find in Files. Голый ⌘ с цифрой занят окном IDE. Поменял здесь - экран Keyboard
- * shortcuts (KeysScreen) берёт плашки отсюда же.
+ * как у Find in Files. Голый ⌘ с цифрой занят окном IDE. Подсказки на кнопках окна
+ * берут плашки отсюда же.
  */
 export const SEARCH_KEYS = {
   chat: ['⌥', '⌘', '1'],

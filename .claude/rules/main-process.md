@@ -14,7 +14,9 @@ paths:
   диск (`storage/json-file.ts`, атомарно) и после каждого изменения шлёт событие
   окну через `broadcast`. Окно не владеет этими данными.
 - **Окну не верим:** строки из запроса проверяются (`assertString`), пути - через
-  `resolveInsideRoot`, отправитель - `isTrustedSender` (уже в `registerInvokeHandlers`).
+  `resolveInsideRoot` (абсолютный путь файла вне проекта - `outsidePath`, только для
+  того, что человек открыл ссылкой), отправитель - `isTrustedSender` (уже в
+  `registerInvokeHandlers`).
 - **Безопасность окна не ослаблять:** `sandbox: true`, `contextIsolation: true`,
   `nodeIntegration: false`, навигация запрещена, внешние ссылки - в браузер. Нужно
   что-то из Node в окне - это новый канал IPC, а не ослабление.

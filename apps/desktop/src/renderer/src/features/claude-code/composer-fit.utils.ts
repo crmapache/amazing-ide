@@ -1,8 +1,8 @@
 /**
  * Как ряд кнопок поля уступает место на узкой панели (как в ACC): вместо переноса на
  * новую строку ряд отдаёт по шагу - имя на чипе редактора (или выключенный чип целиком),
- * «/», лупу, - и только потом Send и Queue сужаются до первой буквы (это уже
- * раскладка, стили). Арифметика здесь, замер - в composer-fit.hooks.ts.
+ * «/», лупу, - и только потом Send и Queue сужаются до
+ * первой буквы (это уже раскладка, стили). Арифметика здесь, замер - в composer-fit.hooks.ts.
  */
 
 /** Что ряд может отдать: имя чипа редактора, выключенный чип целиком, квадратные кнопки. */
@@ -12,10 +12,10 @@ export type FitStep = 'editorName' | 'editorChip' | 'slash' | 'search'
 export type EditorFit = 'named' | 'muted' | null
 
 /**
- * Квадраты, которые уходят, первым - самый дешёвый: «/» печатается и с клавиатуры, у
- * поиска есть ⌘F. Скрепка не уходит никогда.
+ * Что уходит после чипа редактора, первым - самое дешёвое: «/» печатается и с клавиатуры,
+ * у поиска есть ⌘F. Скрепка и кольцо контекста не уходят никогда.
  */
-const SQUARES: readonly FitStep[] = ['slash', 'search']
+const GIVEAWAYS: readonly FitStep[] = ['slash', 'search']
 
 /**
  * Шаги по порядку. Первым - имя на чипе редактора: значок остаётся кнопкой, имя - в его
@@ -26,7 +26,7 @@ export const fitSteps = (editor: EditorFit, present: ReadonlySet<FitStep>): FitS
   const head: FitStep[] =
     editor === 'named' ? ['editorName'] : editor === 'muted' ? ['editorChip'] : []
 
-  return [...head, ...SQUARES.filter((step) => present.has(step))]
+  return [...head, ...GIVEAWAYS.filter((step) => present.has(step))]
 }
 
 /** Замер дробный, а раскладка округляет свои коробки: столько - «ровно». */

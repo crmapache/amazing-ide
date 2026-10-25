@@ -1,5 +1,4 @@
 @use '@amazing-ide/ui/mixins' as *;
-@include spinning-keyframes;
 
 /*
  * Найденные слова в ленте - подсветка реестра браузера (useSearchPaint), а не обёртки:
@@ -36,18 +35,12 @@
   transition: none;
 }
 
-.veilRing {
-  @include spinning;
-
-  color: var(--color-fg-subtle);
-}
-
 .capsule {
   @include glass-overlay;
 
   position: absolute;
   z-index: var(--z-sticky);
-  right: var(--space-3);
+  right: var(--size-panel-gutter);
   display: flex;
   align-items: center;
   gap: var(--space-0-5);

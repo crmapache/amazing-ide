@@ -1,11 +1,11 @@
 import clsx from 'clsx'
-import { X, Search, ChevronUp, ChevronDown, LoaderCircle } from 'lucide-react'
+import { X, Search, ChevronUp, ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@amazing-ide/ui/Button'
 import { IconButton } from '@amazing-ide/ui/IconButton'
+import { Spinner } from '@amazing-ide/ui/Spinner'
 
-import { SEARCH_ICON_SIZE, SEARCH_ICON_STROKE } from '../search.constants'
 import { useSearchStore } from '../search.store'
 import styles from './SearchCapsule.module.scss'
 import type { SearchCapsuleProps } from './SearchCapsule.types'
@@ -32,12 +32,7 @@ export const SearchCapsule = ({ conversationId, offset }: SearchCapsuleProps) =>
   return (
     <>
       <div className={clsx(styles.veil, isLoading && styles.veilOn)} aria-hidden={!isLoading}>
-        <LoaderCircle
-          className={styles.veilRing}
-          size={SEARCH_ICON_SIZE}
-          strokeWidth={SEARCH_ICON_STROKE}
-          aria-hidden
-        />
+        <Spinner tone="neutral" />
         <span>{t('claudeCode.search.capsule.loading')}</span>
       </div>
       <div

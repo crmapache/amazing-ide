@@ -35,12 +35,7 @@ export const newTabConversation = async (tab: NewTab): Promise<Conversation> => 
   const permissionMode =
     pinned?.newTabMode ??
     current?.permissionMode ??
-    // Из тех слоёв настроек, с которыми процесс поднимется (Settings sources).
-    (await defaultPermissionMode(
-      projectPath,
-      await claudeHome(),
-      tab.prefs.settingSources[projectPath],
-    ))
+    (await defaultPermissionMode(projectPath, await claudeHome()))
 
   return freshConversation({
     id,

@@ -5,8 +5,10 @@ import type { UsageWindow, AccountUsage } from '@shared/claude-usage'
 import type { RingMeterTone } from '@amazing-ide/ui/RingMeter.types'
 
 import { DAY_MS, HOUR_MS, MINUTE_MS } from './claude.constants'
+import type { UsageRing } from './claude.types'
 import {
   WEEK_MS,
+  FIVE_HOUR_MS,
   PACE_HIGH_OVER,
   PACE_FULL_PERCENT,
   PACE_HIGH_PERCENT,
@@ -123,3 +125,35 @@ export const weekBudget = (resetsAt: number | null, now: number): number | null 
 
   return Math.min(day * WEEK_DAILY_BUDGET, USAGE_FULL_PERCENT)
 }
+
+/**
+ * Кольца лимитов в порядке окон сервера (как в ACC: пять часов, неделя, неделя модели).
+ * Тон - по темпу до сброса, у недель - бледная дуга ровного темпа; у окна, чью длину
+ * панель не знает, - только по пределу. Окно, которое упёрлось, пока идёт доплата, -
+ * горящее кольцо без цифры: его процент застрял на ста и ничего не говорит.
+ */
+export const usageRings = (usage: AccountUsage, now: number, t: TFunction): UsageRing[] =>
+  usage.windows.map((window) => {
+    const session = window.group === 'session'
+    const isWeek = window.group === 'weekly'
+    const span = session ? FIVE_HOUR_MS : isWeek ? WEEK_MS : null
+    const value = windowPercent(window, now)
+    const pace = isWeek ? weekBudget(window.resetsAt, now) : null
+    const left = window.resetsAt !== null ? window.resetsAt - now : 0
+    const label = windowLabel(window, t)
+    const lines = [
+      t('claudeCode.usage.ringHint', { label, value: Math.round(value) }),
+      left > 0 ? t('claudeCode.usage.resetsIn', { time: formatRemaining(left) }) : '',
+      pace !== null ? t('claudeCode.usage.paceBudget', { value: pace }) : '',
+    ]
+
+    return {
+      key: `${window.group}:${window.model}`,
+      label,
+      value,
+      pace,
+      tone: paceTone(value, span === null ? null : window.resetsAt, span ?? WEEK_MS, now),
+      burning: usage.extra !== null && value >= USAGE_FULL_PERCENT,
+      hint: lines.filter(Boolean).join(' · '),
+    }
+  })

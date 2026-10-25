@@ -1,8 +1,8 @@
-import { useMemo } from 'react'
+import { useMemo, Fragment } from 'react'
 
 import styles from '../UserMessage.module.scss'
 import type { MessageBodyProps } from '../UserMessage.types'
-import { messagePictures } from '../UserMessage.utils'
+import { messagePictures, splitParagraphs } from '../UserMessage.utils'
 import { useFeedScope } from '../../feed-scope.context'
 import { pastedOrdinals } from '../../message.utils'
 import { LinkedText } from '../../LinkedText/LinkedText'
@@ -33,7 +33,19 @@ export const MessageBody = ({
   return (
     <div className={styles.body}>
       {tokens.map((token, index) => {
-        if (token.kind === 'text') return <LinkedText key={index} text={token.value} />
+        // Пустая строка между абзацами - коротким зазором, а не высотой целой строки.
+        if (token.kind === 'text') {
+          return (
+            <Fragment key={index}>
+              {splitParagraphs(token.value).map((paragraph, part) => (
+                <Fragment key={part}>
+                  {part > 0 && <span className={styles.paragraphGap} aria-hidden />}
+                  <LinkedText text={paragraph} />
+                </Fragment>
+              ))}
+            </Fragment>
+          )
+        }
 
         if (token.chip.kind === 'paste') {
           return <PastedText key={index} chip={token.chip} isBlock={index === tokens.length - 1} />

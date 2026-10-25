@@ -6,13 +6,6 @@
   gap: var(--space-3);
 }
 
-// Та же раскладка, что у полосы над полем: пять отрезков с зазором.
-.bar {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: var(--space-1);
-}
-
 .ladder {
   display: flex;
   justify-content: space-between;

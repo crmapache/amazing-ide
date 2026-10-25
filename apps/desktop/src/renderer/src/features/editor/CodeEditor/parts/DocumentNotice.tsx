@@ -6,22 +6,27 @@ import { Button } from '@amazing-ide/ui/Button'
 import styles from '../CodeEditor.module.scss'
 import type { DocumentNoticeProps } from '../CodeEditor.types'
 import { documents } from '../../documents'
+import { isOutsidePath } from '../../../../lib/path.utils'
 import { diffTabKey } from '../../../../state/editor-tabs.utils'
 import { useSelectionStore } from '../../../../state/selection.store'
 
 /**
  * Полоса над кодом, когда файл нельзя молча сохранить, - как уведомление редактора в
  * WebStorm. Конфликт: взять с диска или оставить своё. Удалён: записать снова или
- * закрыть. Не записался: ещё раз. Файл за проектом: сохранить по просьбе. До ответа
+ * закрыть. Не записался: ещё раз. Файл за проектом (ссылка туда или файл вне проекта):
+ * сохранить по просьбе. До ответа
  * автосохранение ждёт.
  */
 export const DocumentNotice = ({ projectId, path, notice }: DocumentNoticeProps) => {
   const { t } = useTranslation()
   const closeTabs = useSelectionStore((state) => state.closeTabs)
+  // Файл вне проекта, открытый ссылкой, - не «через ссылку»: он сам за проектом.
   const message =
     notice.kind === 'saveFailed'
       ? t(`editor.notice.saveFailed.${notice.reason}`)
-      : t(`editor.notice.${notice.kind}`)
+      : notice.kind === 'outside' && isOutsidePath(path)
+        ? t('editor.notice.outsideFile')
+        : t(`editor.notice.${notice.kind}`)
 
   const handleTakeDisk = () => void documents.find(projectId, path)?.takeDisk()
 

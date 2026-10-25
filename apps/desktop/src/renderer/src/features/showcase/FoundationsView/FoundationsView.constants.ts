@@ -64,6 +64,7 @@ export const COLOR_GROUPS: readonly ColorGroup[] = [
       '--color-bg-hover',
       '--color-bg-active',
       '--color-bg-selected',
+      '--color-tab-selected',
       '--color-chrome-hover',
       '--color-chrome-active',
       '--color-chrome-selected',
@@ -79,17 +80,6 @@ export const COLOR_GROUPS: readonly ColorGroup[] = [
       '--color-avatar-3',
       '--color-avatar-4',
       '--color-avatar-5',
-    ],
-  },
-  {
-    titleKey: 'groups.tabGroups',
-    tokens: [
-      '--color-tab-group-0',
-      '--color-tab-group-1',
-      '--color-tab-group-2',
-      '--color-tab-group-3',
-      '--color-tab-group-4',
-      '--color-tab-group-5',
     ],
   },
   {

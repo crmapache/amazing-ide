@@ -7,6 +7,11 @@ const all = new Set(['slash', 'search'] as const)
 describe('шаги ряда кнопок', () => {
   it('имя чипа редактора - первым, потом «/» и лупа', () => {
     expect(fitSteps('named', all)).toEqual(['editorName', 'slash', 'search'])
+    expect(fitSteps('named', new Set(['search', 'slash']))).toEqual([
+      'editorName',
+      'slash',
+      'search',
+    ])
     expect(fitSteps('muted', all)).toEqual(['editorChip', 'slash', 'search'])
     expect(fitSteps(null, new Set(['search']))).toEqual(['search'])
   })

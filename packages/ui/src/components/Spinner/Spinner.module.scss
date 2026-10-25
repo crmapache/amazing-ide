@@ -1,0 +1,75 @@
+// Знак «идёт работа»: бледное кольцо тона и бегущая по нему дуга. Вращается svg целиком -
+// квадратная коробка с целым размером, её центр и есть ось: прежний значок lucide (дуга в
+// три четверти) крутился вокруг коробки, а глаз видел, как его центр тяжести гуляет.
+.spinner {
+  --spinner-tone: var(--color-accent);
+
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.sm {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.md {
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+}
+
+.neutral {
+  --spinner-tone: var(--color-fg-subtle);
+}
+
+// Оборот медленнее шага дуги: два движения не совпадают по фазе, и знак не повторяется
+// одним и тем же рисунком каждые полсекунды.
+.ring {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: spinner-turn calc(var(--duration-spin) * 2) linear infinite;
+}
+
+.track,
+.arc {
+  fill: none;
+}
+
+.track {
+  stroke: color-mix(in srgb, var(--spinner-tone) var(--tint-soft), transparent);
+}
+
+// Без движения (система просит меньше анимаций - длительности нулевые) дуга стоит
+// четвертью круга: знак работы остаётся, точка в одну единицу его бы потеряла.
+.arc {
+  stroke: var(--spinner-tone);
+  stroke-dasharray: 25 200;
+  stroke-linecap: round;
+  animation: spinner-dash calc(var(--duration-spin) * 1.5) var(--easing-standard) infinite;
+}
+
+@keyframes spinner-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+
+// Дуга растёт от точки до двух третей круга, потом хвост догоняет голову и уходит за конец
+// пути - снова точка в начале: цикл без шва. Единицы - доли круга (pathLength 100).
+@keyframes spinner-dash {
+  0% {
+    stroke-dasharray: 1 200;
+    stroke-dashoffset: 0;
+  }
+
+  50% {
+    stroke-dasharray: 65 200;
+    stroke-dashoffset: -25;
+  }
+
+  100% {
+    stroke-dasharray: 65 200;
+    stroke-dashoffset: -99;
+  }
+}

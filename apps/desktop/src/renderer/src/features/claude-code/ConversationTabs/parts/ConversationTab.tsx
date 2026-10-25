@@ -8,7 +8,7 @@ import { openWhenReleased } from '@amazing-ide/ui/Popover.utils'
 import { FORK_MARK } from '../ConversationTabs.constants'
 import styles from '../ConversationTabs.module.scss'
 import type { Drag, ConversationTabProps } from '../ConversationTabs.types'
-import { tabName, groupTone } from '../ConversationTabs.utils'
+import { tabName } from '../ConversationTabs.utils'
 import { useClaudeActions } from '../../claude-actions.hooks'
 import { useClaudeCodeStore } from '../../claude-code.store'
 import { keyLine } from '../../panel-keys.utils'
@@ -19,14 +19,15 @@ import { TabNameField } from './TabNameField'
 
 /**
  * Вкладка разговора: точка состояния с подсказкой словами, знак ⑂ и отступ у форка,
- * имя (режется посередине), крестик. Цвет - группы, свет - если позвала. Двойной клик -
- * поле имени, правый клик - меню (ID разговора, переименовать), нажатие с движением -
- * перетаскивание (голова несёт группу, форк - себя внутри группы).
+ * имя (режется посередине), крестик. Выбранная - тоном вкладок (tinted), свет со звёздочками -
+ * если позвала. Двойной клик - поле имени, правый клик - меню (ID разговора, переименовать),
+ * нажатие с движением - перетаскивание (голова несёт группу, форк - себя внутри группы).
  */
 export const ConversationTab = ({
   conversation,
   isActive,
   startsGroup,
+  endsGroup,
   groupSize,
   call,
   calm,
@@ -111,10 +112,11 @@ export const ConversationTab = ({
       hint={name}
       active={isActive}
       closeLabel={closeLabel}
-      tone={groupTone(groupId)}
+      tinted
       indent={conversation.depth}
-      groupStart={startsGroup}
-      call={call}
+      groupEnd={endsGroup}
+      call={call?.tone ?? null}
+      callSince={call?.at}
       calm={calm}
       lifted={isCarried}
       offset={offset}

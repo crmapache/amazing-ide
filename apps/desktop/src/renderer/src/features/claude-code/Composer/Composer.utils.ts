@@ -4,8 +4,6 @@ import type { Conversation, QueuedMessage } from '@shared/claude'
 import type { DraftToken } from '@shared/claude-draft'
 import type { FeedItem } from '@shared/claude-feed'
 
-import { CONTEXT_SEGMENTS } from './Composer.constants'
-
 /** Подсказка в пустом поле: ждёт ответа на вопрос, идёт ход, режим плана или обычная. */
 export const placeholderKey = (conversation: Conversation | null): ParseKeys => {
   if (conversation?.pending) return 'claudeCode.composer.placeholderWaiting'
@@ -15,10 +13,6 @@ export const placeholderKey = (conversation: Conversation | null): ParseKeys => 
 
   return 'claudeCode.composer.placeholder'
 }
-
-/** Насколько заполнен отрезок index шкалы при доле share: предыдущие - целиком, этот - частью. */
-export const segmentFill = (share: number, index: number): number =>
-  Math.min(1, Math.max(0, share * CONTEXT_SEGMENTS.length - index))
 
 /**
  * Сколько картинок уже ушло в разговоре - в отправленных сообщениях и в очереди: номера

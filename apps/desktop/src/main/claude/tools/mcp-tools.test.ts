@@ -31,7 +31,6 @@ const makeHost = (trusted: boolean) => {
           manualMode: true,
           allowSkipPermissions: true,
           safeMode: true,
-          settingSources: true,
         },
       }),
     isTrusted: () => Promise.resolve(trusted),

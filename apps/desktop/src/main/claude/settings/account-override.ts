@@ -1,8 +1,6 @@
-import type { SettingSources } from '@shared/claude-prefs'
-
 import { OUTRANKING } from '../accounts/account-env'
 import type { LayerFile } from './setting-layers'
-import { isRecord, loadedLayers, repositoryFiles, readSettingsObject } from './setting-layers'
+import { isRecord, repositoryFiles, readSettingsObject } from './setting-layers'
 
 /**
  * Адрес, куда уходит вход. Сам не ключ, но с ним выбранный аккаунт не в деле так же,
@@ -45,23 +43,8 @@ const namesIn = async (files: readonly LayerFile[]): Promise<string[]> => {
 }
 
 /**
- * Что репозиторий задаёт прямо сейчас, независимо от выбранных источников: экран
- * Settings sources отвечает, «то ли это», когда разговор говорит не туда.
+ * Что репозиторий перебивает у процесса разговора: CLI читает оба файла репозитория
+ * всегда, и их `env` ложится поверх выбранного входа (как в ACC).
  */
 export const repositoryOverrides = (projectPath: string): Promise<string[]> =>
   namesIn(repositoryFiles(projectPath))
-
-/**
- * Что репозиторий перебивает у процесса, который реально поднят: по слоям, что ему
- * передали, а CLI без флага `--setting-sources` читает репозиторий всё равно - тогда
- * предупреждение и нужно (как в ACC, passedSources).
- */
-export const launchOverrides = (
-  projectPath: string,
-  sources: SettingSources,
-  flagKnown: boolean,
-): Promise<string[]> => {
-  const layers = loadedLayers(flagKnown ? sources : 'all')
-
-  return namesIn(repositoryFiles(projectPath).filter(({ layer }) => layers.includes(layer)))
-}

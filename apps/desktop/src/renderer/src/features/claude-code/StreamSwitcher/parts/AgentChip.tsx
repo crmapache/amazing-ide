@@ -44,7 +44,7 @@ export const AgentChip = memo(({ tool, isActive, onPick, onStop }: AgentChipProp
   const handleStop = () => onStop({ taskId, kind: 'agent', subject: activity || label })
 
   return (
-    <div className={clsx(styles.chip, isActive && styles.active)}>
+    <div className={clsx(styles.chip, isActive && styles.active, taskId && styles.stoppable)}>
       <Tooltip label={activity} disabled={!activity}>
         <button type="button" className={styles.pick} aria-pressed={isActive} onClick={handlePick}>
           {percent === null ? (
@@ -52,7 +52,7 @@ export const AgentChip = memo(({ tool, isActive, onPick, onStop }: AgentChipProp
           ) : (
             <RingMeter value={percent} label={`${percent}%`} />
           )}
-          <span className={styles.label}>{label}</span>
+          <span className={styles.name}>{label}</span>
           {isRunning && <ChipClock startedAt={tool.startedAt} />}
           {finishedIn > 0 && <span className={styles.duration}>{formatDuration(finishedIn)}</span>}
           {/* Чем занят - строкой на самом чипе: подсказка не обновляется, пока висит, а
@@ -61,12 +61,14 @@ export const AgentChip = memo(({ tool, isActive, onPick, onStop }: AgentChipProp
         </button>
       </Tooltip>
       {taskId && (
-        <IconButton
-          icon={X}
-          size="sm"
-          label={t('claudeCode.agents.streams.stopAgent')}
-          onClick={handleStop}
-        />
+        <span className={styles.stop}>
+          <IconButton
+            icon={X}
+            size="xs"
+            label={t('claudeCode.agents.streams.stopAgent')}
+            onClick={handleStop}
+          />
+        </span>
       )}
     </div>
   )

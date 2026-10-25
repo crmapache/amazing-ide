@@ -1,12 +1,14 @@
 @use '@amazing-ide/ui/mixins' as *;
 @include breathing-keyframes;
 
+// «Пусто» на выбранной вкладке группы - её тоном (--tab-mark от ClosableTab), как крестик
+// рядом: серая точка на цветной подложке читалась грязной. Вне такой вкладки - серая.
 .statusDot {
   flex-shrink: 0;
   width: var(--size-status-dot);
   height: var(--size-status-dot);
   border-radius: var(--radius-full);
-  background-color: var(--color-fg-disabled);
+  background-color: var(--tab-mark, var(--color-fg-disabled));
   transition: background-color var(--duration-normal) var(--easing-standard);
 }
 

@@ -121,9 +121,7 @@ const refused = (reason: RewindRefusal, detail: string): RewindOutcome => ({
  * выключения, копии ещё держит, но вернуть ими код значило бы спорить с настройкой.
  */
 const checkpointsOff = async (runtime: ConversationRuntime): Promise<boolean> => {
-  const { projectPath } = runtime.meta
-
-  return !(await fileCheckpointing(projectPath, runtime.host.settingSources(projectPath)))
+  return !(await fileCheckpointing(runtime.meta.projectPath))
 }
 
 /**

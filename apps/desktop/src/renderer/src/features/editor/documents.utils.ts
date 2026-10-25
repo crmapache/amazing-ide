@@ -1,5 +1,20 @@
+import { isOutsidePath } from '../../lib/path.utils'
+
 /** Ключ документа редактора: файл в своём проекте. */
 export const documentKey = (projectId: string, path: string): string => `${projectId}\n${path}`
+
+/**
+ * Какой файл просить у главного процесса: путь от корня проекта или абсолютный путь файла
+ * вне проекта (его вкладку открыли ссылкой). Поле выбирается по виду пути, а не догадкой
+ * главного процесса: путь от корня никогда не станет абсолютным молча.
+ */
+export const fileRequest = (
+  projectId: string,
+  path: string,
+): { projectId: string } & (
+  | { relativePath: string; absolutePath?: undefined }
+  | { absolutePath: string; relativePath?: undefined }
+) => (isOutsidePath(path) ? { projectId, absolutePath: path } : { projectId, relativePath: path })
 
 const isLowSurrogate = (code: number) => code >= 0xdc00 && code <= 0xdfff
 

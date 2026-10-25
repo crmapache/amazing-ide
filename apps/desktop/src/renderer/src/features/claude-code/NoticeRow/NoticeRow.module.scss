@@ -1,13 +1,13 @@
 @use '@amazing-ide/ui/mixins' as *;
 
 // Отметка разговора: чип, подпись и пунктир до края - граница, а не событие (как в ACC).
+// Отступы от соседних строк - у ленты (Feed), не здесь.
 .checkpoint,
 .checkpointButton {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   min-width: 0;
-  margin: var(--space-1) 0;
 }
 
 .checkpointButton {
@@ -22,10 +22,6 @@
       color: var(--color-fg-muted);
     }
   }
-
-  &:focus-visible {
-    outline: var(--focus-ring-width) solid var(--color-focus);
-  }
 }
 
 .checkpointChip {
@@ -34,7 +30,6 @@
   flex-shrink: 0;
   color: var(--color-fg-disabled);
   font-family: var(--font-code);
-  font-size: var(--font-size-2xs);
 }
 
 .checkpointText {
@@ -94,7 +89,6 @@
   flex-shrink: 0;
   color: var(--tone);
   font-family: var(--font-code);
-  font-size: var(--font-size-2xs);
 }
 
 .pending {
@@ -133,6 +127,15 @@
   flex-shrink: 0;
   color: var(--color-fg-subtle);
   font-family: var(--font-code);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// Доля идущей работы сразу за словами строки (компакт): тихая, цифрами одной ширины -
+// тикает, а слова перед ней стоят на месте.
+.progress {
+  margin-left: var(--space-2);
+  color: var(--color-fg-subtle);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }

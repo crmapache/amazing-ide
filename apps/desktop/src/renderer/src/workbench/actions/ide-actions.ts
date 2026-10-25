@@ -18,6 +18,7 @@ import { PROJECT_ACTIONS } from '../../features/projects/project-actions.constan
 import { useProjectActionRunner } from '../../features/projects/project-actions.hooks'
 import type { SearchAction } from '../../features/search-everywhere/search-everywhere.types'
 import { useClaudePanelToggle } from './claude-panel'
+import { useSettingsActions } from './settings-actions'
 
 /**
  * Действия IDE для поиска везде. Собраны здесь, а не в поиске: им нужны проекты, git
@@ -37,6 +38,7 @@ export const useIdeActions = (): SearchAction[] => {
   const selectSideView = useLayoutStore((state) => state.selectSideView)
   const selectMainView = useLayoutStore((state) => state.selectMainView)
   const toggleClaudePanel = useClaudePanelToggle()
+  const settingsActions = useSettingsActions()
 
   const projectActions: SearchAction[] = PROJECT_ACTIONS.map((entry) => ({
     id: `project.${entry.id}`,
@@ -124,5 +126,12 @@ export const useIdeActions = (): SearchAction[] => {
     run: () => openRecentProject(recent.rootPath),
   }))
 
-  return [...projectActions, ...workspaceActions, ...gitActions, ...viewActions, ...recentActions]
+  return [
+    ...projectActions,
+    ...workspaceActions,
+    ...gitActions,
+    ...viewActions,
+    ...settingsActions,
+    ...recentActions,
+  ]
 }

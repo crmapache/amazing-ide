@@ -2,9 +2,6 @@ import type { SoundEvent } from '@shared/claude-prefs'
 
 import type { ClosableTabCall } from '@amazing-ide/ui/ClosableTab.types'
 
-/** Сколько цветов групп в дизайн-системе: --color-tab-group-0 ... 5. */
-export const GROUP_TONE_COUNT = 6
-
 /**
  * Повод звука - в цвет света вкладки. Три цвета, а не семь: взгляд на полосу вмещает
  * три. Лимит - внимание, а не ошибка: это пауза.
@@ -33,6 +30,12 @@ export const LANDING_MS = 160
 
 /** Сколько светящиеся вкладки двигаются без человека рядом (без мыши и клавиш в окне). */
 export const CALLS_REST_AFTER_MS = 30_000
+
+/**
+ * Под каким ключом жест меряет «+» за последней вкладкой: он не вкладка, но едет вместе с
+ * рядом. Id разговоров - uuid, с ними ключ не совпадёт.
+ */
+export const ADD_KEY = '+'
 
 /** Знак форка перед именем вкладки - как в ACC; глубину показывает и отступ. */
 export const FORK_MARK = '⑂'

@@ -1,5 +1,4 @@
 @use '@amazing-ide/ui/mixins' as *;
-@include spinning-keyframes;
 
 // Затемнение под окном - только над панелью: окно живёт в ней, как боковое меню.
 .scrim {
@@ -98,13 +97,6 @@
   gap: var(--space-0-5);
 }
 
-.spinner {
-  @include spinning;
-
-  flex-shrink: 0;
-  color: var(--color-fg-subtle);
-}
-
 // --- Описание для модели ----------------------------------------------------------
 
 .ask {
@@ -157,7 +149,7 @@
 .askNote {
   color: var(--color-fg-subtle);
   font-family: var(--font-code);
-  font-size: var(--font-size-2xs);
+  font-size: var(--font-size-xs);
 }
 
 .steady {
@@ -212,7 +204,7 @@
   border-top: var(--border-width) solid var(--color-border);
   color: var(--color-fg-subtle);
   font-family: var(--font-code);
-  font-size: var(--font-size-2xs);
+  font-size: var(--font-size-xs);
 }
 
 // --- Находки ----------------------------------------------------------------------
@@ -263,7 +255,7 @@
   flex-shrink: 0;
   color: var(--color-fg-subtle);
   font-family: var(--font-code);
-  font-size: var(--font-size-2xs);
+  font-size: var(--font-size-xs);
   white-space: nowrap;
 }
 
@@ -347,7 +339,7 @@ button.hitBody {
 .hitMeta {
   color: var(--color-fg-subtle);
   font-family: var(--font-code);
-  font-size: var(--font-size-2xs);
+  font-size: var(--font-size-xs);
 }
 
 .reason {
@@ -417,7 +409,7 @@ button.hitBody {
 .progressMeta {
   color: var(--color-fg-subtle);
   font-family: var(--font-code);
-  font-size: var(--font-size-2xs);
+  font-size: var(--font-size-xs);
 }
 
 .steps {

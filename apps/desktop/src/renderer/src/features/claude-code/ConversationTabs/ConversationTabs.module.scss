@@ -1,7 +1,7 @@
 @use '@amazing-ide/ui/mixins' as *;
 
 // Шапка панели: полоса вкладок разговоров над линией, переносится на столько рядов,
-// сколько нужно; кнопки справа стоят у первого ряда.
+// сколько нужно; форк и меню справа стоят у первого ряда.
 .conversationTabs {
   display: flex;
   flex-shrink: 0;
@@ -13,9 +13,13 @@
   border-bottom: var(--border-width) solid var(--color-border);
 }
 
-// Ряды прижаты кверху, даже когда полоса на время жеста выше своих вкладок: иначе
-// флекс растянул бы ряды, и вкладки съехали бы мимо замеренных мест.
-.tabList {
+// Полоса: вкладки рядами и «+» сразу за последней. Ряды прижаты кверху, даже когда полоса
+// на время жеста выше своих вкладок: иначе флекс растянул бы ряды, и вкладки съехали бы
+// мимо замеренных мест.
+.strip {
+  // Место под «+» за последней вкладкой: кнопка и зазор до неё.
+  --add-room: calc(var(--size-control-md) + var(--space-1));
+
   display: flex;
   flex: 1;
   flex-wrap: wrap;
@@ -25,19 +29,67 @@
   min-width: 0;
 }
 
+// Список вкладок для скринридера, а не своя коробка: вкладки стоят прямо в рядах полосы,
+// и «+» переносится вместе с последней из них.
+.tabList {
+  display: contents;
+}
+
+// Последняя вкладка держит место под «+» своим полем: ряд переносится по внешним размерам,
+// так что вкладка и место уходят на новый ряд вместе, а «+» (внешний размер - ноль)
+// остаётся рядом на любом ряду. Основа уступает на узкой полосе: вкладка шире ряда
+// переполнила бы его, и «+» ушёл бы вниз один. Жест передаёт роль вкладке, которую
+// отпускание поставит последней (data-tail), и снимает с последней по разметке.
+.tabList > :last-child,
+.tabList > [data-tail] {
+  flex-basis: min(var(--size-tab-basis), 100% - var(--add-room) - var(--space-1-5));
+  margin-inline-end: var(--add-room);
+}
+
+.tabList > [data-untail] {
+  flex-basis: var(--size-tab-basis);
+  margin-inline-end: 0;
+}
+
+// Жест раскладывает полосу в будущем порядке, а зазор групп (groupEnd у ClosableTab) стоит
+// по разметке: вкладка, которая в новом порядке закроет группу или перестанет её закрывать,
+// получает или теряет его здесь. Ниже правила хвоста - бывшая последняя тоже может закрыть
+// группу.
+.tabList > [data-group-end='on'] {
+  margin-inline-end: var(--size-tab-group-gap);
+}
+
+.tabList > [data-group-end='off'] {
+  margin-inline-end: 0;
+}
+
+// «+» на месте, которое держит для него последняя вкладка: втянут назад на свою ширину и
+// зазор ряда, его внешний размер - ноль. Ряд рвётся перед последней вкладкой или нигде,
+// но не между ними. Уступает место вкладке под рукой, как её соседи.
+.add {
+  display: flex;
+  margin-inline-start: calc((var(--size-control-md) + var(--space-0-5)) * -1);
+  transition: transform var(--duration-normal) var(--easing-standard);
+}
+
+// Без вкладок «+» стоит за подписью панели: втягиваться некуда.
 .heading {
   @include caps-label;
   @include truncate;
 
-  flex: 1;
   align-self: center;
   padding: 0 var(--space-2);
   color: var(--color-fg-subtle);
+
+  & + .add {
+    margin-inline-start: 0;
+  }
 }
 
+// На выбранной вкладке группы - её тоном, как точка и крестик рядом (--tab-mark).
 .forkMark {
   flex-shrink: 0;
-  color: var(--color-fg-subtle);
+  color: var(--tab-mark, var(--color-fg-subtle));
   font-family: var(--font-code);
   font-size: var(--font-size-xs);
   line-height: var(--line-height-tight);

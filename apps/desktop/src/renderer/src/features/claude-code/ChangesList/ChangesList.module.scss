@@ -1,12 +1,15 @@
 @use '@amazing-ide/ui/mixins' as *;
 
 // Файлы хода - тихий список под ответом, на поверхности кода: это сумма диффов выше, а
-// не реплика.
+// не реплика. Всё внутри - строки, кнопки, их подсветка - стоит на одном поле от рамки:
+// подсветка, прижатая к скруглённому углу, читалась прилипшей к краю.
 .changesList {
+  --changes-inset: var(--space-1-5);
+
   display: flex;
   flex-direction: column;
   margin-bottom: var(--space-2);
-  padding: var(--space-0-5) 0;
+  padding: var(--changes-inset);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-lg);
   background-color: var(--color-surface-sunken);
@@ -25,23 +28,10 @@
   display: flex;
   align-items: center;
   min-width: 0;
-  padding-right: var(--space-1);
 }
 
-.row {
-  display: flex;
-  flex: 1;
-  align-items: baseline;
-  min-width: 0;
-  padding: var(--space-0-5) var(--space-3);
-  border-radius: var(--radius-sm);
-  color: var(--color-fg-muted);
-  font-family: var(--font-code);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-normal);
-  text-align: left;
-}
-
+// Сброс кнопки - раньше правила строки: его padding: 0 иначе съедал поля строки, и иконки
+// стояли вплотную к рамке списка.
 .link {
   @include button-reset;
   @include interactive-surface;
@@ -55,12 +45,49 @@
   }
 }
 
-// Строка выровнена по базовой линии текста, иконка - по центру строки.
+// Строка высотой с кнопку отката: иконка, текст и кнопка стоят по одной середине, и
+// между иконками соседних строк остаётся воздух. Отступ слева - тот же, что у текста
+// кнопок подвала: иконки файлов и «Show all» - одна колонка. Скругление концентрично углу
+// списка: радиус рамки минус поле до неё.
+.row {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+  min-height: var(--size-control-sm);
+  padding: 0 var(--space-2);
+  border-radius: calc(var(--radius-lg) - var(--changes-inset));
+  color: var(--color-fg-muted);
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  text-align: left;
+}
+
+// Шапка - весь ход разом над строками, отделена от них чертой. Число файлов - тише путей.
+.head {
+  margin-bottom: var(--space-0-5);
+  padding-bottom: var(--space-0-5);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.count {
+  @include truncate;
+
+  flex: 0 1 auto;
+  min-width: 0;
+  color: var(--color-fg-subtle);
+}
+
+// Иконка - по середине строки и на шаг от пути: вплотную к тексту она читалась его буквой.
 .icon {
-  display: inline-flex;
+  display: flex;
   flex-shrink: 0;
-  align-self: center;
-  margin-right: var(--space-1-5);
+  margin-right: var(--space-2);
+
+  svg {
+    display: block;
+  }
 }
 
 // Длинный путь теряет папки с начала, а не имя: ближняя к файлу папка говорит больше
@@ -149,13 +176,14 @@
   width: var(--size-control-sm);
 }
 
-// Подвал не меняет высоту, когда кнопки в нём появляются и пропадают.
+// Подвал не меняет высоту, когда кнопки в нём появляются и пропадают. От строк - на шаг,
+// от рамки - на общее поле списка, как строки.
 .footer {
   display: flex;
   gap: var(--space-1);
   align-items: center;
   min-height: var(--size-control-sm);
-  padding: var(--space-0-5) var(--space-1) 0;
+  margin-top: var(--space-1);
 }
 
 .spacer {

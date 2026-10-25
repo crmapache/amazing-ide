@@ -26,14 +26,8 @@
     }
   }
 
-  &:active::after,
-  &:focus-visible::after {
+  &:active::after {
     background-color: var(--color-accent);
-  }
-
-  // Фокус показывает сама черта, рамка поверх неё лишняя.
-  &:focus-visible {
-    outline: none;
   }
 }
 

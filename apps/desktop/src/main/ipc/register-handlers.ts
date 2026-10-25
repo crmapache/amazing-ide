@@ -1,6 +1,7 @@
 import { shell } from 'electron'
 
 import type { ClaudeService } from '../claude/claude-service'
+import type { OutsideWatchers } from '../fs/outside-watchers'
 import type { GitStatusService } from '../git/git-status-service'
 import type { SearchService } from '../search/search-service'
 import type { UpdateService } from '../updates/update-service'
@@ -20,6 +21,7 @@ import { createGitHandlers } from './git-handlers'
 import type { InvokeHandlers } from './handle'
 import { createProjectSyncHandlers } from './project-sync-handlers'
 import { createSearchHandlers } from './search-handlers'
+import { createWindowHandlers } from './window-handlers'
 import { createWorkspaceHandlers } from './workspace-handlers'
 import type { HandlerContext } from './workspace-handlers'
 
@@ -29,6 +31,8 @@ type Services = HandlerContext & {
   claude: ClaudeService
   /** Статусы git открытых проектов: перечитываются по слежению за диском. */
   gitStatus: GitStatusService
+  /** Слежение за файлами вне проекта, открытыми вкладками редактора. */
+  outsideWatchers: OutsideWatchers
   /** Поиск по разговорам панели Claude Code - своим модулем, мимо сервиса разговоров. */
   conversationSearch: SearchDesk
 }
@@ -46,7 +50,7 @@ export const createInvokeHandlers = (services: Services): InvokeHandlers => {
     ...createSearchHandlers(workspace, search),
     ...createFsHandlers(workspace, search),
     ...createEditorHandlers(workspace),
-    ...createProjectSyncHandlers(workspace, services.gitStatus),
+    ...createProjectSyncHandlers(workspace, services.gitStatus, services.outsideWatchers),
     ...createGitChangesHandlers(workspace, services.gitStatus),
     ...createClaudeHandlers(workspace, claude),
     ...createClaudeToolsHandlers(workspace, claude),
@@ -55,6 +59,7 @@ export const createInvokeHandlers = (services: Services): InvokeHandlers => {
     ...createClaudePanelHandlers(claude),
     ...createClaudeSettingsHandlers(workspace, claude),
     ...createClaudeSearchHandlers(workspace, services.conversationSearch),
+    ...createWindowHandlers(services.getWindow),
 
     'updates:getStatus': () => updates.getStatus(),
     'updates:install': () => updates.install(),

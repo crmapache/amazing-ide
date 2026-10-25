@@ -8,7 +8,8 @@ import { MenuSeparator } from '@amazing-ide/ui/MenuSeparator'
 
 import { PROJECT_ACTIONS } from '../project-actions.constants'
 import { useProjectActionRunner } from '../project-actions.hooks'
-import { displayPath, projectTone, projectInitials } from '../projects.utils'
+import { projectTone, projectInitials } from '../projects.utils'
+import { displayPath } from '../../../lib/path.utils'
 import { useAppInfo } from '../../../state/app-info.queries'
 import { useWorkspace, useWorkspaceActions } from '../../../state/workspace.queries'
 

@@ -90,12 +90,15 @@ describe('сборка ленты из потока CLI', () => {
 })
 
 describe('конец хода', () => {
-  it('нулевой ход после --resume ленту не трогает', () => {
+  it('итог локальной команды без шагов - ход со своей ценой (рукопожатие отсеивает разговор)', () => {
     const builder = new FeedBuilder()
 
-    builder.finishTurn({ type: 'result', num_turns: 0, result: '' }, false)
+    builder.finishTurn(
+      { type: 'result', num_turns: 0, result: '', local_command: 'compact', total_cost_usd: 0.01 },
+      false,
+    )
 
-    expect(builder.items).toEqual([])
+    expect(builder.items).toEqual([expect.objectContaining({ kind: 'turn', costUsd: 0.01 })])
   })
 
   it('незаконченный вызов при остановке помечается прерванным', () => {

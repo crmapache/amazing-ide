@@ -4,6 +4,7 @@ import { ListTodo } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Disclosure } from '@amazing-ide/ui/Disclosure'
+import { Spinner } from '@amazing-ide/ui/Spinner'
 
 import { ROW_ICON_SIZE, ROW_ICON_STROKE } from '../claude.constants'
 import { STATE_ICON, STATE_CLASS } from './TaskListPanel.constants'
@@ -42,16 +43,17 @@ export const TaskListPanel = ({ tasks }: TaskListPanelProps) => {
       {isOpen && (
         <ul className={styles.list}>
           {tasks.map((task) => {
-            const Icon = STATE_ICON[task.state]
+            const Icon = task.state === 'in_progress' ? null : STATE_ICON[task.state]
 
             return (
               <li key={task.id} className={clsx(styles.task, styles[STATE_CLASS[task.state]])}>
-                <Icon
-                  className={styles.taskIcon}
-                  size={ROW_ICON_SIZE}
-                  strokeWidth={ROW_ICON_STROKE}
-                  aria-hidden
-                />
+                <span className={styles.taskIcon}>
+                  {Icon ? (
+                    <Icon size={ROW_ICON_SIZE} strokeWidth={ROW_ICON_STROKE} aria-hidden />
+                  ) : (
+                    <Spinner />
+                  )}
+                </span>
                 <span className={styles.subject}>
                   {task.state === 'in_progress' && task.activeForm ? task.activeForm : task.subject}
                 </span>

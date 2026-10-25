@@ -81,7 +81,8 @@ export const editorColors = (colors: ThemeColors): editor.IColors => {
   return {
     foreground: hex('fg'),
     descriptionForeground: hex('fgSubtle'),
-    focusBorder: hex('focus'),
+    // Кольца фокуса нет нигде в IDE, и у виджетов Monaco тоже.
+    focusBorder: TRANSPARENT,
     'icon.foreground': hex('fgMuted'),
     'widget.border': hex('borderStrong'),
     'widget.shadow': TRANSPARENT,

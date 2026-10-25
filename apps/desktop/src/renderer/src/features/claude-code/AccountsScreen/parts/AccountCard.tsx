@@ -65,10 +65,10 @@ export const AccountCard = ({
             </Button>
           )}
           {/* Обычный вход тоже называют (как в ACC): забыть его нельзя, а назвать - можно. */}
-          <Button size="sm" variant="ghost" disabled={busy} onClick={() => onRename(account)}>
+          <Button size="sm" disabled={busy} onClick={() => onRename(account)}>
             {t('claudeCode.accounts.rename')}
           </Button>
-          <Button size="sm" variant="ghost" disabled={busy} onClick={() => onForget(account)}>
+          <Button size="sm" disabled={busy} onClick={() => onForget(account)}>
             {account.id === '' ? t('claudeCode.accounts.logout') : t('claudeCode.accounts.forget')}
           </Button>
         </>

@@ -317,7 +317,7 @@ export type NoticeFeedItem = FeedItemBase & {
   subject?: string | undefined
   /**
    * cli-error: запрос отвергнут (400) из-за параметра выборки - его добавил шлюз или
-   * прокси из настроек, а не панель. Под ошибкой - объяснение и путь к Settings sources.
+   * прокси из настроек, а не панель. Под ошибкой - объяснение.
    */
   sampling?: boolean | undefined
 }

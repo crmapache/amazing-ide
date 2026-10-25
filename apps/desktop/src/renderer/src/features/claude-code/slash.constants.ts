@@ -45,14 +45,19 @@ export const BUILTIN_ARGUMENTS: Partial<Record<BuiltinCommandId, string>> = {
 }
 
 /**
- * Команды, которые CLI в режиме потока не выполняет, а честно отказывает: показывать их
- * в подсказке - обещать отказ.
+ * Команды, которые CLI в режиме потока не выполняет, а честно отказывает, и запуск флота,
+ * присланный сервером (только в сессиях, поднятых сервером): показывать их в подсказке -
+ * обещать отказ. Служебные с «__» в начале не показываются тоже (`isOffered`).
  */
 export const UNAVAILABLE_IN_STREAM: ReadonlySet<string> = new Set([
   'export',
   'permissions',
   'status',
+  'workflow-launch-exec',
 ])
+
+/** Начало имени служебной команды CLI (`__remote-workflow`): человеку её не набирать. */
+export const INTERNAL_COMMAND_PREFIX = '__'
 
 /** Значение «как в настройках CLI» у /model и /effort. */
 export const DEFAULT_ARGUMENT = 'default'

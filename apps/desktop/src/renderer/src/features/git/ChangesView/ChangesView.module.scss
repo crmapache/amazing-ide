@@ -40,11 +40,6 @@
   color: var(--color-fg-muted);
   font-size: var(--font-size-md);
   text-align: left;
-
-  &:focus-visible {
-    outline: var(--focus-ring-width) solid var(--color-focus);
-    outline-offset: calc(var(--focus-ring-width) * -1);
-  }
 }
 
 // Файл в разнице сейчас - залитая строка, как выбранный файл в дереве.

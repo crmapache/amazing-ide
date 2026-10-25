@@ -73,4 +73,19 @@
   min-height: 1lh;
 }
 
+// Перенос вместо прокрутки вбок: строка по ширине блока, продолжение - с висячим отступом,
+// первая буква строки остаётся у края, и новая строка не путается с перенесённой.
+.wrap {
+  .code {
+    width: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .line {
+    padding-left: var(--space-4);
+    text-indent: calc(var(--space-4) * -1);
+  }
+}
+
 @include syntax-role-classes;

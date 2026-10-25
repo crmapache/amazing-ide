@@ -1,6 +1,13 @@
 import { it, expect, describe } from 'vitest'
 
-import { expandHome, insideRoot, rankByName, isNetworkPath, readWrittenPath } from './path-location'
+import {
+  expandHome,
+  insideRoot,
+  rankByName,
+  outsidePath,
+  isNetworkPath,
+  readWrittenPath,
+} from './path-location'
 
 const ROOT = '/Users/max/project'
 const HOME = '/Users/max'
@@ -130,5 +137,15 @@ describe('rankByName', () => {
   it('хвост наверх не лезет, пустое не ищется', () => {
     expect(rankByName('../Button.js', files, true)).toEqual([])
     expect(rankByName('./', files, true)).toEqual([])
+  })
+})
+
+describe('outsidePath', () => {
+  it('абсолютный путь - нормализованный, остальное - отказ', () => {
+    expect(outsidePath('/Users/max/./notes/../a.md')).toBe('/Users/max/a.md')
+    expect(outsidePath('notes/a.md')).toBeNull()
+    expect(outsidePath('//host/share/a.md')).toBeNull()
+    expect(outsidePath('/Users/max/a\u0007.md')).toBeNull()
+    expect(outsidePath(`/${'a'.repeat(5000)}`)).toBeNull()
   })
 })

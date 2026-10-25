@@ -12,3 +12,6 @@ export const DRAFT_SAVE_DELAY_MS = 400
 
 /** Сколько отправленных сообщений вкладки помнит ↑. */
 export const SENT_HISTORY_KEPT = 50
+
+/** Клавиша отправки словами - для подсказки на Send и строки поправляемого в очереди. */
+export const SEND_KEY_HINT = 'Enter'

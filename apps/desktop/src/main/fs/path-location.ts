@@ -26,6 +26,19 @@ export const hasControlChars = (path: string): boolean =>
 export const isNetworkPath = (path: string): boolean =>
   path.startsWith('//') || path.startsWith('\\\\') || path.includes('://')
 
+/**
+ * Абсолютный путь вне проекта, который прислало окно, - нормализованный, или null, если
+ * идти по нему нельзя: не абсолютный, слишком длинный, сетевой, с управляющими знаками.
+ * Окну на слово не верим: путь пришёл из текста, который писал агент.
+ */
+export const outsidePath = (path: string): string | null =>
+  isAbsolute(path) &&
+  path.length <= MAX_PATH_LENGTH &&
+  !isNetworkPath(path) &&
+  !hasControlChars(path)
+    ? normalize(path)
+    : null
+
 /** `file://` агент тоже пишет - снимаем. Хост в адресе (не localhost) - сетевой путь, отказ. */
 const withoutFileScheme = (path: string): string | null => {
   if (!/^file:/i.test(path)) return path

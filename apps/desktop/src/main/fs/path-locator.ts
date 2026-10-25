@@ -4,6 +4,8 @@ import { homedir } from 'node:os'
 import type { PathLocation } from '@shared/fs'
 
 import { insideRoot, rankByName, readWrittenPath } from './path-location'
+import { toWindowPath } from './project-paths'
+import { opensAsText } from './text-file'
 
 type EntryKind = 'file' | 'folder'
 
@@ -50,8 +52,8 @@ const projectPathOf = async (rootPath: string, absolutePath: string): Promise<st
 }
 
 /**
- * Куда ведёт путь из текста ленты: файл или папка проекта, что-то вне проекта, выбор
- * из нескольких одноимённых или ничего. Сначала - как написан (от корня или
+ * Куда ведёт путь из текста ленты: файл или папка проекта, что-то вне проекта (у файла -
+ * откроет ли его редактор), выбор из нескольких одноимённых или ничего. Сначала - как написан (от корня или
  * абсолютный), потом, если относительный и там пусто, - по имени среди файлов проекта
  * (listFiles - тот же список, что кормит «@»; спрашиваем его только на промахе).
  */
@@ -76,9 +78,12 @@ export const locatePath = async (
         : { kind: 'projectFolder', relativePath }
     }
 
+    // В NFC, как пути дерева: один файл из ссылки агента и из Finder - одна вкладка.
+    const absolutePath = toWindowPath(target.absolutePath)
+
     return kind === 'file'
-      ? { kind: 'outsideFile', absolutePath: target.absolutePath }
-      : { kind: 'outsideFolder', absolutePath: target.absolutePath }
+      ? { kind: 'outsideFile', absolutePath, editable: await opensAsText(target.absolutePath) }
+      : { kind: 'outsideFolder', absolutePath }
   }
 
   if (!target.byName) return MISSING

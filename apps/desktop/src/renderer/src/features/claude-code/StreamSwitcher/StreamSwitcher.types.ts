@@ -21,6 +21,16 @@ export type CommandChipProps = {
   onStop: (target: StopTarget) => void
 }
 
+export type CommandViewProps = {
+  command: string
+  /** Зачем команда - слова модели из вызова; пусто - строки нет. */
+  description: string
+  /** С какого момента идёт (мс); 0 - не известно, времени не будет. */
+  startedAt: number
+  /** Остановить - тем же вопросом, что крестик чипа; null - CLI не назвал задачу. */
+  onStop: (() => void) | null
+}
+
 export type StopTaskDialogProps = {
   conversationId: string
   target: StopTarget

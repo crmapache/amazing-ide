@@ -4,28 +4,18 @@ import { join } from 'node:path'
 
 import { it, expect, describe } from 'vitest'
 
-import { launchOverrides, overridingNames, repositoryOverrides } from './account-override'
+import { overridingNames, repositoryOverrides } from './account-override'
 import { allowedPinnedMode } from './default-mode'
-import { layerFiles, loadedLayers, settingSourcesArg } from './setting-layers'
+import { layerFiles } from './setting-layers'
 
-describe('источники настроек', () => {
-  it('аргумент флага - словами CLI, «все» - без флага', () => {
-    expect(settingSourcesArg('all')).toBeNull()
-    expect(settingSourcesArg('noLocal')).toBe('user,project')
-    expect(settingSourcesArg('user')).toBe('user')
-  })
-
-  it('политика организации читается при любом выборе', () => {
-    expect(loadedLayers('user')).toEqual(['policy', 'user'])
-    expect(loadedLayers('noLocal')).toEqual(['policy', 'project', 'user'])
-    expect(loadedLayers('all')).toEqual(['policy', 'local', 'project', 'user'])
-  })
-
-  it('панель читает те же файлы, с которыми запускает: без локального - его не читает', async () => {
-    const files = await layerFiles('/p', '/home/.claude', 'noLocal')
+describe('слои настроек', () => {
+  it('панель читает все слои, что и CLI: политика первой, дальше от сильного к слабому', async () => {
+    const files = await layerFiles('/p', '/home/.claude')
     const own = files.filter((item) => item.layer !== 'policy')
 
+    expect(files[0]?.layer).toBe('policy')
     expect(own).toEqual([
+      { layer: 'local', file: '/p/.claude/settings.local.json' },
       { layer: 'project', file: '/p/.claude/settings.json' },
       { layer: 'user', file: '/home/.claude/settings.json' },
     ])
@@ -61,24 +51,6 @@ describe('репозиторий перебивает вход', () => {
       await writeFile(join(root, '.claude', 'settings.local.json'), '{ broken')
 
       expect(await repositoryOverrides(root)).toEqual(['ANTHROPIC_API_KEY', 'ANTHROPIC_BASE_URL'])
-    } finally {
-      await rm(root, { recursive: true, force: true })
-    }
-  })
-
-  it('у запущенного процесса - только переданные слои; CLI без флага читает репозиторий', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'acc-layers-'))
-
-    try {
-      await mkdir(join(root, '.claude'))
-      await writeFile(
-        join(root, '.claude', 'settings.local.json'),
-        JSON.stringify({ env: { ANTHROPIC_API_KEY: 'k' } }),
-      )
-
-      expect(await launchOverrides(root, 'all', true)).toEqual(['ANTHROPIC_API_KEY'])
-      expect(await launchOverrides(root, 'noLocal', true)).toEqual([])
-      expect(await launchOverrides(root, 'user', false)).toEqual(['ANTHROPIC_API_KEY'])
     } finally {
       await rm(root, { recursive: true, force: true })
     }

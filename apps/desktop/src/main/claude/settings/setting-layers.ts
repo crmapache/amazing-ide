@@ -1,14 +1,12 @@
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
-import type { SettingSources } from '@shared/claude-prefs'
-
 /**
  * Слои настроек Claude Code - те же файлы, что читает CLI, от сильного к слабому:
  * политика организации, локальный файл проекта, общий файл проекта, настройки
  * человека. Первое найденное значение и действует. Файлы репозитория сильнее личных:
  * для разрешений и хуков это верно, а блок `env` из них перебивает вход, сделанный на
- * этой машине (Settings sources).
+ * этой машине (строка SETTINGS в ленте).
  */
 export type SettingsLayer = 'policy' | 'local' | 'project' | 'user'
 
@@ -24,28 +22,6 @@ const MANAGED_FILE = 'managed-settings.json'
 export const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
 
-/**
- * Какие слои читает проект при выбранных источниках. Политика - всегда: флаг
- * `--setting-sources` её не знает, настройки организации действуют при любом выборе.
- */
-export const loadedLayers = (sources: SettingSources): readonly SettingsLayer[] => {
-  if (sources === 'user') return ['policy', 'user']
-  if (sources === 'noLocal') return ['policy', 'project', 'user']
-
-  return ['policy', 'local', 'project', 'user']
-}
-
-/**
- * Аргумент `--setting-sources` - словами CLI. null - флаг не передаётся вовсе: машина,
- * где экран не открывали, запускает CLI ровно как до появления настройки.
- */
-export const settingSourcesArg = (sources: SettingSources): string | null => {
-  if (sources === 'user') return 'user'
-  if (sources === 'noLocal') return 'user,project'
-
-  return null
-}
-
 /** Локальный и общий файлы настроек репозитория - сильный первым. */
 export const repositoryFiles = (projectPath: string): LayerFile[] => [
   { layer: 'local', file: join(projectPath, '.claude', 'settings.local.json') },
@@ -53,28 +29,22 @@ export const repositoryFiles = (projectPath: string): LayerFile[] => [
 ]
 
 /**
- * Файлы слоёв проекта от сильного к слабому - только те, что CLI велено читать.
- * Что панель читает, обязано совпадать с тем, с чем она запускает: режим из слоя,
- * который процесс не грузит, назвал бы режим, в котором он не поднимется.
+ * Файлы слоёв проекта от сильного к слабому - все, что читает CLI: процесс разговора
+ * поднимается без `--setting-sources`, и панель читает ровно то же, иначе назвала бы
+ * режим, в котором процесс не поднимется.
  */
-export const layerFiles = async (
-  projectPath: string,
-  claudeHome: string,
-  sources: SettingSources,
-): Promise<LayerFile[]> => {
-  const wanted = loadedLayers(sources)
+export const layerFiles = async (projectPath: string, claudeHome: string): Promise<LayerFile[]> => {
   const piecesDir = join(MANAGED_DIR, `${MANAGED_FILE}.d`)
   const pieces = (await readdir(piecesDir).catch(() => []))
     .filter((name) => name.endsWith('.json'))
     .sort()
-  const files: LayerFile[] = [
+
+  return [
     { layer: 'policy', file: join(MANAGED_DIR, MANAGED_FILE) },
     ...pieces.map((name): LayerFile => ({ layer: 'policy', file: join(piecesDir, name) })),
     ...repositoryFiles(projectPath),
     { layer: 'user', file: join(claudeHome, 'settings.json') },
   ]
-
-  return files.filter((item) => wanted.includes(item.layer))
 }
 
 /** Объект JSON из файла. Нет файла или он битый - пустой: чужой файл не роняет панель. */

@@ -5,15 +5,15 @@ import { CheckpointRow } from '../../NoticeRow/parts/CheckpointRow'
 
 /**
  * Метка над лентой, как в ACC: выше в транскрипте есть ещё - нажатие приносит страницу
- * ранних сообщений, читаемое при этом не сдвигается.
+ * ранних сообщений, читаемое при этом не сдвигается. Пока страница едет, метка остаётся той
+ * же кнопкой: подмена на строку другой высоты дёргала ленту; повторное нажатие гасит
+ * useLoadEarlier.
  */
-export const EarlierMarker = ({ onLoad, isLoading }: EarlierMarkerProps) => {
+export const EarlierMarker = ({ onLoad }: EarlierMarkerProps) => {
   const { t } = useTranslation()
 
   return (
-    <CheckpointRow
-      chip={t('claudeCode.notice.chips.earlier')}
-      onClick={isLoading ? undefined : onLoad}>
+    <CheckpointRow chip={t('claudeCode.notice.chips.earlier')} onClick={onLoad}>
       {t('claudeCode.feed.loadEarlier')}
     </CheckpointRow>
   )

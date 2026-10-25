@@ -15,6 +15,7 @@ import {
   decodeText,
   encodeText,
   insideRoot,
+  outsideFile,
   relativeInside,
 } from './text-file.utils'
 
@@ -124,12 +125,18 @@ const checkExpected = async (
   return base !== null && onDisk && hashText(onDisk.text) === base ? 'write' : { kind: 'conflict' }
 }
 
-const write = async (
-  rootPath: string,
-  relativePath: string,
-  { text, bom, expected, base = null, outside = false }: WriteRequest,
+/**
+ * Можно ли писать в настоящий файл target: файл проекта - если он в проекте или человек
+ * сам попросил (ссылка за проект), файл вне проекта - только по просьбе человека.
+ */
+type WriteGate = (target: string) => Promise<boolean>
+
+const writeAt = async (
+  absolute: string,
+  label: string,
+  { text, bom, expected, base = null }: WriteRequest,
+  allowed: WriteGate,
 ): Promise<FileWrite> => {
-  const absolute = insideRoot(rootPath, relativePath)
   const bytes = encodeText(text, bom)
 
   try {
@@ -137,14 +144,10 @@ const write = async (
 
     if (current && !current.isFile()) return MISSING
 
-    // Пишется настоящий файл: ссылка остаётся ссылкой. Ведёт она за проект - только по
-    // явной просьбе человека (⌘S), автосохранение туда не ходит.
+    // Пишется настоящий файл: ссылка остаётся ссылкой.
     const target = current ? await realpath(absolute) : absolute
-    const realRoot = await realpath(rootPath)
 
-    if (!outside && relativeInside(realRoot, target) === null) {
-      return { kind: 'failed', reason: 'outside' }
-    }
+    if (!(await allowed(target))) return { kind: 'failed', reason: 'outside' }
 
     const verdict =
       expected === null ? null : await checkExpected(target, current, { text, expected, base })
@@ -155,29 +158,50 @@ const write = async (
   } catch (error) {
     if (MISSING_CODES.has(errorCode(error))) return MISSING
 
-    return { kind: 'failed', reason: failureOf(error, relativePath) }
+    return { kind: 'failed', reason: failureOf(error, label) }
   }
 }
+
+/** Запись в учёте идущих: выход из IDE её дождётся. */
+const tracked = (job: Promise<FileWrite>): Promise<FileWrite> => {
+  const settle = () => void pending.delete(job)
+
+  pending.add(job)
+  // Отказ (негодный путь) уходит тому, кто позвал; учёт записей его не теряет и не ловит.
+  job.then(settle, settle)
+
+  return job
+}
+
+/** Файл проекта: в проекте - всегда, ссылкой за проект - только по просьбе человека. */
+const writeProjectFile = async (rootPath: string, relativePath: string, request: WriteRequest) =>
+  writeAt(insideRoot(rootPath, relativePath), relativePath, request, async (target) =>
+    request.outside ? true : relativeInside(await realpath(rootPath), target) !== null,
+  )
+
+/** Файл вне проекта - только по просьбе человека, что бы ни прислало окно. */
+const writeOutsideFile = async (path: string, request: WriteRequest) =>
+  writeAt(outsideFile(path), path, request, () => Promise.resolve(request.outside === true))
 
 /**
  * Записать текст файла проекта. С expected файл, который за это время поменял кто-то ещё,
  * не трогается (conflict); без него - пишется поверх (человек выбрал «оставить моё»).
+ * Ссылка, ведущая за проект, пишется только по явной просьбе человека (outside, ⌘S):
+ * автосохранение туда не ходит.
  */
 export const writeTextFile = (
   rootPath: string,
   relativePath: string,
   request: WriteRequest,
-): Promise<FileWrite> => {
-  const job = write(rootPath, relativePath, request)
+): Promise<FileWrite> => tracked(writeProjectFile(rootPath, relativePath, request))
 
-  const settle = () => void pending.delete(job)
-
-  pending.add(job)
-  // Отказ (путь за корень) уходит тому, кто позвал; учёт записей его не теряет и не ловит.
-  job.then(settle, settle)
-
-  return job
-}
+/**
+ * Записать файл вне проекта (его открыли ссылкой) - только по явной просьбе человека
+ * (outside, ⌘S), даже если окно по ошибке попросит автосохранение. Остальное - как у
+ * файла проекта: версия, конфликт, безопасная запись. Путь проверяется заново.
+ */
+export const writeOutsideTextFile = (path: string, request: WriteRequest): Promise<FileWrite> =>
+  tracked(writeOutsideFile(path, request))
 
 /** Дождаться записей, которые ещё идут: перед выходом из IDE. */
 export const settleWrites = async (): Promise<void> => {

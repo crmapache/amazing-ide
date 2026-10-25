@@ -4,6 +4,7 @@ import { sep, relative, isAbsolute } from 'node:path'
 
 import type { TextHash, FileFailure, FileVersion } from '@shared/fs'
 
+import { outsidePath } from './path-location'
 import { resolveInsideRoot } from './project-paths'
 import { UTF8_BOM, DENIED_CODES, BINARY_SNIFF_BYTES } from './text-file.constants'
 
@@ -36,6 +37,18 @@ export const insideRoot = (rootPath: string, relativePath: string): string => {
   return absolute
 }
 
+/**
+ * Файл вне проекта, который открыли ссылкой: путь проверяется заново (outsidePath), не
+ * годится - ошибка, а не чтение, как путь за корень у файла проекта.
+ */
+export const outsideFile = (path: string): string => {
+  const absolute = outsidePath(path)
+
+  if (absolute === null) throw new Error(`Путь к файлу вне проекта не годится: ${path}`)
+
+  return absolute
+}
+
 /** Путь от корня до настоящего файла через «/» или null, если файл за корнем. */
 export const relativeInside = (realRoot: string, realPath: string): string | null => {
   const fromRoot = relative(realRoot, realPath)
@@ -43,6 +56,22 @@ export const relativeInside = (realRoot: string, realPath: string): string | nul
   if (fromRoot === '..' || fromRoot.startsWith(`..${sep}`) || isAbsolute(fromRoot)) return null
 
   return fromRoot.split(sep).join('/')
+}
+
+/**
+ * Начало файла похоже на текст: без нулей и валидный UTF-8. Буква, разрезанная краем
+ * куска, не считается ошибкой - кусок кончился посреди неё.
+ */
+export const isTextStart = (head: Buffer): boolean => {
+  if (head.includes(0)) return false
+
+  try {
+    new TextDecoder('utf-8', { fatal: true }).decode(head, { stream: true })
+
+    return true
+  } catch {
+    return false
+  }
 }
 
 /**

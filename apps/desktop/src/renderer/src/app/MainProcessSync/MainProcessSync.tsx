@@ -4,7 +4,6 @@ import { useWorkspaceSync } from '../../state/workspace.queries'
 import { useAsideSync } from '../../features/claude-code/aside.queries'
 import { useClaudeSync } from '../../features/claude-code/claude.queries'
 import { useClaudeSearchSync } from '../../features/claude-code/search.queries'
-import { useSpellcheckSync } from '../../features/claude-code/spellcheck.hooks'
 import { useEditorSync } from '../../features/editor/editor-sync.hooks'
 import { useDirectorySync } from '../../features/file-tree/file-tree.queries'
 import { useGitStatusSync } from '../../features/file-tree/git-status.queries'
@@ -20,7 +19,6 @@ export const MainProcessSync = () => {
   useUpdateStatusSync()
   useClaudeSync()
   useAsideSync()
-  useSpellcheckSync()
   useClaudeSearchSync()
   useDirectorySync()
   useGitStatusSync()

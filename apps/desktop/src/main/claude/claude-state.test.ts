@@ -1,6 +1,6 @@
 import { it, expect, describe } from 'vitest'
 
-import { toStored, startingState, freshConversation, parseStoredClaude } from './claude-state'
+import { toStored, freshConversation, parseStoredClaude } from './claude-state'
 
 describe('сохранённые разговоры', () => {
   it('очередь переживает перезапуск текстом, битые записи в ней отбрасываются', () => {
@@ -51,23 +51,6 @@ describe('сохранённые разговоры', () => {
     expect(parsed.trustedProjects).toEqual(['/p'])
   })
 
-  it('«Tabs on start» выключено - вкладки после перезапуска не возвращаются', () => {
-    const stored = {
-      conversations: [{ id: 'c1', projectPath: '/p', sessionId: 's1' }],
-      activeByProject: { '/p': 'c1' },
-      trustedProjects: ['/p'],
-    }
-    const kept = startingState(parseStoredClaude(stored))
-    const dropped = startingState(parseStoredClaude({ ...stored, prefs: { restoreTabs: false } }))
-
-    expect(kept.conversations).toHaveLength(1)
-    expect(dropped.conversations).toEqual([])
-    expect(dropped.closed).toEqual([])
-    expect(dropped.activeByProject).toEqual({})
-    // Доверие к папке - не вкладка: оно остаётся.
-    expect(dropped.trustedProjects).toEqual(['/p'])
-  })
-
   it('форк, который несёт разговор целиком вместо разреза, помнит это после перезапуска', () => {
     const fork = { sourceSessionId: 's0', sourceTitle: 'Origin', at: 'a1' }
     const parsed = parseStoredClaude({
@@ -81,6 +64,47 @@ describe('сохранённые разговоры', () => {
     expect(parsed.conversations[1]?.fork).toEqual(fork)
   })
 
+  it('контекст вкладки переживает перезапуск, а без окна или битый не пишется', () => {
+    const conversation = freshConversation({
+      id: 'c1',
+      projectPath: '/p',
+      sessionId: 's1',
+      title: 'Fix',
+      model: null,
+      effort: null,
+      permissionMode: 'default',
+      queue: [],
+      fork: null,
+      updatedAt: 0,
+    })
+    const known = {
+      ...conversation,
+      usage: { contextTokens: 52_000, contextWindow: 200_000 },
+    }
+    const unknown = {
+      ...conversation,
+      usage: { contextTokens: 9_000, contextWindow: 0 },
+    }
+    const parsed = parseStoredClaude(
+      JSON.parse(
+        JSON.stringify({
+          conversations: [
+            toStored(known),
+            toStored({ ...unknown, id: 'c2' }),
+            { ...toStored({ ...conversation, id: 'c3' }), context: { tokens: 'x', window: -1 } },
+          ],
+        }),
+      ),
+    )
+    const restored = parsed.conversations.map((stored) => freshConversation(stored).usage)
+
+    expect(restored).toEqual([
+      { contextTokens: 52_000, contextWindow: 200_000 },
+      { contextTokens: 0, contextWindow: 0 },
+      { contextTokens: 0, contextWindow: 0 },
+    ])
+  })
+
   it('выбранной остаётся только вкладка разговора: снятые вкладки панели после перезапуска пропадают', () => {
     const parsed = parseStoredClaude({
       conversations: [{ id: 'c1', projectPath: '/p', sessionId: 's1' }],
@@ -90,5 +114,20 @@ describe('сохранённые разговоры', () => {
 
     expect(parsed.activeByProject).toEqual({ '/p': 'c1' })
     expect(parsed).not.toHaveProperty('panelTabs')
+  })
+})
+
+describe('команды проекта', () => {
+  it('имена переживают перезапуск; чужая папка и битые имена отбрасываются', () => {
+    const parsed = parseStoredClaude({
+      commandsByProject: {
+        '/p': ['compact', 'mcp__srv__prompt', 7, ''],
+        relative: ['compact'],
+        '/q': 'compact',
+      },
+    })
+
+    expect(parsed.commandsByProject).toEqual({ '/p': ['compact', 'mcp__srv__prompt'] })
+    expect(parseStoredClaude({}).commandsByProject).toEqual({})
   })
 })

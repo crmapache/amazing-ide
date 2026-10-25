@@ -5,10 +5,20 @@ export const SIDE_VIEW_IDS: readonly SideViewId[] = ['files', 'changes']
 export const MAIN_VIEW_IDS: readonly MainViewId[] = ['file', 'scenarios', 'statistics']
 export const PROVIDER_VIEW_IDS: readonly ProviderViewId[] = ['claude-code']
 
-export const PANEL_WIDTH_LIMITS: Record<PanelSide, { min: number; max: number }> = {
-  side: { min: 180, max: 640 },
-  provider: { min: 300, max: 960 },
-}
+/**
+ * Уже панель не бывает. Потолка нет: шире панель растёт только в место середины, а та,
+ * когда места мало, сворачивается сама - панель дотягивается до самой полосы иконок.
+ */
+export const PANEL_MIN_WIDTH: Record<PanelSide, number> = { side: 180, provider: 300 }
+
+/**
+ * Меньше этого месту середины не быть: уже 300 у листа в нём ни код, ни сценарии не
+ * читаются, и середина сворачивается сама, пока место не вернётся. Место считается
+ * вместе с зазором до правой панели (Workbench.module.scss), отсюда 300 + --space-2.
+ * Окно не уже MIN_WINDOW_SIZE главного процесса, а его хватает на обе панели на
+ * минимуме и середину на этом пределе - поэтому показать её по просьбе можно всегда.
+ */
+export const MAIN_MIN_WIDTH = 308
 
 export const DEFAULT_PANEL_WIDTH: Record<PanelSide, number> = {
   side: 280,

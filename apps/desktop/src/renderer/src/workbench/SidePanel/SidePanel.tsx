@@ -16,9 +16,11 @@ export const SidePanel = <ViewId extends string>({
   activeViewId,
   isOpen,
   width,
+  minWidth,
   placement,
   resizeLabel,
   onResize,
+  ref,
 }: SidePanelProps<ViewId>) => {
   const handleEdge = placement === 'start' ? 'end' : 'start'
 
@@ -26,11 +28,12 @@ export const SidePanel = <ViewId extends string>({
 
   return (
     <aside
+      ref={ref}
       className={clsx(styles.sidePanel, !isOpen && styles.closed)}
       // По нему «открыть панель» узнаёт, что фокус уже в правой панели (actions/claude-panel.ts).
       data-placement={placement}
-      // eslint-disable-next-line no-restricted-syntax -- ширину задаёт перетаскивание
-      style={{ width }}>
+      // eslint-disable-next-line no-restricted-syntax -- ширину задают перетаскивание и место в окне
+      style={{ width, minWidth }}>
       <ViewStack views={views} activeViewId={activeViewId} isOpen={isOpen} />
       <ResizeHandle edge={handleEdge} label={resizeLabel} onResize={handleResize} />
     </aside>

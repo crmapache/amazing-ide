@@ -1,7 +1,19 @@
 import type { FileRead, TextHash, FileWrite, FileVersion, EditorCommand } from '../fs'
 import type { WebImageRead, ProjectImageRead } from '../preview-images'
 
-type FileRequest = { projectId: string; relativePath: string }
+/** Файл проекта: путь от корня через «/». */
+type ProjectFileRequest = { projectId: string; relativePath: string }
+
+/**
+ * Файл редактора: файл проекта (relativePath) или файл вне проекта по абсолютному пути
+ * (absolutePath) - его открыли ссылкой. Ровно одно из двух: путь от корня никогда не
+ * становится абсолютным молча. projectId - у обоих: вкладка живёт в проекте, а закрытый
+ * проект ничего не читает.
+ */
+type FileRequest = { projectId: string } & (
+  | { relativePath: string; absolutePath?: undefined }
+  | { absolutePath: string; relativePath?: undefined }
+)
 
 /**
  * Часть контракта (contract.ts) про редактор середины окна: чтение и запись файлов
@@ -17,7 +29,7 @@ export type EditorInvokeContract = {
    * «оставить моё»). base - отпечаток текста, от которого правили: версия другая, а текст
    * на диске тот же - файл только тронули, запись идёт. bom - вернуть метку UTF-8, с
    * которой файл был прочитан. outside - человек сам попросил записать файл, ссылка
-   * которого ведёт за проект (⌘S).
+   * которого ведёт за проект, или файл вне проекта (⌘S): без него такой файл не пишется.
    */
   'fs:writeFile': {
     request: FileRequest & {
@@ -35,7 +47,7 @@ export type EditorInvokeContract = {
    * которую окно уже держит: та же - unchanged, без байтов.
    */
   'fs:readImage': {
-    request: FileRequest & { known?: FileVersion | null }
+    request: ProjectFileRequest & { known?: FileVersion | null }
     response: ProjectImageRead
   }
   /**

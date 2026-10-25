@@ -63,6 +63,8 @@ const disk = {
   outside: false,
   writes: [] as string[],
   outsideWrites: [] as boolean[],
+  /** Какой путь просили у главного процесса: от корня (rel:) или абсолютный (abs:). */
+  asked: [] as string[],
   hold: null as null | Promise<void>,
   readHold: null as null | Promise<void>,
 }
@@ -110,8 +112,19 @@ vi.mock('../../lib/highlighter', () => ({ preloadLanguage: () => Promise.resolve
 vi.mock('../../lib/ipc', () => ({
   invoke: async (
     channel: string,
-    request: { text: string; expected: string | null; base?: string | null; outside?: boolean },
+    request: {
+      text: string
+      expected: string | null
+      base?: string | null
+      outside?: boolean
+      relativePath?: string
+      absolutePath?: string
+    },
   ) => {
+    disk.asked.push(
+      request.absolutePath ? `abs:${request.absolutePath}` : `rel:${request.relativePath}`,
+    )
+
     if (channel === 'fs:readFile') {
       // Файл читается сразу, а ответ может прийти позже: так его обгоняет запись.
       const snapshot = read()
@@ -157,9 +170,9 @@ const gate = () => {
   return { hold, release }
 }
 
-const open = async (text: string) => {
+const open = async (text: string, path = 'src/app.ts') => {
   disk.text = text
-  const document = new EditorDocument('p1', 'src/app.ts', host)
+  const document = new EditorDocument('p1', path, host)
 
   await document.load()
 
@@ -176,6 +189,7 @@ beforeEach(() => {
     outside: false,
     writes: [],
     outsideWrites: [],
+    asked: [],
     hold: null,
     readHold: null,
   })
@@ -445,5 +459,31 @@ describe('файл по ссылке за проект', () => {
     expect(disk.writes).toEqual(['export A=1\n'])
     expect(disk.outsideWrites).toEqual([true])
     expect(document.notice).toBeNull()
+  })
+})
+
+describe('файл вне проекта, открытый ссылкой', () => {
+  it('читается и пишется абсолютным путём; сам не пишется - только по просьбе', async () => {
+    disk.outside = true
+
+    const { document, model } = await open('# план', '/Users/max/.claude/plans/plan.md')
+
+    model.type('\n')
+    await vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS * 2)
+
+    expect(document.notice).toEqual({ kind: 'outside' })
+    expect(disk.writes).toEqual([])
+
+    await document.saveAsked()
+
+    expect(disk.writes).toEqual(['# план\n'])
+    expect(disk.outsideWrites).toEqual([true])
+    expect(new Set(disk.asked)).toEqual(new Set(['abs:/Users/max/.claude/plans/plan.md']))
+  })
+
+  it('файл проекта по-прежнему просится путём от корня', async () => {
+    await open('a')
+
+    expect(disk.asked).toEqual(['rel:src/app.ts'])
   })
 })

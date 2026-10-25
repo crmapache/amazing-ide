@@ -4,12 +4,13 @@ import { BrowserWindow } from 'electron'
 
 import {
   MIN_WINDOW_SIZE,
+  TITLE_BAR_HEIGHT,
   WINDOW_BACKGROUND,
   DEFAULT_WINDOW_SIZE,
-  TRAFFIC_LIGHT_POSITION,
 } from './main-window.constants'
 import { openExternalWeb } from './open-external'
 import { installSpellMenu } from './spell-menu'
+import { trafficLightPosition } from './traffic-lights'
 
 /**
  * Главное окно IDE. Страница работает в песочнице без Node, а наружу ходит только
@@ -24,14 +25,15 @@ export const createMainWindow = (rendererUrl: string | undefined): BrowserWindow
     show: false,
     backgroundColor: WINDOW_BACKGROUND,
     titleBarStyle: 'hiddenInset',
-    trafficLightPosition: TRAFFIC_LIGHT_POSITION,
+    // До замера шапки окном - по шапке обычного размера текста (window:setTitleBarHeight).
+    trafficLightPosition: trafficLightPosition(TITLE_BAR_HEIGHT),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: true,
       contextIsolation: true,
       nodeIntegration: false,
-      // Проверку орфографии включает страница (Settings → Spell check): выключенная
-      // настройка ставит spellcheck="false" на корень документа.
+      // Проверка орфографии включена всегда: поля для прозы подчёркивают слова сами, у
+      // полей имён и путей свой spellCheck={false}.
       spellcheck: true,
     },
   })

@@ -6,7 +6,7 @@ import { invoke } from '../../lib/ipc'
 import { useIpcEvent } from '../../lib/ipc.hooks'
 import { heldPaths, guardDiscard, useDiscardGuard } from '../../state/discard-guard.store'
 import { activeTab } from '../../state/editor-tabs.utils'
-import { useLayoutStore } from '../../state/layout.store'
+import { isMainShown, useLayoutStore } from '../../state/layout.store'
 import { QUERY_KEYS } from '../../state/query-keys'
 import { useSelectionStore } from '../../state/selection.store'
 import { useActiveProject } from '../../state/workspace.queries'
@@ -65,10 +65,10 @@ const historyKeyHandler = (projectId: string) => (event: KeyboardEvent) => {
 
   if (!isHistoryKey || event.defaultPrevented || target?.closest(OWN_HISTORY)) return
 
-  const { main } = useLayoutStore.getState()
+  const layout = useLayoutStore.getState()
   const active = activeTab(useSelectionStore.getState().tabsByProject[projectId])
 
-  if (!active || !main.isOpen || main.activeViewId !== 'file') return
+  if (!active || !isMainShown(layout) || layout.main.activeViewId !== 'file') return
 
   event.preventDefault()
   useEditorStore.getState().requestFocus(event.shiftKey ? 'redo' : 'undo')
@@ -109,10 +109,10 @@ export const useEditorSync = () => {
   useIpcEvent('editor:command', (command) => {
     if (command === 'saveAll') return void answerQuit()
 
-    const { main } = useLayoutStore.getState()
+    const layout = useLayoutStore.getState()
     const active = project && activeTab(useSelectionStore.getState().tabsByProject[project.id])
 
-    if (project && active && main.isOpen && main.activeViewId === 'file') {
+    if (project && active && isMainShown(layout) && layout.main.activeViewId === 'file') {
       requestCloseTabs(project.id, [active])
     }
   })

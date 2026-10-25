@@ -5,7 +5,7 @@ import { EmptyState } from '@amazing-ide/ui/EmptyState'
 
 import { useClaudeCodeStore } from '../claude-code.store'
 import { useProjectConversations } from '../claude.queries'
-import { useGaugeCalm, usePanelZoom } from '../panel-look.hooks'
+import { useGaugeCalm } from '../panel-look.hooks'
 import { CliMissing } from '../CliMissing/CliMissing'
 import { ConversationPane } from '../ConversationPane/ConversationPane'
 import { ConversationTabs } from '../ConversationTabs/ConversationTabs'
@@ -32,7 +32,6 @@ import { NoChats } from './parts/NoChats'
 export const ClaudeCodeView = () => {
   const { t } = useTranslation()
   const { project, state, conversations, active } = useProjectConversations()
-  const zoom = usePanelZoom()
   const emptied = useClaudeCodeStore((store) => Boolean(project && store.emptied[project.rootPath]))
   const closedCount = (project && state?.closedByProject[project.rootPath]?.length) ?? 0
   const keys = usePanelKeys(project, conversations, active, closedCount)
@@ -57,11 +56,8 @@ export const ClaudeCodeView = () => {
   if (state && needsSignIn(state)) return <LoginGate accounts={state.accounts} />
 
   return (
-    // Свой размер текста (Settings → Appearance) - масштабом поддерева панели, не окна.
     <div
       className={styles.claudeCodeView}
-      // eslint-disable-next-line no-restricted-syntax -- масштаб - число из настроек
-      style={zoom === undefined ? undefined : { zoom }}
       onFocus={focus.handleFocus}
       onBlur={focus.handleBlur}
       onKeyDown={keys.handleKeyDown}

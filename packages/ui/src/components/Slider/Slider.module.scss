@@ -37,10 +37,4 @@
   &:disabled {
     cursor: not-allowed;
   }
-
-  &:focus-visible {
-    border-radius: var(--radius-full);
-    outline: none;
-    box-shadow: var(--shadow-focus);
-  }
 }

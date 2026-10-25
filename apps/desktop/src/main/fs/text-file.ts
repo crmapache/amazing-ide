@@ -3,7 +3,7 @@ import { open, access, realpath } from 'node:fs/promises'
 
 import type { FileRead, FileVersion } from '@shared/fs'
 
-import { MISSING_CODES, TEXT_FILE_MAX_BYTES } from './text-file.constants'
+import { MISSING_CODES, BINARY_SNIFF_BYTES, TEXT_FILE_MAX_BYTES } from './text-file.constants'
 import {
   hashText,
   errorCode,
@@ -11,6 +11,8 @@ import {
   versionOf,
   decodeText,
   insideRoot,
+  isTextStart,
+  outsideFile,
   relativeInside,
 } from './text-file.utils'
 
@@ -30,18 +32,24 @@ const locateReal = async (rootPath: string, absolute: string, relativePath: stri
   }
 }
 
+/** Где на самом деле лежит прочитанный файл - спрашивается только у текста. */
+type Place = { outside: boolean; realPath: string | null }
+
+/** Файл вне проекта сам по себе и есть место: настоящий путь окну не нужен. */
+const OUTSIDE: Place = { outside: true, realPath: null }
+
 /**
- * Файл проекта для редактора. Версия и байты берутся из одного открытого файла: иначе
- * правка между ними дала бы версию от одного содержимого и текст от другого. Открытие -
- * без ожидания (O_NONBLOCK): канал FIFO в проекте иначе навсегда занял бы поток главного
- * процесса. known - версия, которую окно уже держит: совпала - текст не читается.
+ * Файл для редактора. Версия и байты берутся из одного открытого файла: иначе правка между
+ * ними дала бы версию от одного содержимого и текст от другого. Открытие - без ожидания
+ * (O_NONBLOCK): канал FIFO иначе навсегда занял бы поток главного процесса. known - версия,
+ * которую окно уже держит: совпала - текст не читается. label - путь для журнала.
  */
-export const readTextFile = async (
-  rootPath: string,
-  relativePath: string,
-  known: FileVersion | null = null,
+const readAt = async (
+  absolute: string,
+  label: string,
+  known: FileVersion | null,
+  place: () => Promise<Place>,
 ): Promise<FileRead> => {
-  const absolute = insideRoot(rootPath, relativePath)
   let handle
 
   try {
@@ -49,7 +57,7 @@ export const readTextFile = async (
   } catch (error) {
     return MISSING_CODES.has(errorCode(error))
       ? MISSING
-      : { kind: 'failed', reason: failureOf(error, relativePath) }
+      : { kind: 'failed', reason: failureOf(error, label) }
   }
 
   try {
@@ -67,12 +75,12 @@ export const readTextFile = async (
 
     if (!decoded) return { kind: 'binary' }
 
-    const [readOnly, place] = await Promise.all([
+    const [readOnly, where] = await Promise.all([
       access(absolute, constants.W_OK).then(
         () => false,
         () => true,
       ),
-      locateReal(rootPath, absolute, relativePath),
+      place(),
     ])
 
     return {
@@ -80,11 +88,58 @@ export const readTextFile = async (
       ...decoded,
       version: versionOf(info),
       readOnly,
-      ...place,
+      ...where,
       hash: hashText(decoded.text),
     }
   } catch (error) {
-    return { kind: 'failed', reason: failureOf(error, relativePath) }
+    return { kind: 'failed', reason: failureOf(error, label) }
+  } finally {
+    await handle.close()
+  }
+}
+
+/** Файл проекта для редактора: путь от корня, за корень - ошибка. */
+export const readTextFile = async (
+  rootPath: string,
+  relativePath: string,
+  known: FileVersion | null = null,
+): Promise<FileRead> => {
+  const absolute = insideRoot(rootPath, relativePath)
+
+  return readAt(absolute, relativePath, known, () => locateReal(rootPath, absolute, relativePath))
+}
+
+/**
+ * Файл вне проекта для редактора - его открыли ссылкой (лента Claude Code). Те же проверки
+ * и потолки, что у файла проекта; путь проверяется заново, негодный - ошибка. Текст всегда
+ * помечен outside: сам он не сохраняется, только по просьбе человека.
+ */
+export const readOutsideTextFile = async (
+  path: string,
+  known: FileVersion | null = null,
+): Promise<FileRead> => readAt(outsideFile(path), path, known, () => Promise.resolve(OUTSIDE))
+
+/**
+ * Откроет ли его редактор: обычный файл не больше потолка, и его начало - текст UTF-8 без
+ * нулей (обрезанная на краю буква - не повод). Картинку, PDF и архив по ссылке честнее
+ * отдать их программе, чем показать «не текст». Без ожидания - как чтение.
+ */
+export const opensAsText = async (absolute: string): Promise<boolean> => {
+  const handle = await open(absolute, constants.O_RDONLY | constants.O_NONBLOCK).catch(() => null)
+
+  if (!handle) return false
+
+  try {
+    const info = await handle.stat()
+
+    if (!info.isFile() || info.size > TEXT_FILE_MAX_BYTES) return false
+
+    const head = Buffer.alloc(Math.min(info.size, BINARY_SNIFF_BYTES))
+    const { bytesRead } = await handle.read(head, 0, head.length, 0)
+
+    return isTextStart(head.subarray(0, bytesRead))
+  } catch {
+    return false
   } finally {
     await handle.close()
   }

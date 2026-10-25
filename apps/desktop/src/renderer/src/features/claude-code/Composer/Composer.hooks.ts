@@ -98,7 +98,6 @@ export const useComposer = ({ project, conversation, draftKey }: ComposerProps) 
     field,
     tokens: draft.tokens,
     sent,
-    sendKey: prefs.sendKey,
     suggestKey: suggest.handleKey,
     // Посреди /compact всё ждёт очереди: сжатие глотает то, что пишут в процесс.
     letGo: (mode) => void submit(isCompacting(items, conversation) ? 'queue' : mode),

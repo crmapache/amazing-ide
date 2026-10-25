@@ -13,7 +13,7 @@ import { CarryOnRow } from '../CarryOnRow/CarryOnRow'
 import { PinnedBar } from '../PinnedBar/PinnedBar'
 import { SearchCapsule } from '../SearchCapsule/SearchCapsule'
 import { StreamSwitcher } from '../StreamSwitcher/StreamSwitcher'
-import { ROW_ATTRIBUTE } from './Feed.constants'
+import { ROW_RHYTHM, ROW_ATTRIBUTE } from './Feed.constants'
 import { useUnread, useFeedScroll } from './Feed.hooks'
 import styles from './Feed.module.scss'
 import type { FeedProps } from './Feed.types'
@@ -44,6 +44,7 @@ export const Feed = ({ conversation, items }: FeedProps) => {
     lit,
     isAway,
     goToRow,
+    keepPlace,
     contentRef,
     scrollerRef,
     handleClick,
@@ -63,6 +64,11 @@ export const Feed = ({ conversation, items }: FeedProps) => {
     loadEarlier,
   })
   useSearchPaint(contentRef, conversation.id, items)
+
+  const handleLoadEarlier = () => {
+    keepPlace()
+    loadEarlier()
+  }
 
   return (
     <FeedScopeContext value={scope}>
@@ -91,11 +97,12 @@ export const Feed = ({ conversation, items }: FeedProps) => {
                 className={styles.content}
                 onPointerDownCapture={handlePointerDown}
                 onClickCapture={handleClick}>
-                {hasEarlier && <EarlierMarker isLoading={isLoading} onLoad={loadEarlier} />}
+                {hasEarlier && <EarlierMarker onLoad={handleLoadEarlier} />}
                 {rows.map((row) => (
                   <div
                     key={row.id}
                     {...{ [ROW_ATTRIBUTE]: row.id }}
+                    data-rhythm={ROW_RHYTHM[row.kind]}
                     data-lit={lit === row.id || undefined}
                     className={styles.row}>
                     <FeedRowView row={row} />

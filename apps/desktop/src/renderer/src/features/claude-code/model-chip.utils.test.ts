@@ -3,7 +3,7 @@ import { it, expect, describe } from 'vitest'
 
 import type { Conversation } from '@shared/claude'
 
-import { modelChip, modelCaption } from './model-chip.utils'
+import { modelChip, modelFamily, modelCaption } from './model-chip.utils'
 import type { PickableModel } from './models.types'
 
 /** Переводчик-эхо: ключ и параметры - по ним и проверяем. */
@@ -24,6 +24,13 @@ const conversation = (change: Partial<Conversation>): Conversation =>
   ({ id: 'c', model: 'opus[1m]', activeModel: 'claude-opus-5-5', ...change }) as Conversation
 
 describe('чип MODEL', () => {
+  it('семья модели по идентификатору: opusplan не путается с opus, своя - без семьи', () => {
+    expect(modelFamily('claude-opus-4-8')).toBe('opus')
+    expect(modelFamily('opusplan')).toBe('opusplan')
+    expect(modelFamily('Sonnet[1m]')).toBe('sonnet')
+    expect(modelFamily('gpt-proxy/x')).toBeUndefined()
+  })
+
   it('имя для людей из идентификатора', () => {
     expect(modelCaption('claude-opus-4-8', [])).toBe('Opus 4.8')
     expect(modelCaption('claude-haiku-4-5-20251001', [])).toBe('Haiku 4.5')

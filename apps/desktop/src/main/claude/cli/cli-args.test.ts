@@ -6,7 +6,6 @@ const features = {
   manualMode: true,
   allowSkipPermissions: false,
   safeMode: true,
-  settingSources: true,
 }
 const base = {
   sessionId: 'new',
@@ -14,7 +13,6 @@ const base = {
   effort: null,
   permissionMode: 'default' as const,
   fork: null,
-  settingSources: 'all' as const,
 }
 
 /** Значение флага в аргументах. */
@@ -50,21 +48,7 @@ describe('аргументы запуска', () => {
     expect(args).not.toContain('--fork-session')
   })
 
-  it('источники настроек: «все» - строка запуска прежняя, остальное - словами CLI', () => {
-    const launch = (settingSources: 'all' | 'noLocal' | 'user') =>
-      buildLaunchArgs({ ...base, resume: false, settingSources }, features)
-
-    expect(launch('all')).not.toContain('--setting-sources')
-    expect(valueOf(launch('noLocal'), '--setting-sources')).toBe('user,project')
-    expect(valueOf(launch('user'), '--setting-sources')).toBe('user')
-  })
-
-  it('CLI без флага слоёв его не получает: иначе он не стартовал бы вовсе', () => {
-    const args = buildLaunchArgs(
-      { ...base, resume: false, settingSources: 'user' },
-      { ...features, settingSources: false },
-    )
-
-    expect(args).not.toContain('--setting-sources')
+  it('слои настроек не урезаются: CLI читает все, как в терминале', () => {
+    expect(buildLaunchArgs({ ...base, resume: false }, features)).not.toContain('--setting-sources')
   })
 })

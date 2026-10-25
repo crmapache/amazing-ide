@@ -3,37 +3,27 @@ import { useTranslation } from 'react-i18next'
 
 import { IconButton } from '@amazing-ide/ui/IconButton'
 
-import { PIN_LIMIT } from '../pins.constants'
-import { usePins, usePinsStore } from '../pins.store'
+import { usePin } from '../pins.store'
 import type { PinButtonProps } from './PinButton.types'
 
 /**
- * Булавка в углу карточки - одна на своё сообщение и на ответ. Закреплённое - нажатая
- * кнопка (её видно и с экрана, где полки нет). Полная полка гасит булавки остального, но
- * не прячет: подсказка говорит, что сначала надо открепить, - до нажатия, а не после.
+ * Горящая булавка в углу карточки, как в ACC: видна, только пока сообщение закреплено, -
+ * её видно и с экрана, где полки нет, а нажатие открепляет. Закрепить - пункт меню карточки
+ * (PinItem).
  */
 export const PinButton = ({ conversationId, itemId }: PinButtonProps) => {
   const { t } = useTranslation()
-  const pins = usePins(conversationId)
-  const toggle = usePinsStore((store) => store.toggle)
-  const isPinned = pins.includes(itemId)
-  const isCrowded = !isPinned && pins.length >= PIN_LIMIT
-  const label = isPinned
-    ? t('claudeCode.pins.remove')
-    : isCrowded
-      ? t('claudeCode.pins.crowded')
-      : t('claudeCode.pins.add')
+  const pin = usePin(conversationId, itemId)
 
-  const handlePin = () => toggle(conversationId, itemId)
+  if (!pin.isPinned) return null
 
   return (
     <IconButton
       icon={Pin}
       size="sm"
-      label={label}
-      active={isPinned}
-      aria-disabled={isCrowded || undefined}
-      onClick={handlePin}
+      label={t('claudeCode.pins.remove')}
+      active
+      onClick={pin.toggle}
     />
   )
 }

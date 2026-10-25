@@ -16,7 +16,6 @@ import { useIpcEvent } from '../../lib/ipc.hooks'
 import { QUERY_KEYS } from '../../state/query-keys'
 import { useActiveProject } from '../../state/workspace.queries'
 import { touchesFiles, applyFeedPatch, finishedTurnProjects } from './claude.utils'
-import { useForgetDraftsOnStart } from './drafts.hooks'
 import { useCallSounds } from './sounds.hooks'
 import { useTabCallsSync } from './tab-calls.hooks'
 
@@ -57,7 +56,17 @@ export const usePanelPrefs = (): PanelPrefs =>
 export const useRefusedModes = (): RefusedModes =>
   useQuery({ ...claudeStateQuery, select: (state) => state.refusedModes }).data ?? NO_REFUSALS
 
-/** Слэш-команды, которые CLI сообщил для проекта; пусто, пока процесс не поднимался. */
+/**
+ * Свои команды CLI (/compact, /clear…) - служебным запросом при старте IDE, без разговора;
+ * пусто, пока CLI не ответил.
+ */
+export const useBuiltinCommands = (): readonly SlashCommand[] =>
+  useQuery({ ...claudeStateQuery, select: (state) => state.builtinCommands }).data ?? NO_COMMANDS
+
+/**
+ * Слэш-команды, которые CLI сообщил для проекта; с прошлого запуска IDE - именами, пусто,
+ * пока процесс проекта ни разу не поднимался.
+ */
 export const useSlashCommands = (projectPath: string): readonly SlashCommand[] =>
   useQuery({ ...claudeStateQuery, select: (state) => state.commandsByProject[projectPath] }).data ??
   NO_COMMANDS
@@ -121,10 +130,8 @@ export const useConversationHistory = (projectId: string | undefined, enabled: b
 export const useClaudeSync = () => {
   const queryClient = useQueryClient()
 
-  // Разговор позвал человека - звук (Settings → Sound alerts); вкладки после перезапуска
-  // не вернулись - и их черновики (Settings → Tabs on start).
+  // Разговор позвал человека - звук (Settings → Sound alerts).
   useCallSounds()
-  useForgetDraftsOnStart()
   // И свет позвавшей вкладки цветом повода - пока её не откроют.
   useTabCallsSync()
 

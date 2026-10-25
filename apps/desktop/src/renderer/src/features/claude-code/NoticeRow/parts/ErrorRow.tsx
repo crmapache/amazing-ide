@@ -7,14 +7,13 @@ import styles from '../NoticeRow.module.scss'
 import type { NoticeItemProps } from '../NoticeRow.types'
 import { useFeedStore } from '../../feed.store'
 import { LinkedText } from '../../LinkedText/LinkedText'
-import { SamplingNote } from './SamplingNote'
 import { SignInActions } from './SignInActions'
 
 /**
  * Ошибка, как в ACC: красная плашка с текстом CLI (адреса и пути в нём - ссылки) и
  * крестиком. Протухший вход - кнопки войти и сменить аккаунт, отказ шлюза из-за параметра
- * выборки - объяснение и путь к источникам настроек; но только у живой записи: у
- * прочитанной из истории входить и чинить уже нечего.
+ * выборки - объяснение (как в ACC): параметр послала не панель, а шлюз или прокси из
+ * настроек. Но только у живой записи: у прочитанной из истории входить и чинить уже нечего.
  */
 export const ErrorRow = ({ item }: NoticeItemProps) => {
   const { t } = useTranslation()
@@ -43,7 +42,9 @@ export const ErrorRow = ({ item }: NoticeItemProps) => {
           </span>
         )}
         {item.code === 'not-logged-in' && !item.replayed && <SignInActions />}
-        {item.sampling && !item.replayed && <SamplingNote />}
+        {item.sampling && !item.replayed && (
+          <span className={styles.errorNote}>{t('claudeCode.notice.sampling')}</span>
+        )}
       </div>
       <IconButton
         icon={X}

@@ -14,19 +14,32 @@ export const commandsFromInit = (init: CliMessage): SlashCommand[] => {
     : []
 }
 
-/** Команды из `system/commands_changed`: с описаниями и подсказкой аргументов. */
-export const commandsFromChange = (message: CliMessage): SlashCommand[] =>
-  recordsField(message, 'commands')
-    .map((command) => ({
-      name: stringField(command, 'name'),
-      description: stringField(command, 'description'),
-      argumentHint: stringField(command, 'argumentHint'),
-    }))
-    .filter((command) => command.name.length > 0)
+/**
+ * Команды из `system/commands_changed`, ответа на `reload_plugins` или `initialize`: полный
+ * список с описаниями и подсказкой аргументов, им список и заменяется. Поля `commands` нет -
+ * null: это «новостей нет», а не «команд не осталось».
+ */
+export const commandsFromChange = (message: CliMessage): SlashCommand[] | null =>
+  Array.isArray(message['commands'])
+    ? recordsField(message, 'commands')
+        .map((command) => ({
+          name: stringField(command, 'name'),
+          description: stringField(command, 'description'),
+          argumentHint: stringField(command, 'argumentHint'),
+          ...(command['builtin'] === true && { builtin: true }),
+        }))
+        .filter((command) => command.name.length > 0)
+    : null
+
+/** Свои команды CLI из ответа на `initialize`: служебный процесс без разговора их знает. */
+export const builtinsFromReply = (reply: unknown): SlashCommand[] =>
+  isRecord(reply)
+    ? (commandsFromChange({ type: '', ...reply }) ?? []).filter((command) => command.builtin)
+    : []
 
 /**
- * Свежий список команд поверх известного: описание из старого списка не теряется,
- * если новый (из init) пришёл только с именами.
+ * Свежий список команд поверх известного: описание из старого списка или из своих команд
+ * CLI не теряется, если новый (из init) пришёл только с именами.
  */
 export const mergeCommands = (known: SlashCommand[], incoming: SlashCommand[]): SlashCommand[] => {
   const described = new Map(known.map((command) => [command.name, command]))

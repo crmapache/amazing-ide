@@ -1,10 +1,13 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { it, vi, expect, describe, afterEach, beforeEach } from 'vitest'
 
 import { freshConversation } from '../claude-state'
 import type { CliProcess } from '../cli/cli-process'
 import type { ConversationHost } from './conversation-runtime'
 import { ConversationRuntime } from './conversation-runtime'
-import { REWOUND_DENY, IDLE_SLEEP_MS } from './conversation.constants'
+import { REWOUND_DENY, IDLE_SLEEP_MS, COMMAND_RESULT_GRACE_MS } from './conversation.constants'
 import { PLAN_ANSWERED_IN_CHAT } from './pending-requests'
 import { rewind } from './rewind'
 import { spawnConversationProcess } from './spawn'
@@ -68,7 +71,6 @@ const makeRuntime = (trusted: { value: boolean }) => {
           manualMode: true,
           allowSkipPermissions: true,
           safeMode: true,
-          settingSources: true,
         },
       }),
     isTrusted: () => Promise.resolve(trusted.value),
@@ -80,7 +82,6 @@ const makeRuntime = (trusted: { value: boolean }) => {
     thumbnail: () => '',
     accountId: () => '',
     onUsageHint: () => undefined,
-    settingSources: () => 'all',
     onCall: () => undefined,
   }
   const runtime = new ConversationRuntime(
@@ -139,6 +140,24 @@ const finishTurn = (runtime: ConversationRuntime, isClean = true) => {
   runtime.syncStatus()
   runtime.afterTurn(isClean)
 }
+
+/**
+ * Настоящая запись CLI 2.1.293: /compact первым сообщением процесса, поднятого с --resume
+ * (статус, init после сжатия, граница, итог без шагов и отметки команды). command - uuid
+ * нашего сообщения, его CLI повторяет в отметках и итоге.
+ */
+const compactLines = (command: string): object[] =>
+  readFileSync(join(import.meta.dirname, '__fixtures__/compact-fresh.ndjson'), 'utf8')
+    .split('\n')
+    .filter(Boolean)
+    .map((line) => JSON.parse(line.replaceAll('{{command}}', command)) as object)
+
+/** Отметка CLI о команде. */
+const lifecycle = (command: string, state: string) => ({
+  type: 'command_lifecycle',
+  command_uuid: command,
+  state,
+})
 
 /** Сообщение без картинок. */
 const msg = (text: string) => ({ text, images: [] })
@@ -443,5 +462,182 @@ describe('сообщение', () => {
     await runtime.send(msg('what now'))
 
     expect(fake.texts[1]).toBe('<bash-input>ls</bash-input>\n\nwhat now')
+  })
+})
+
+describe('контекст разговора', () => {
+  it('окно известно с начала первого хода, а не с его конца', async () => {
+    const runtime = makeRuntime({ value: true })
+    const fake = fakeProcess()
+
+    fake.replies['get_context_usage'] = { totalTokens: 41_000, maxTokens: 1_000_000 }
+    nextProcess(fake)
+    await runtime.send(msg('build a game'))
+    receive(runtime, fake, { type: 'system', subtype: 'init', session_id: 's1' })
+
+    expect(fake.control).toHaveBeenCalledWith({ subtype: 'get_context_usage' })
+    await vi.waitFor(() =>
+      expect(runtime.meta.usage).toMatchObject({ contextTokens: 41_000, contextWindow: 1_000_000 }),
+    )
+
+    // Дальше по ходу занятое растёт по ответам модели, окно остаётся.
+    receive(runtime, fake, {
+      type: 'assistant',
+      parent_tool_use_id: null,
+      message: {
+        model: 'claude-opus-5-5',
+        usage: { input_tokens: 5, cache_read_input_tokens: 90_000 },
+      },
+    })
+
+    expect(runtime.meta.usage).toMatchObject({ contextTokens: 90_005, contextWindow: 1_000_000 })
+  })
+
+  it('окно в итоге хода - модели разговора, а не субагента с окном пошире', async () => {
+    const runtime = makeRuntime({ value: true })
+    const fake = fakeProcess()
+
+    nextProcess(fake)
+    await runtime.send(msg('build a game'))
+    receive(runtime, fake, {
+      type: 'system',
+      subtype: 'init',
+      session_id: 's1',
+      model: 'main-model',
+    })
+    receive(runtime, fake, {
+      type: 'result',
+      num_turns: 1,
+      result: 'done',
+      total_cost_usd: 0,
+      usage: { iterations: [{ input_tokens: 10, cache_read_input_tokens: 20_000 }] },
+      modelUsage: {
+        'main-model': { contextWindow: 200_000 },
+        'agent-model': { contextWindow: 1_000_000 },
+      },
+    })
+
+    expect(runtime.meta.usage).toMatchObject({ contextTokens: 20_010, contextWindow: 200_000 })
+  })
+})
+
+describe('конец хода', () => {
+  it('/compact первым сообщением свежего процесса заканчивает ход, и очередь уходит', async () => {
+    const runtime = makeRuntime({ value: true })
+    const fake = fakeProcess()
+
+    nextProcess(fake)
+    await runtime.send(msg('/compact'))
+    await runtime.enqueue(msg('next'))
+
+    for (const line of compactLines(fake.uuids[0] ?? '')) receive(runtime, fake, line)
+
+    expect(runtime.meta.status).toBe('idle')
+    expect(runtime.meta.stopRequestedAt).toBeNull()
+    expect(runtime.feed.builder.items.at(-1)).toMatchObject({ kind: 'turn', costUsd: 0.01004223 })
+    await vi.waitFor(() => expect(fake.texts).toEqual(['/compact', 'next']))
+  })
+
+  it('/compact кончает ход и без отметок CLI - по имени команды и uuid в итоге', async () => {
+    const runtime = makeRuntime({ value: true })
+    const fake = fakeProcess()
+
+    nextProcess(fake)
+    await runtime.send(msg('/compact'))
+
+    const lines = compactLines(fake.uuids[0] ?? '').filter(
+      (line) => (line as { type: string }).type !== 'command_lifecycle',
+    )
+
+    for (const line of lines) receive(runtime, fake, line)
+
+    expect(runtime.meta.status).toBe('idle')
+  })
+
+  it('пустой итог свежего процесса без нашего сообщения - рукопожатие, ход идёт', async () => {
+    const runtime = makeRuntime({ value: true })
+    const fake = fakeProcess()
+
+    nextProcess(fake)
+    await runtime.send(msg('hello'))
+    receive(runtime, fake, { type: 'result', num_turns: 0, result: '', is_error: false })
+
+    expect(runtime.meta.status).toBe('running')
+
+    receive(runtime, fake, { type: 'result', num_turns: 1, result: 'hi', total_cost_usd: 0 })
+
+    expect(runtime.meta.status).toBe('idle')
+  })
+
+  it('команда хода кончилась, а итога нет - ход закрывается без него', async () => {
+    vi.useFakeTimers()
+
+    const runtime = makeRuntime({ value: true })
+    const fake = fakeProcess()
+
+    nextProcess(fake)
+    await runtime.send(msg('hello'))
+
+    const command = fake.uuids[0] ?? ''
+
+    receive(runtime, fake, lifecycle(command, 'started'))
+    receive(runtime, fake, lifecycle(command, 'completed'))
+
+    expect(runtime.meta.status).toBe('running')
+
+    await vi.advanceTimersByTimeAsync(COMMAND_RESULT_GRACE_MS + 1)
+
+    expect(runtime.meta.status).toBe('idle')
+  })
+
+  it('итог перед отметкой закрывает ход один раз: отметка после него ничего не трогает', async () => {
+    vi.useFakeTimers()
+
+    const runtime = makeRuntime({ value: true })
+    const fake = fakeProcess()
+
+    nextProcess(fake)
+    await runtime.send(msg('hello'))
+
+    const command = fake.uuids[0] ?? ''
+
+    receive(runtime, fake, { type: 'result', num_turns: 1, result: 'hi', total_cost_usd: 0 })
+    receive(runtime, fake, lifecycle(command, 'completed'))
+    await runtime.send(msg('again'))
+    await vi.advanceTimersByTimeAsync(COMMAND_RESULT_GRACE_MS + 1)
+
+    // Отметка прошлого хода не закрывает новый.
+    expect(runtime.meta.status).toBe('running')
+  })
+
+  it('сообщение посреди хода, кончившись, ход не закрывает', async () => {
+    vi.useFakeTimers()
+
+    const runtime = makeRuntime({ value: true })
+    const fake = fakeProcess()
+
+    nextProcess(fake)
+    await runtime.send(msg('first'))
+    await runtime.send(msg('and also this'))
+    receive(runtime, fake, lifecycle(fake.uuids[1] ?? '', 'completed'))
+    await vi.advanceTimersByTimeAsync(COMMAND_RESULT_GRACE_MS + 1)
+
+    expect(fake.texts).toEqual(['first', 'and also this'])
+    expect(runtime.meta.status).toBe('running')
+  })
+
+  it('процесс, умерший посреди /compact, - вышел, а не «не поднялся»', async () => {
+    const runtime = makeRuntime({ value: true })
+    const fake = fakeProcess()
+
+    nextProcess(fake)
+    await runtime.send(msg('/compact'))
+    receive(runtime, fake, lifecycle(fake.uuids[0] ?? '', 'started'))
+    runtime.handleExit(fake as unknown as CliProcess, 1, 'boom')
+
+    expect(runtime.feed.builder.items.at(-1)).toMatchObject({
+      kind: 'notice',
+      code: 'process-exited',
+    })
   })
 })

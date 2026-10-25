@@ -19,7 +19,7 @@ export const TabStripSpecimen = () => {
       <div role="tablist" aria-label={t('specimens.tabStrip')} className={styles.tabStripWrap}>
         <ClosableTab
           width="grow"
-          tone={2}
+          tinted
           active
           label={t('samples.chatTitle')}
           hint={t('samples.chatTitle')}
@@ -29,9 +29,10 @@ export const TabStripSpecimen = () => {
         />
         <ClosableTab
           width="grow"
-          tone={2}
+          tinted
           indent={1}
           call="success"
+          groupEnd
           active={false}
           label={t('samples.chatFork')}
           hint={t('samples.chatFork')}
@@ -41,8 +42,8 @@ export const TabStripSpecimen = () => {
         />
         <ClosableTab
           width="grow"
-          tone={4}
-          groupStart
+          tinted
+          groupEnd
           active={false}
           label={t('samples.chatLong')}
           hint={t('samples.chatLong')}
@@ -52,9 +53,9 @@ export const TabStripSpecimen = () => {
         />
         <ClosableTab
           width="grow"
-          tone={0}
-          groupStart
+          tinted
           call="attention"
+          groupEnd
           active={false}
           label={t('samples.chatCalling')}
           hint={t('samples.chatCalling')}
@@ -64,8 +65,7 @@ export const TabStripSpecimen = () => {
         />
         <ClosableTab
           width="grow"
-          tone={5}
-          groupStart
+          tinted
           call="danger"
           calm
           active={false}

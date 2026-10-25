@@ -1,12 +1,11 @@
 import type { LucideIcon } from 'lucide-react'
-import { Circle, CircleCheck, LoaderCircle } from 'lucide-react'
+import { Circle, CircleCheck } from 'lucide-react'
 
 import type { TaskState } from '@shared/claude-feed'
 
-/** Значок задачи по её состоянию. */
-export const STATE_ICON: Record<TaskState, LucideIcon> = {
+/** Значок стоящей задачи; у идущей вместо значка - Spinner. */
+export const STATE_ICON: Record<Exclude<TaskState, 'in_progress'>, LucideIcon> = {
   pending: Circle,
-  in_progress: LoaderCircle,
   completed: CircleCheck,
 }
 

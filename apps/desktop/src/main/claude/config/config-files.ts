@@ -1,8 +1,6 @@
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 
-import type { SettingSources } from '@shared/claude-prefs'
-
 import { loginShellEnv } from '../cli/shell-env'
 import { claudeHome } from '../history/transcript-paths'
 import { layerFiles, readLayers, readSettingsObject } from '../settings/setting-layers'
@@ -22,12 +20,9 @@ const globalConfigFile = async () => {
     : join(env['HOME'] || homedir(), '.claude.json')
 }
 
-/** Файлы настроек Claude Code - те слои, что проект читает при своих источниках. */
-export const readConfigFiles = async (
-  projectPath: string,
-  sources: SettingSources,
-): Promise<ConfigFiles> => {
-  const files = await layerFiles(projectPath, await claudeHome(), sources)
+/** Файлы настроек Claude Code - все слои, что проект читает. */
+export const readConfigFiles = async (projectPath: string): Promise<ConfigFiles> => {
+  const files = await layerFiles(projectPath, await claudeHome())
   const [layers, globalConfig] = await Promise.all([
     readLayers(files),
     readSettingsObject(await globalConfigFile()),
@@ -40,7 +35,7 @@ export const readConfigFiles = async (
  * Включены ли копии файлов для процессов проекта. Не прочиталось - включены: так CLI и
  * считает без записи, а лишняя переменная безвредна.
  */
-export const fileCheckpointing = (projectPath: string, sources: SettingSources): Promise<boolean> =>
-  readConfigFiles(projectPath, sources)
+export const fileCheckpointing = (projectPath: string): Promise<boolean> =>
+  readConfigFiles(projectPath)
     .then(checkpointsOn)
     .catch(() => true)

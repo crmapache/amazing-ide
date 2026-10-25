@@ -1,7 +1,12 @@
 import type { KeyboardEvent } from 'react'
 import { useRef, useEffect } from 'react'
 
-import { ITEM_SELECTOR, NAVIGATION_KEYS, AUTOFOCUS_SELECTOR } from './Menu.constants'
+import {
+  ITEM_SELECTOR,
+  NAVIGATION_KEYS,
+  AUTOFOCUS_SELECTOR,
+  CURRENT_ITEM_SELECTOR,
+} from './Menu.constants'
 import styles from './Menu.module.scss'
 import type { MenuProps } from './Menu.types'
 import { nextIndex } from './Menu.utils'
@@ -19,6 +24,7 @@ export const Menu = ({ label, autoFocus = false, header, children }: MenuProps) 
 
     const target =
       ref.current?.querySelector<HTMLElement>(AUTOFOCUS_SELECTOR) ??
+      ref.current?.querySelector<HTMLElement>(CURRENT_ITEM_SELECTOR) ??
       ref.current?.querySelector<HTMLElement>(ITEM_SELECTOR)
 
     target?.focus()

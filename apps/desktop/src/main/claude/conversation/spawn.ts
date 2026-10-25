@@ -8,7 +8,7 @@ import type { Environment } from '../cli/shell-env'
 import { fileCheckpointing } from '../config/config-files'
 import { findTranscript } from '../history/transcript-paths'
 import { fastModeRequest } from '../panel/fast-mode'
-import { launchOverrides } from '../settings/account-override'
+import { repositoryOverrides } from '../settings/account-override'
 import type { ConversationRuntime } from './conversation-runtime'
 
 /**
@@ -49,8 +49,7 @@ export const spawnConversationProcess = async (
   // старте, а падает на первом сообщении. Аргументы ниже читают её уже исправленной.
   runtime.host.panel?.launching(runtime, runtime.host.accountId())
 
-  const sources = runtime.host.settingSources(meta.projectPath)
-  const checkpoints = await fileCheckpointing(meta.projectPath, sources)
+  const checkpoints = await fileCheckpointing(meta.projectPath)
   const args = buildLaunchArgs(
     {
       sessionId: meta.sessionId,
@@ -59,7 +58,6 @@ export const spawnConversationProcess = async (
       effort: meta.effort,
       permissionMode: meta.permissionMode,
       fork: meta.fork,
-      settingSources: sources,
     },
     cli.features,
   )
@@ -85,9 +83,7 @@ export const spawnConversationProcess = async (
   // молча не в деле - лента говорит об этом строкой SETTINGS. На обычном входе это просто
   // то, как устроен проект (как в ACC).
   if (runtime.host.accountId() !== '') {
-    const flagKnown = cli.features.settingSources
-
-    runtime.feed.builder.noteOutranked(await launchOverrides(meta.projectPath, sources, flagKnown))
+    runtime.feed.builder.noteOutranked(await repositoryOverrides(meta.projectPath))
   }
 
   return process

@@ -1,7 +1,6 @@
 import { stat } from 'node:fs/promises'
 
 import type { ClaudeConfigView, ClaudeConfigFailure } from '@shared/claude-config'
-import type { SettingSources } from '@shared/claude-prefs'
 
 import type { ClaudeCli } from '../cli/cli-locator'
 import { runCli } from '../tools/cli-run'
@@ -28,10 +27,7 @@ export class ClaudeConfigDesk {
   private catalog: { identity: string; entries: ConfigEntry[] } | null = null
   private changing = false
 
-  constructor(
-    private readonly host: ToolsHost,
-    private readonly sourcesOf: (projectPath: string) => SettingSources,
-  ) {}
+  constructor(private readonly host: ToolsHost) {}
 
   /** Список с действующими значениями; CLI спрашивается, только если списка ещё нет. */
   async list(projectPath: string): Promise<ClaudeConfigView> {
@@ -116,7 +112,7 @@ export class ClaudeConfigDesk {
   }
 
   private async read(projectPath: string, entries: readonly ConfigEntry[]) {
-    return configSettings(entries, await readConfigFiles(projectPath, this.sourcesOf(projectPath)))
+    return configSettings(entries, await readConfigFiles(projectPath))
   }
 
   private async valueOf(projectPath: string, entries: readonly ConfigEntry[], key: string) {

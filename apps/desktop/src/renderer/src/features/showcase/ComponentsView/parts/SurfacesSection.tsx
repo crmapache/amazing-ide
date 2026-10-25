@@ -1,4 +1,4 @@
-import { FilePlus, FolderOpen, MoreHorizontal, MousePointerClick } from 'lucide-react'
+import { Pin, FilePlus, FolderOpen, MoreHorizontal, MousePointerClick } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Avatar } from '@amazing-ide/ui/Avatar'
@@ -58,6 +58,14 @@ export const SurfacesSection = () => {
               icon={FolderOpen}
               label={t('samples.openFile')}
               hint={t('samples.notBuilt')}
+              disabled
+              onSelect={() => undefined}
+            />
+            <MenuItem
+              icon={Pin}
+              label={t('samples.pinItem')}
+              description={t('samples.pinCrowded')}
+              wrapDescription
               disabled
               onSelect={() => undefined}
             />

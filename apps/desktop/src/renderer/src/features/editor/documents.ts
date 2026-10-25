@@ -12,6 +12,7 @@ import type { DocumentHost } from './editor-document'
 import { SAVE_COMMAND } from './editor.constants'
 import { useEditorStore } from './editor.store'
 import { monaco } from './monaco-setup'
+import { watchOutsideFiles } from './outside-watch'
 
 /** Файл нужен середине: открыт вкладкой или вкладкой разницы - там он правая сторона. */
 const isOpenTab = (tabs: Readonly<Record<string, EditorTabs>>, document: EditorDocument) =>
@@ -51,6 +52,7 @@ class Documents {
     this.open.set(document.key, document)
     useEditorStore.getState().setStatus(document.key, document.status)
     void document.load()
+    watchOutsideFiles([...this.open.values()])
 
     return document
   }
@@ -84,7 +86,8 @@ class Documents {
 
   /**
    * На диске проекта что-то поменялось: открытые файлы, которых это касается, сверяются -
-   * по пути вкладки и по настоящему пути, если файл открыт по ссылке.
+   * по пути вкладки и по настоящему пути, если файл открыт по ссылке. Файл вне проекта
+   * приходит своим абсолютным путём (watchOutsideFiles).
    */
   diskChanged({ projectId, files }: ProjectDiskChange): void {
     for (const document of this.open.values()) {
@@ -120,6 +123,7 @@ class Documents {
       this.open.delete(document.key)
       useEditorStore.getState().setStatus(document.key, null)
       this.publishHeld(document.projectId)
+      watchOutsideFiles([...this.open.values()])
     } else if (!isOpenTab(useSelectionStore.getState().tabsByProject, document)) {
       useSelectionStore.getState().selectFile(document.projectId, document.path)
     }

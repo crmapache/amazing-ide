@@ -74,10 +74,6 @@ export const formatTokens = (tokens: number): string => {
   return `${(tokens / 1_000_000).toFixed(1)}M`
 }
 
-/** Цена хода: до цента - тремя знаками, чтобы дешёвый ход не выглядел бесплатным. */
-export const formatCost = (usd: number): string =>
-  usd >= 1 ? `$${usd.toFixed(2)}` : `$${usd.toFixed(usd >= 0.1 ? 2 : 3)}`
-
 /**
  * Ступень шкалы контекста: зелёная, жёлтая, оранжевая, красная. Ступень, а не цвет:
  * красит её роль --color-gauge-*, которую приглушает режим спокойных цветов.

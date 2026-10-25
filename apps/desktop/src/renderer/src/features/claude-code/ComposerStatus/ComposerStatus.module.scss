@@ -1,39 +1,30 @@
 @use '@amazing-ide/ui/mixins' as *;
 
-// Строка под полем: селекторы слева, показания справа. Не помещается - показания
-// уходят на свою строку, а не сжимают селекторы.
+// Строка под полем - всегда одна: индикатор модели, усилия и режима слева режет подпись,
+// показания справа стоят целиком.
 .composerStatus {
   display: flex;
   flex-shrink: 0;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-1) var(--space-2);
+  gap: var(--space-2);
+  min-width: 0;
   padding: 0 var(--space-2) var(--space-2);
 }
 
-.selectors,
+// Показания справа - в ряд с воздухом между ними, как в ACC: кольцо и его процент держатся
+// вместе, соседние кольца - отдельно. От края - на поле кнопки индикатора слева: строка
+// симметрична.
 .meters {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
-  gap: var(--space-0-5);
-  min-width: 0;
-}
-
-.meters {
+  gap: var(--space-3);
   margin-left: auto;
+  padding-right: var(--space-1-5);
 }
 
-// Подпись селектора капсом перед значением: MODEL, EFFORT, MODE.
-.caption {
-  @include caps-label;
-
-  color: var(--color-fg-disabled);
-}
-
-.quiet {
-  color: var(--color-fg-disabled);
-}
+// Тон режима - у слова; обычный режим («спрашивать») тихий, без тона.
 
 .info {
   color: var(--color-info);
@@ -47,16 +38,15 @@
   color: var(--color-danger);
 }
 
-// MODEL не та, что выбрали (CLI сменил сам или выбор не доехал) - предупреждение.
+// Модель не та, что выбрали (CLI сменил сам или выбор не доехал) - предупреждение.
 .warning {
   color: var(--color-warning);
 }
 
-// ↯ быстрого режима после MODEL: горит - акцент, ждёт ответа CLI - тускло, не работает -
+// ↯ быстрого режима после модели: горит - акцент, ждёт ответа CLI - тускло, не работает -
 // предупреждение. Знак текстом, а не эмодзи: эмодзи красит себя сам.
 .fastMark {
   margin-left: var(--space-0-5);
-  font-size: var(--font-size-xs);
 }
 
 .on {
@@ -67,34 +57,53 @@
   color: var(--color-fg-disabled);
 }
 
-.rings {
-  @include button-reset;
-  @include interactive-surface;
+// Панель индикатора: вкладки разделов над списком выбранного раздела.
+.setupPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+  min-height: 0;
+}
 
+// Вкладки разделов - по своей ширине: растянутая подложка пустела бы справа.
+.sections {
+  display: flex;
+}
+
+// Все разделы - в одной клетке сетки: высоту задаёт самый высокий, и панель, открытая
+// над полем, не прыгает верхним краем при смене вкладки.
+.sectionPages {
+  display: grid;
+}
+
+.sectionPage {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+// Спрятанный раздел держит место, но не виден, не ловит ни мышь, ни фокус и не читается
+// скринридером.
+.sectionHidden {
+  visibility: hidden;
+}
+
+// Показание строки: кольцо и процент, без подписи - что за окно, говорит подсказка. Не
+// кнопка: подложки под курсором нет, как в ACC.
+.meter {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1-5);
   height: var(--size-control-sm);
-  padding: 0 var(--space-1-5);
-  border-radius: var(--radius-sm);
-
-  &:focus-visible {
-    outline: var(--focus-ring-width) solid var(--color-focus);
-  }
+  cursor: default;
 }
 
-.ring {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-// Процент - цветом темпа, моноширинным: цифры не прыгают при смене.
-.ringValue {
+// Процент - цветом ступени, моноширинным: цифры не прыгают при смене. Ступени - роли
+// --color-gauge-*: их приглушает режим спокойных цветов.
+.meterValue {
   font-family: var(--font-code);
   font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
 
-  // Ступени шкалы - роли --color-gauge-*: их приглушает режим спокойных цветов.
   &.success {
     color: var(--color-gauge-1);
   }
@@ -113,32 +122,9 @@
 }
 
 .tokens {
-  padding: 0 var(--space-1-5);
   color: var(--color-success);
   font-family: var(--font-code);
   font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
   cursor: default;
-
-  &:focus-visible {
-    border-radius: var(--radius-sm);
-    outline: var(--focus-ring-width) solid var(--color-focus);
-  }
-}
-
-.usagePanel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-}
-
-.usageTitle {
-  @include caps-label;
-
-  color: var(--color-fg-subtle);
-}
-
-.usageActions {
-  display: flex;
-  justify-content: flex-end;
 }

@@ -7,6 +7,11 @@ export type MenuItemProps = {
   label: string
   /** Вторая строка мельче: путь проекта и подобное. */
   description?: string | undefined
+  /**
+   * Вторая строка - объяснение, а не значение: переносится целиком, а не режется
+   * многоточием (почему пункт погашен, что не вернётся). Путь и имя - режутся.
+   */
+  wrapDescription?: boolean | undefined
   /** Иконка слева. Для значка или своей картинки - leading. */
   icon?: LucideIcon | undefined
   leading?: ReactNode | undefined

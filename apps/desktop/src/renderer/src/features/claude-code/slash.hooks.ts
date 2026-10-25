@@ -8,7 +8,12 @@ import { useQuery } from '@tanstack/react-query'
 
 import { invoke } from '../../lib/ipc'
 import { QUERY_KEYS } from '../../state/query-keys'
-import { usePanelPrefs, useModelCatalog, useSlashCommands } from './claude.queries'
+import {
+  usePanelPrefs,
+  useModelCatalog,
+  useSlashCommands,
+  useBuiltinCommands,
+} from './claude.queries'
 import { usePanelCommands } from './panel-commands.hooks'
 import { DISK_COMMANDS_REFRESH_MS } from './slash-catalog.constants'
 import {
@@ -19,13 +24,14 @@ import {
   BUILTIN_ARGUMENTS,
 } from './slash.constants'
 import type { CommandEntry, CommandOption } from './slash.types'
-import { buildCommands } from './slash.utils'
+import { withBuiltins, buildCommands } from './slash.utils'
 import { FALLBACK_MODELS, DEFAULT_MODEL_VALUE } from './ComposerStatus/ComposerStatus.constants'
 
 /**
  * Каталог «/» для поля: команды панели (только те, что умеют что-то в IDE), встроенные
- * с пояснениями, имена от CLI и команды с диска. Диск перечитывается, пока поле в
- * фокусе: новый скилл виден за пару секунд и до первого сообщения.
+ * с пояснениями, команды от CLI (свои - и до первого хода) и команды с диска. Диск
+ * перечитывается, пока поле в фокусе: новый скилл виден за пару секунд и до первого
+ * сообщения.
  */
 export const useCommandCatalog = (
   project: Project,
@@ -34,7 +40,9 @@ export const useCommandCatalog = (
 ) => {
   const { t } = useTranslation()
   const panelActions = usePanelCommands(conversation)
-  const cli = useSlashCommands(project.rootPath)
+  const projectCommands = useSlashCommands(project.rootPath)
+  const builtins = useBuiltinCommands()
+  const cli = useMemo(() => withBuiltins(projectCommands, builtins), [projectCommands, builtins])
   const disk = useQuery({
     queryKey: QUERY_KEYS.claudeCommands(project.id),
     queryFn: () => invoke('claude:listCommands', { projectId: project.id }),

@@ -1,6 +1,6 @@
 import { it, expect, describe } from 'vitest'
 
-import { displayPath, projectTone, parentFolder, projectInitials } from './projects.utils'
+import { projectTone, parentFolder, projectInitials } from './projects.utils'
 
 describe('projectInitials', () => {
   it('первые буквы двух слов, любые разделители и camelCase', () => {
@@ -22,19 +22,6 @@ describe('projectTone', () => {
     expect(projectTone('amazing-ide')).toBe(projectTone('amazing-ide'))
     expect(projectTone('roas-radar')).toBeGreaterThanOrEqual(0)
     expect(projectTone('roas-radar')).toBeLessThan(6)
-  })
-})
-
-describe('displayPath', () => {
-  it('домашняя папка - через ~', () => {
-    expect(displayPath('/Users/max/Documents/Projects/x', '/Users/max')).toBe(
-      '~/Documents/Projects/x',
-    )
-  })
-
-  it('похожий префикс и чужие пути - как есть', () => {
-    expect(displayPath('/Users/maxim/x', '/Users/max')).toBe('/Users/maxim/x')
-    expect(displayPath('/opt/x', undefined)).toBe('/opt/x')
   })
 })
 

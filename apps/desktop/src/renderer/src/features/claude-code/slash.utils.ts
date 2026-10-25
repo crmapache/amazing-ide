@@ -1,7 +1,7 @@
 import type { SlashCommand } from '@shared/claude'
 import type { CommandHint } from '@shared/claude-draft'
 
-import { MAX_SUGGESTIONS, UNAVAILABLE_IN_STREAM } from './slash.constants'
+import { MAX_SUGGESTIONS, UNAVAILABLE_IN_STREAM, INTERNAL_COMMAND_PREFIX } from './slash.constants'
 import type { HeldChoice, CommandEntry, CommandOption } from './slash.types'
 
 /**
@@ -9,10 +9,35 @@ import type { HeldChoice, CommandEntry, CommandOption } from './slash.types'
  * исчезает, как только строка перестала быть командой (поведение - как в ACC).
  */
 
+/** Команду можно предложить: CLI в потоке её выполнит, и она не служебная. */
+const isOffered = (name: string) =>
+  !name.startsWith(INTERNAL_COMMAND_PREFIX) && !UNAVAILABLE_IN_STREAM.has(name)
+
 /**
- * Каталог по порядку: команды панели, встроенные с пояснениями, имена от CLI, потом
- * найденное на диске и ещё не названное CLI - по имени, чтобы тот же набор файлов не
- * перерисовывал список в другом порядке. Файл с диска важнее своего пояснения.
+ * Команды CLI для проекта и свои команды CLI одним списком: проект - в порядке CLI, имя
+ * без пояснения (из init или с диска IDE) берёт его и признак своей команды у своей
+ * команды CLI; свои, которых проект ещё не назвал (до первого хода), - следом.
+ */
+export const withBuiltins = (
+  project: readonly SlashCommand[],
+  builtins: readonly SlashCommand[],
+): SlashCommand[] => {
+  const known = new Map(builtins.map((command) => [command.name, command]))
+  const named = new Set(project.map((command) => command.name))
+
+  return [
+    ...project.map((command) =>
+      command.description ? command : (known.get(command.name) ?? command),
+    ),
+    ...builtins.filter((command) => !named.has(command.name)),
+  ]
+}
+
+/**
+ * Каталог по порядку: команды панели, встроенные с пояснениями, команды от CLI (свои -
+ * с меткой встроенной), потом найденное на диске и ещё не названное CLI - по имени, чтобы
+ * тот же набор файлов не перерисовывал список в другом порядке. Файл с диска важнее
+ * своего пояснения.
  */
 export const buildCommands = (
   panel: readonly CommandEntry[],
@@ -43,7 +68,7 @@ export const buildCommands = (
   }
 
   for (const command of cli) {
-    if (UNAVAILABLE_IN_STREAM.has(command.name)) continue
+    if (!isOffered(command.name)) continue
 
     const hint = hints.get(command.name)
 
@@ -51,12 +76,12 @@ export const buildCommands = (
       id: command.name,
       hint: hint?.description || command.description,
       argumentHint: hint?.argumentHint || command.argumentHint || undefined,
-      group: 'project',
+      group: command.builtin ? 'built-in' : 'project',
     })
   }
 
   const onDisk = disk
-    .filter((hint) => !seen.has(hint.name) && !UNAVAILABLE_IN_STREAM.has(hint.name))
+    .filter((hint) => !seen.has(hint.name) && isOffered(hint.name))
     .map((hint): CommandEntry => ({
       id: hint.name,
       hint: hint.description,

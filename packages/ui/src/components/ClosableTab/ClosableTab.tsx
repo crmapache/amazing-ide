@@ -8,13 +8,14 @@ import { MIDDLE_MOUSE_BUTTON } from './ClosableTab.constants'
 import { useMiddleCut } from './ClosableTab.hooks'
 import styles from './ClosableTab.module.scss'
 import type { ClosableTabProps } from './ClosableTab.types'
+import { CallLight } from './parts/CallLight'
 
 /**
  * Вкладка, которую можно закрыть: открытый проект, разговор. Выбранная залита
- * графитом (с тоном группы - цветом группы, плоско), крестик виден на ней и при
- * наведении, средняя кнопка мыши закрывает. В полосе разговоров (width grow) растёт в
- * свободное место и режет подпись посередине; несёт цвет группы, отступ форка и
- * свечение позвавшей. Ставится в элемент с role="tablist". Вкладки-разделы - Tabs.
+ * графитом (tinted - тоном вкладок, плоско, и знаки на ней тем же тоном), крестик виден
+ * на ней и при наведении, средняя кнопка мыши закрывает. В полосе разговоров (width grow)
+ * растёт в свободное место и режет подпись посередине; несёт отступ форка и свет
+ * позвавшей (CallLight). Ставится в элемент с role="tablist". Вкладки-разделы - Tabs.
  */
 export const ClosableTab = ({
   label,
@@ -23,10 +24,11 @@ export const ClosableTab = ({
   closeLabel,
   leading,
   width = 'fill',
-  tone,
+  tinted = false,
   indent = 0,
-  groupStart = false,
+  groupEnd = false,
   call,
+  callSince,
   calm = false,
   lifted = false,
   offset,
@@ -56,18 +58,18 @@ export const ClosableTab = ({
         styles.closableTab,
         styles[width],
         active && styles.active,
-        tone !== undefined && styles[`tone${tone}`],
-        groupStart && styles.groupStart,
+        tinted && styles.tinted,
+        groupEnd && styles.groupEnd,
         lifted && styles.lifted,
         calm && styles.calm,
+        call && [styles.calling, styles[call]],
       )}
       // eslint-disable-next-line no-restricted-syntax -- глубина форка и сдвиг под рукой меняются на лету
       style={place}
       onMouseDown={onMouseDown}
       onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}>
-      {tone !== undefined && <span className={styles.groupBar} aria-hidden />}
-      {call && <span className={clsx(styles.call, styles[call])} aria-hidden />}
+      {call !== undefined && <CallLight call={call} since={callSince} />}
       {editor ? (
         <span className={styles.label}>
           {leading}

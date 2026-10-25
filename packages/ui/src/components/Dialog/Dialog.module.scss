@@ -16,6 +16,13 @@
   }
 }
 
+// Окно под диалогом видно как есть: диалог меняет то, на что надо смотреть (размер
+// текста). Модальность та же - окно под ним не нажимается.
+.clear::backdrop {
+  background-color: transparent;
+  backdrop-filter: none;
+}
+
 .form {
   display: flex;
   flex-direction: column;

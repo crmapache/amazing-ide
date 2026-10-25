@@ -1,7 +1,5 @@
 import type { EffortLevel, PermissionMode } from '@shared/claude'
-import type { SettingSources } from '@shared/claude-prefs'
 
-import { settingSourcesArg } from '../settings/setting-layers'
 import type { CliFeatures } from './cli-features'
 import { PANEL_BRIEFING } from './cli.constants'
 
@@ -18,19 +16,6 @@ export type LaunchOptions = {
    * `at` под нашим id. Родившийся форк продолжается своим транскриптом.
    */
   fork: { sourceSessionId: string; at: string } | null
-  /**
-   * Какие слои настроек Claude Code читает проект (Settings sources). Спрашивается на
-   * каждом запуске: экран открывают, когда разговоры уже идут, и следующий подъём
-   * процесса должен идти так, как только что попросили.
-   */
-  settingSources: SettingSources
-}
-
-/** Флаг слоёв: «все» - флага нет вовсе; CLI, который его не знает, не получает его. */
-const sourcesArgs = (sources: SettingSources, features: CliFeatures): string[] => {
-  const value = settingSourcesArg(sources)
-
-  return value !== null && features.settingSources ? ['--setting-sources', value] : []
 }
 
 /** С чего начать сессию: продолжить, ответвить от источника или начать с нашим id. */
@@ -83,5 +68,4 @@ export const buildLaunchArgs = (options: LaunchOptions, features: CliFeatures): 
   ...(features.allowSkipPermissions ? ['--allow-dangerously-skip-permissions'] : []),
   ...(options.model ? ['--model', options.model] : []),
   ...(options.effort ? ['--effort', options.effort] : []),
-  ...sourcesArgs(options.settingSources, features),
 ]

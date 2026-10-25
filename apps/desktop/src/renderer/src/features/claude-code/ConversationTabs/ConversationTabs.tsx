@@ -10,19 +10,20 @@ import { useClaudeActions } from '../claude-actions.hooks'
 import { useClaudeCodeStore } from '../claude-code.store'
 import { keyLine } from '../panel-keys.utils'
 import { useResting, useAnswerOnOpen } from '../tab-calls.hooks'
-import { CALLS_REST_AFTER_MS } from './ConversationTabs.constants'
+import { ADD_KEY, CALLS_REST_AFTER_MS } from './ConversationTabs.constants'
 import { useTabDrag } from './ConversationTabs.hooks'
 import styles from './ConversationTabs.module.scss'
 import type { ConversationTabsProps } from './ConversationTabs.types'
+import { endsGroup } from './ConversationTabs.utils'
 import { ConversationTab } from './parts/ConversationTab'
 import { TabContextMenu } from './parts/TabContextMenu'
 
 /**
  * Шапка панели, как в ACC: полоса вкладок разговоров в несколько рядов (группа - разговор
- * и его форки - подряд и одним цветом), справа три кнопки IDE - новый разговор, форк
- * выбранного, меню. Отдельной кнопки истории нет: прошлые разговоры - строка меню и
- * /resume. Ветка и PR - в шапке окна, а не здесь: ветка там уже есть, второй раз она не
- * нужна. Вкладки переставляются рукой, порядок хранит главный процесс.
+ * и его форки - подряд), сразу за последней вкладкой - «+» нового разговора, справа на
+ * месте - форк выбранного и меню. Отдельной кнопки истории нет: прошлые разговоры - строка
+ * меню и /resume. Ветка и PR - в шапке окна, а не здесь: ветка там уже есть, второй раз она
+ * не нужна. Вкладки переставляются рукой, порядок хранит главный процесс.
  */
 export const ConversationTabs = ({ project, conversations, activeId }: ConversationTabsProps) => {
   const { t } = useTranslation()
@@ -35,7 +36,7 @@ export const ConversationTabs = ({ project, conversations, activeId }: Conversat
     state?.conversations
       .filter((conversation) => conversation.projectPath === project.rootPath)
       .map((conversation) => conversation.id) ?? null
-  const { stripRef, register, view, onPress, wasDragged } = useTabDrag(conversations, {
+  const { stripRef, addRef, register, view, onPress, wasDragged } = useTabDrag(conversations, {
     moveGroup: (groupId, before) => moveGroup(groupId, before).then(idsOf),
     moveTab: (id, before) => moveTab(id, before).then(idsOf),
   })
@@ -52,6 +53,7 @@ export const ConversationTabs = ({ project, conversations, activeId }: Conversat
   const active = conversations.find((conversation) => conversation.id === activeId)
   const canFork = Boolean(active && (active.title || active.fork))
   const groupSizes = new Map<string, number>()
+  const addShift = view.shifts[ADD_KEY]
 
   for (const { groupId } of conversations)
     groupSizes.set(groupId, (groupSizes.get(groupId) ?? 0) + 1)
@@ -71,40 +73,49 @@ export const ConversationTabs = ({ project, conversations, activeId }: Conversat
 
   return (
     <div className={styles.conversationTabs} data-tab-strip>
-      {conversations.length > 0 ? (
-        <div
-          ref={stripRef}
-          role="tablist"
-          aria-label={t('claudeCode.tabsLabel')}
-          className={styles.tabList}
-          // eslint-disable-next-line no-restricted-syntax -- полоса подрастает на ряд, который добавит отпускание
-          style={view.reach ? { minHeight: view.reach } : undefined}>
-          {conversations.map((conversation, index) => (
-            <ConversationTab
-              key={conversation.id}
-              conversation={conversation}
-              isActive={conversation.id === activeId}
-              startsGroup={conversations[index - 1]?.groupId !== conversation.groupId}
-              groupSize={groupSizes.get(conversation.groupId) ?? 1}
-              call={calls[conversation.id]?.tone ?? null}
-              calm={calm}
-              dragView={view}
-              register={register}
-              onPress={onPress}
-              onMenu={handleMenu}
-              wasDragged={wasDragged}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className={styles.heading}>{t('claudeCode.title')}</div>
-      )}
+      <div
+        ref={stripRef}
+        className={styles.strip}
+        // eslint-disable-next-line no-restricted-syntax -- полоса подрастает на ряд, который добавит отпускание
+        style={view.reach ? { minHeight: view.reach } : undefined}>
+        {conversations.length > 0 ? (
+          <div role="tablist" aria-label={t('claudeCode.tabsLabel')} className={styles.tabList}>
+            {conversations.map((conversation, index) => (
+              <ConversationTab
+                key={conversation.id}
+                conversation={conversation}
+                isActive={conversation.id === activeId}
+                startsGroup={conversations[index - 1]?.groupId !== conversation.groupId}
+                endsGroup={endsGroup(conversations, index)}
+                groupSize={groupSizes.get(conversation.groupId) ?? 1}
+                call={calls[conversation.id] ?? null}
+                calm={calm}
+                dragView={view}
+                register={register}
+                onPress={onPress}
+                onMenu={handleMenu}
+                wasDragged={wasDragged}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className={styles.heading}>{t('claudeCode.title')}</div>
+        )}
+        <span
+          ref={addRef}
+          className={styles.add}
+          // eslint-disable-next-line no-restricted-syntax -- «+» уступает место вкладке под рукой, как её соседи
+          style={
+            addShift ? { transform: `translate(${addShift.x}px, ${addShift.y}px)` } : undefined
+          }>
+          <IconButton
+            icon={Plus}
+            label={t('claudeCode.tabs.newChat', { key: keyLine('newTab') })}
+            onClick={handleNew}
+          />
+        </span>
+      </div>
       <div className={styles.actions}>
-        <IconButton
-          icon={Plus}
-          label={t('claudeCode.tabs.newChat', { key: keyLine('newTab') })}
-          onClick={handleNew}
-        />
         <IconButton
           icon={GitFork}
           label={canFork ? t('claudeCode.forkChat') : t('claudeCode.forkNothing')}

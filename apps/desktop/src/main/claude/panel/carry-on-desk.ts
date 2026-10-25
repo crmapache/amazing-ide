@@ -133,11 +133,9 @@ export class CarryOnDesk {
   afterResult(runtime: ConversationRuntime, result: CliMessage, now: number): void {
     const { id } = runtime.meta
 
-    // Пустой итог нового процесса (после --resume) - рукопожатие, а не прошедший ход.
-    const handshake = numberField(result, 'num_turns') === 0 && !stringField(result, 'result')
-
+    // Рукопожатие свежего процесса сюда не доходит: его отсеивает разговор (turn-command.ts).
     if (this.refusedTurns.delete(id)) this.noteLimitRefusal(runtime, now)
-    else if (result['is_error'] !== true && !handshake) {
+    else if (result['is_error'] !== true) {
       this.said.delete(id)
       this.host.noteAnswered(runtime.accountId)
     }

@@ -1,9 +1,17 @@
 @use '@amazing-ide/ui/mixins' as *;
 
+// Снизу - зазор до строки под полем (модель, усилие, режим), как в ACC: селектор
+// принадлежит полю и стоит к нему вплотную, а не отдельной полосой.
 .composer {
   position: relative;
   flex-shrink: 0;
-  padding: 0 var(--space-3) var(--space-3);
+  padding: 0 var(--size-panel-gutter) var(--space-1-5);
+
+  // Разговора ещё нет - строки под полем тоже нет, и рамка стоит у края панели: тем же
+  // полем, что и по бокам.
+  &[data-alone] {
+    padding-bottom: var(--size-panel-gutter);
+  }
 }
 
 // Поле - самая тёмная поверхность панели с тонкой рамкой, как TextField: в фокусе -
@@ -27,10 +35,12 @@
   }
 }
 
-// Текст с чипами внутри строки. Растёт с текстом до потолка, дальше - прокрутка внутри.
+// Текст с чипами внутри строки. Растёт с текстом до пяти строк, дальше - прокрутка внутри:
+// длинный черновик не отъедает ленту, а потолок в строках, а не в доле окна, одинаков на
+// любом экране. lh - строка самого поля, и в моноширинном «!» тоже ровно пять его строк.
 .field {
   min-height: calc(2lh + var(--space-3) + var(--space-1));
-  max-height: var(--size-composer-max);
+  max-height: calc(5lh + var(--space-3) + var(--space-1));
   padding: var(--space-3) var(--space-3) var(--space-1);
   overflow-y: auto;
   outline: none;
@@ -80,7 +90,6 @@
 .toolbar {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
   min-width: 0;
   padding: var(--space-1) var(--space-1-5) var(--space-1-5);
 }
@@ -114,6 +123,41 @@
 
 .spacer {
   flex: 1;
+}
+
+// Кольцо контекста - показание, а не кнопка: подложки под курсором нет. От лупы - на зазор
+// между группами кнопок (свой зазор ряда плюс поле), а не вплотную, как кнопка группы.
+.contextMeter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: var(--size-control-sm);
+  margin-left: var(--space-1);
+  cursor: default;
+}
+
+// Процент - цветом ступени, моноширинным: цифры не прыгают при смене. Ступени - роли
+// --color-gauge-*: их приглушает режим спокойных цветов.
+.contextValue {
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+
+  &.success {
+    color: var(--color-gauge-1);
+  }
+
+  &.warning {
+    color: var(--color-gauge-2);
+  }
+
+  &.high {
+    color: var(--color-gauge-3);
+  }
+
+  &.danger {
+    color: var(--color-gauge-4);
+  }
 }
 
 .sendButtons {
@@ -150,69 +194,15 @@
   overflow: hidden;
 }
 
-// Ужатая раскладка: строка селекторов и колец - своей строкой внутри рамки, под кнопками.
-.compactSelectors {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  min-width: 0;
-  overflow: hidden;
-}
-
-.contextBar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3) 0;
-  cursor: default;
-}
-
-// Пять отрезков с зазором - риски на 20, 40, 60 и 80 процентах.
-.contextSegments {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: var(--space-1);
-  width: 100%;
-  padding: var(--space-1) 0;
-
-  &:focus-visible {
-    border-radius: var(--radius-sm);
-    outline: var(--focus-ring-width) solid var(--color-focus);
-  }
-}
-
-.contextValue {
-  margin-left: auto;
-  font-family: var(--font-code);
-  font-size: var(--font-size-2xs);
-  font-variant-numeric: tabular-nums;
-
-  &.success {
-    color: var(--color-success);
-  }
-
-  &.warning {
-    color: var(--color-warning);
-  }
-
-  &.accent {
-    color: var(--color-accent-strong);
-  }
-
-  &.danger {
-    color: var(--color-danger);
-  }
-}
-
 // Подсказка команд - стеклянный слой над полем, как всплывающие панели окна.
 .suggest {
   @include glass-overlay;
   @include enter-transition;
 
   position: absolute;
-  right: var(--space-3);
+  right: var(--size-panel-gutter);
   bottom: calc(100% + var(--space-1));
-  left: var(--space-3);
+  left: var(--size-panel-gutter);
   z-index: var(--z-overlay);
   max-height: var(--size-listbox-max);
   padding: var(--space-1);

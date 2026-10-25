@@ -1,14 +1,14 @@
 @use '@amazing-ide/ui/mixins' as *;
 
 // Сообщение человека - карточка с рамкой на приподнятой подложке, во всю ширину ленты
-// (как в ACC): своё отделено от ответа шапкой «YOU» и подложкой, а не цветом.
+// (как в ACC): своё отделено от ответа шапкой «YOU» и подложкой, а не цветом. Отступы от
+// соседних строк - у ленты (Feed), не здесь.
 .userMessage {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-1-5);
   min-width: 0;
-  margin: var(--space-4) 0 var(--space-3);
   padding: var(--space-2) var(--space-3);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-xl);
@@ -16,13 +16,15 @@
 }
 
 // По базовой линии, а не по середине: подпись и время - разные кегли, и центрованные
-// коробки ставят сами буквы на пиксель врозь. Справа - место под кнопки в углу.
+// коробки ставят сами буквы на пиксель врозь. Справа - место под кнопки в углу: булавка
+// закреплённого, копия и три точки. Высота - по самим словам, без запаса под кнопки: они
+// лежат поверх угла, а текст ниже начинается там, где они кончаются (как в ACC); запас
+// под них раздувал шапку почти вдвое, и между «YOU» и словами человека зияла пустота.
 .head {
   display: flex;
   align-items: baseline;
   gap: var(--space-2);
-  min-height: var(--size-control-sm);
-  padding-right: calc(var(--size-control-sm) * 4);
+  padding-right: calc(var(--size-control-sm) * 3);
 }
 
 .label {
@@ -34,12 +36,12 @@
 .time {
   color: var(--color-fg-subtle);
   font-family: var(--font-code);
-  font-size: var(--font-size-2xs);
+  font-size: var(--font-size-xs);
 }
 
-// Кнопки в правом верхнем углу - на тех же отступах, что у ответа: при переходе курсора
-// между карточками они не прыгают. Видны всегда: кнопка, которая прячется до наведения,
-// - дорога назад, которую не найти.
+// Кнопки в правом верхнем углу - на том же отступе справа, что у ответа, по высоте - на
+// середине шапки «YOU». Видны всегда: кнопка, которая прячется до наведения, - дорога
+// назад, которую не найти.
 .actions {
   position: absolute;
   top: var(--space-1);
@@ -133,7 +135,7 @@
   overflow: hidden;
   color: var(--color-fg-muted);
   font-family: var(--font-code);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   -webkit-box-orient: vertical;
@@ -146,7 +148,7 @@
   overscroll-behavior: contain;
   color: var(--color-fg-muted);
   font-family: var(--font-code);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   line-height: var(--line-height-normal);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -155,7 +157,7 @@
 .pasteCut {
   color: var(--color-fg-subtle);
   font-family: var(--font-code);
-  font-size: var(--font-size-2xs);
+  font-size: var(--font-size-xs);
 }
 
 // Кнопка вокруг плашки вставленной картинки: стоит в строке как слово, вид - у плашки.
@@ -164,4 +166,11 @@
 
   display: inline;
   cursor: pointer;
+}
+
+// Пустая строка между абзацами - короткий зазор, как между абзацами ответа, а не высота
+// целой строки: набранное с переносами разваливалось на острова.
+.paragraphGap {
+  display: block;
+  height: var(--space-2);
 }

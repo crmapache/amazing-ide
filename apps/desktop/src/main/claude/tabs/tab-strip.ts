@@ -73,12 +73,9 @@ export class TabStrip {
     return view
   }
 
-  /**
-   * Закрытые - на диск, если вкладки возвращаются на старте. Картинки очереди остаются в
-   * памяти.
-   */
-  stored(keepClosed: boolean): ClosedTab[] {
-    return keepClosed ? this.closed : []
+  /** Закрытые - на диск: вкладки возвращаются на старте. Картинки очереди остаются в памяти. */
+  stored(): ClosedTab[] {
+    return this.closed
   }
 
   /** Новая вкладка встаёт в полосу (форк - за своей группой) и становится выбранной. */
@@ -154,8 +151,7 @@ export class TabStrip {
 
     if (!title || !outranks('user', runtime.meta.titleSource)) return this.host.state()
 
-    // Модель больше не называет разговор: имя ей не перебить, спрашивать незачем.
-    runtime.titleSource = null
+    // Модель больше не называет разговор: имя от человека ей не перебить (session-title.ts).
     runtime.update({ title, titleSource: 'user' })
     await writeOwnTitle(runtime, title)
 

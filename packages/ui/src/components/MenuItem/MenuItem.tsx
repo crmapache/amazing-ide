@@ -9,13 +9,15 @@ import type { MenuItemProps } from './MenuItem.types'
 
 /**
  * Пункт меню: иконка или значок, подпись, по желанию вторая строка и подсказка
- * справа. Выбор закрывает всплывающую панель, в которой пункт стоит. С selection -
+ * справа (объяснение во второй строке - с переносом, wrapDescription). Выбор закрывает
+ * всплывающую панель, в которой пункт стоит. С selection -
  * вариант выбора с отметкой (вопрос с вариантами ответа). С iconTone и chevron -
  * строка бокового меню: иконка в плитке, значение справа, стрелка на следующий экран.
  */
 export const MenuItem = ({
   label,
   description,
+  wrapDescription = false,
   icon: Icon,
   leading,
   current = false,
@@ -60,7 +62,11 @@ export const MenuItem = ({
       </span>
       <span className={styles.text}>
         <span className={styles.label}>{label}</span>
-        {description && <span className={styles.description}>{description}</span>}
+        {description && (
+          <span className={clsx(styles.description, wrapDescription && styles.wrap)}>
+            {description}
+          </span>
+        )}
       </span>
       {hint && (
         <span className={clsx(styles.hint, hintTone && [styles.toned, styles[hintTone]])}>

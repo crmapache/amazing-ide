@@ -11,8 +11,73 @@ export const FEED_FLUSH_MS = 33
  */
 export const IDLE_SLEEP_MS = 30 * 60 * 1000
 
+/**
+ * Сколько ждать итога хода после отметки CLI «команда хода кончилась». CLI пишет итог
+ * раньше отметки, в тот же миг; пауза - запас, чтобы не закрыть ход раньше пришедшего
+ * следом итога, если когда-нибудь порядок поменяется.
+ */
+export const COMMAND_RESULT_GRACE_MS = 1000
+
 /** Заголовок из первого сообщения, пока CLI не придумал свой. */
 export const DRAFT_TITLE_CHARS = 60
+
+/**
+ * Короче - имя по сообщению не просим: CLI на тексте короче 10 знаков отвечает пустым
+ * («ок», «дальше» о разговоре ничего не говорят), и ждём следующего сообщения.
+ */
+export const TITLE_MIN_CHARS = 10
+
+/**
+ * Сколько начала сообщения уходит модели за именем. О чём разговор - в первых строках,
+ * дальше вставленный лог или спецификация, а за них платили бы ради имени в пять слов.
+ */
+export const TITLE_SAMPLE_CHARS = 1000
+
+/**
+ * Команды, которые говорят, что сделали С разговором или с инструментом, а не о чём
+ * работа: вкладка с именем «/compact» назвалась бы служебным шагом. Остальные команды -
+ * работа (скилл, «/code-review») и называют разговор не хуже фразы. Сравнение - имени
+ * целиком: «acme:status» плагина - его собственная команда.
+ */
+export const HOUSEKEEPING_COMMANDS: ReadonlySet<string> = new Set([
+  'clear',
+  'compact',
+  'resume',
+  'rewind',
+  'fork',
+  'export',
+  'rename',
+  'login',
+  'logout',
+  'exit',
+  'quit',
+  'upgrade',
+  'model',
+  'effort',
+  'config',
+  'permissions',
+  'hooks',
+  'agents',
+  'todos',
+  'memory',
+  'mcp',
+  'ide',
+  'add-dir',
+  'statusline',
+  'output-style',
+  'terminal-setup',
+  'vim',
+  'privacy-settings',
+  'context',
+  'cost',
+  'usage',
+  'status',
+  'doctor',
+  'help',
+  'bug',
+  'feedback',
+  'release-notes',
+])
 
 /** Отказ на вопрос, который панель не умеет показать: без ответа ход повис бы навсегда. */
 export const UNSUPPORTED_REQUEST = 'This host does not support this request.'

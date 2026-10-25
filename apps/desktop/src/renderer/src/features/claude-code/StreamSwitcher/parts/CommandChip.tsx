@@ -1,8 +1,10 @@
+import clsx from 'clsx'
 import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { IconButton } from '@amazing-ide/ui/IconButton'
-import { Tooltip } from '@amazing-ide/ui/Tooltip'
+import { Popover } from '@amazing-ide/ui/Popover'
+import { usePopover } from '@amazing-ide/ui/Popover.hooks'
 
 import styles from '../StreamSwitcher.module.scss'
 import type { CommandChipProps } from '../StreamSwitcher.types'
@@ -10,40 +12,58 @@ import { commandLabel } from '../StreamSwitcher.utils'
 import { inputText } from '../../claude.utils'
 import { StatusDot } from '../../StatusDot/StatusDot'
 import { ChipClock } from './ChipClock'
+import { CommandView } from './CommandView'
 
 /**
- * Фоновая команда - не поток: своего журнала у неё нет, нажимать некуда. Чип - знак, что
- * процесс жив, и он стоит ровно столько, сколько процесс идёт. Подсказка - сама команда
- * и описание модели: «что это всё ещё работает» - вопрос, который чип и задаёт.
+ * Фоновая команда - не поток: своего журнала у неё нет. Чип - знак, что процесс жив, и он
+ * стоит ровно столько, сколько процесс идёт. Нажатие открывает под ним саму команду
+ * (CommandView), а не подсказку: длинную цепочку в подсказке не прочесть. Крестик
+ * останавливает, как у агента.
  */
 export const CommandChip = ({ tool, onStop }: CommandChipProps) => {
   const { t } = useTranslation()
+  const popover = usePopover()
   const command = inputText(tool.input, 'command')
   const description = inputText(tool.input, 'description')
   const label = commandLabel(command) || description
-  const hint = [command.split('\n')[0]?.trim(), description].filter(Boolean).join('\n')
+  const taskId = tool.task?.taskId ?? ''
+  const startedAt = tool.task?.startedAt ?? 0
 
-  const handleStop = () =>
-    onStop({ taskId: tool.task?.taskId ?? '', kind: 'command', subject: description || label })
+  const handleStop = () => onStop({ taskId, kind: 'command', subject: description || label })
+
+  const handleStopFromView = () => {
+    popover.close()
+    handleStop()
+  }
 
   return (
-    <div className={styles.chip}>
-      <Tooltip label={hint} disabled={!hint}>
-        <span className={styles.static}>
-          <StatusDot status="running" />
-          <span className={styles.label}>{t('claudeCode.agents.streams.background')}</span>
-          <ChipClock startedAt={tool.task?.startedAt ?? 0} />
-          {label && <span className={styles.meta}>{label}</span>}
+    <div className={clsx(styles.chip, styles.static, taskId && styles.stoppable)}>
+      <button {...popover.triggerProps} type="button" className={styles.pick}>
+        <StatusDot status="running" />
+        <span className={styles.name}>{t('claudeCode.agents.streams.background')}</span>
+        <ChipClock startedAt={startedAt} />
+        {label && <span className={styles.meta}>{label}</span>}
+      </button>
+      {taskId && (
+        <span className={styles.stop}>
+          <IconButton
+            icon={X}
+            size="xs"
+            label={t('claudeCode.agents.streams.stopCommand')}
+            onClick={handleStop}
+          />
         </span>
-      </Tooltip>
-      {tool.task?.taskId && (
-        <IconButton
-          icon={X}
-          size="sm"
-          label={t('claudeCode.agents.streams.stopCommand')}
-          onClick={handleStop}
-        />
       )}
+      <Popover {...popover.popoverProps} width="lg">
+        {popover.isOpen && (
+          <CommandView
+            command={command}
+            description={description}
+            startedAt={startedAt}
+            onStop={taskId ? handleStopFromView : null}
+          />
+        )}
+      </Popover>
     </div>
   )
 }

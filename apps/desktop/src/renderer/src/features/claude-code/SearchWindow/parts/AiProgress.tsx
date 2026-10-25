@@ -1,6 +1,8 @@
 import clsx from 'clsx'
-import { Check, Ellipsis, LoaderCircle } from 'lucide-react'
+import { Check, Ellipsis } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+
+import { Spinner } from '@amazing-ide/ui/Spinner'
 
 import styles from '../SearchWindow.module.scss'
 import type { AiProgressProps } from '../SearchWindow.types'
@@ -19,12 +21,7 @@ export const AiProgress = ({ steps, seconds }: AiProgressProps) => {
   return (
     <div className={styles.progress} role="status">
       <div className={styles.progressHead}>
-        <LoaderCircle
-          className={styles.spinner}
-          size={SEARCH_ICON_SIZE}
-          strokeWidth={SEARCH_ICON_STROKE}
-          aria-hidden
-        />
+        <Spinner tone="neutral" />
         <span className={styles.progressText}>{t('claudeCode.search.aiSearching')}</span>
         <span className={styles.progressMeta}>
           {t('claudeCode.search.stepsMeta', {

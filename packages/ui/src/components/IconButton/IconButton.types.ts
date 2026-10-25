@@ -3,7 +3,8 @@ import type { LucideIcon } from 'lucide-react'
 
 import type { TooltipPlacement } from '../Tooltip/Tooltip.types'
 
-export type IconButtonSize = 'sm' | 'md'
+/** xs - знак внутри плотной плашки (крестик на чипе), sm - строка и поле, md - полосы окна. */
+export type IconButtonSize = 'xs' | 'sm' | 'md'
 
 /** ghost - тихая кнопка в полосе или строке; primary - главное действие (отправить). */
 export type IconButtonVariant = 'ghost' | 'primary'

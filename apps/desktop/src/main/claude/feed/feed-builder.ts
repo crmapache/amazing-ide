@@ -107,11 +107,6 @@ export class FeedBuilder {
     return this.taskList.tasks
   }
 
-  /** Сколько стоили все ходы, собранные этим сборщиком. */
-  get totalCostUsd(): number {
-    return this.closer.totalCostUsd
-  }
-
   /**
    * Что известно из прочитанного транскрипта: модель последнего ответа основного потока
    * (вкладке из истории) и вопрос, на котором разговор оборвался (null - такого нет).
@@ -207,6 +202,11 @@ export class FeedBuilder {
   /** Конец хода по `result` (turn-closer.ts). interrupted - ход останавливали. */
   finishTurn(result: CliMessage, interrupted: boolean): void {
     this.closer.finish(result, interrupted)
+  }
+
+  /** Ход кончился без `result` (turn-closer.ts): незаконченное закрыто, итога нет. */
+  closeTurnWithoutResult(interrupted: boolean): void {
+    this.closer.close(interrupted)
   }
 
   /** Поднят новый процесс CLI: цена хода считается от его нуля, а не от итога прошлого. */

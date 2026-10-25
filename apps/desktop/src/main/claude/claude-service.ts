@@ -2,20 +2,14 @@ import { randomUUID } from 'node:crypto'
 import { join } from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
 
-import type {
-  ForkOrigin,
-  ClaudeState,
-  Conversation,
-  HistoryEntry,
-  SlashCommand,
-} from '@shared/claude'
+import type { ForkOrigin, ClaudeState, Conversation, HistoryEntry } from '@shared/claude'
 import type { FeedPatch, ConversationFeed } from '@shared/claude-feed'
 import type { ConversationCall } from '@shared/claude-prefs'
 
 import type { JsonFile } from '../storage/json-file'
 import { ClaudePersistence } from './claude-persistence'
 import type { StoredClaude } from './claude-state'
-import { toStored, startingState, freshConversation, parseStoredClaude } from './claude-state'
+import { toStored, freshConversation, parseStoredClaude } from './claude-state'
 import { SHUTDOWN_MAX_MS } from './claude.constants'
 import { ConversationActions } from './conversation-actions'
 import { forkOriginFor } from './fork-origin'
@@ -25,6 +19,7 @@ import { ConversationCalls } from './calls/conversation-calls'
 import { CliAccess } from './cli/cli-access'
 import type { CliProcess } from './cli/cli-process'
 import { ProcessGroup } from './cli/process-group'
+import { ProjectCommands } from './cli/project-commands'
 import { ComposerTools } from './composer/composer-tools'
 import type { ConversationHost } from './conversation/conversation-runtime'
 import { ConversationRuntime } from './conversation/conversation-runtime'
@@ -85,7 +80,7 @@ export class ClaudeService {
     state: () => this.getState(),
   })
   private readonly runtimes = new Map<string, ConversationRuntime>()
-  private readonly commandsByProject: Record<string, SlashCommand[]> = {}
+  private readonly commands: ProjectCommands
   readonly cli = new CliAccess(
     () => this.scheduleBroadcast(),
     (cli) => ({ ...cli, env: this.accounts.envFor(cli.env) }),
@@ -116,6 +111,9 @@ export class ClaudeService {
       () => events.onState(this.getState()),
     )
     this.activeByProject = stored.activeByProject
+    this.commands = new ProjectCommands(stored.commandsByProject, (saved) =>
+      saved ? this.persist.changed() : this.scheduleBroadcast(),
+    )
     this.settings.prefs = stored.prefs
     this.trust = new WorkspaceTrust(stored.trustedProjects, () => this.persist.changed())
 
@@ -153,7 +151,7 @@ export class ClaudeService {
       onForgotten: (id) => void usage.forget(id),
     })
 
-    const stored = startingState(parseStoredClaude(await file.read()))
+    const stored = parseStoredClaude(await file.read())
 
     service = new ClaudeService(stored, file, events, accounts, usage)
     void service.panel.start()
@@ -166,7 +164,8 @@ export class ClaudeService {
       conversations: [...this.runtimes.values()].map((runtime) => runtime.meta),
       activeByProject: this.activeByProject,
       closedByProject: this.tabs.closedByProject(),
-      commandsByProject: this.commandsByProject,
+      commandsByProject: this.commands.view,
+      builtinCommands: this.cli.commands,
       models: this.cli.models,
       cli: this.cli.status,
       accounts: { ...this.accounts.view, usage: this.usage.view, ...this.panel.accountFacts() },
@@ -314,18 +313,15 @@ export class ClaudeService {
     isTrusted: (projectPath) => this.trust.isTrusted(projectPath),
     onChange: () => this.persist.changed(),
     onFeedPatch: (patch) => this.events.onFeed(patch),
-    onCommands: (projectPath, commands) => {
-      this.commandsByProject[projectPath] = commands
-      this.scheduleBroadcast()
-    },
+    onCommands: (projectPath, commands) => this.commands.set(projectPath, commands),
     onModels: (models) => this.cli.setModels(models),
-    knownCommands: (projectPath) => this.commandsByProject[projectPath] ?? [],
+    // Имена из init - без пояснений: их дают свои команды CLI и прошлый список проекта.
+    knownCommands: (projectPath) => [...this.cli.commands, ...this.commands.of(projectPath)],
     thumbnail: makeThumbnail,
     accountId: () => this.accounts.current,
     onUsageHint: (runtime) => {
       if (runtime.process?.isAlive) this.usage.fromProcess(runtime.accountId, runtime.process)
     },
-    settingSources: (projectPath) => this.settings.sourcesOf(projectPath),
     onCall: (conversationId, reason, key) => this.calls.add(conversationId, reason, key),
     panel: this.panel,
   }
@@ -390,10 +386,11 @@ export class ClaudeService {
   private stored(): StoredClaude {
     return {
       conversations: [...this.runtimes.values()].map((runtime) => toStored(runtime.meta)),
-      closed: this.tabs.stored(this.settings.prefs.restoreTabs),
+      closed: this.tabs.stored(),
       activeByProject: this.activeByProject,
       trustedProjects: this.trust.list,
       prefs: this.settings.prefs,
+      commandsByProject: this.commands.stored(),
     }
   }
 }

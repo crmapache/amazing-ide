@@ -8,12 +8,6 @@ import type { Ref, ReactNode, MouseEventHandler } from 'react'
  */
 export type ClosableTabWidth = 'fill' | 'fit' | 'grow'
 
-/**
- * Цвет группы - полоска сверху и заливка выбранной вкладки: --color-tab-group-0 ... 5.
- * Идентификационный, как цвет значка проекта: вкладки одной группы узнаются по нему.
- */
-export type ClosableTabTone = 0 | 1 | 2 | 3 | 4 | 5
-
 /** Вкладка позвала человека: успех, внимание, ошибка - цвет повода (роли состояний). */
 export type ClosableTabCall = 'success' | 'attention' | 'danger'
 
@@ -24,16 +18,28 @@ export type ClosableTabProps = {
   active: boolean
   /** Подпись крестика для скринридера и подсказки: «Close amazing-ide». */
   closeLabel: string
-  /** Перед подписью: точка состояния, знак форка. */
+  /**
+   * Перед подписью: точка состояния, знак форка. На выбранной tinted-вкладке им
+   * доступен --tab-mark - полупрозрачный тон вкладки, которым нарисован и крестик.
+   */
   leading?: ReactNode | undefined
   width?: ClosableTabWidth | undefined
-  tone?: ClosableTabTone | undefined
+  /**
+   * Выбранная - тоном вкладок (--color-tab-selected), а не графитом: полоса разговоров,
+   * где выбранную ищут взглядом среди многих.
+   */
+  tinted?: boolean | undefined
   /** Отступ слева ступенями: глубина форка в группе. */
   indent?: number | undefined
-  /** Первая вкладка группы: зазор от соседней группы слева. */
-  groupStart?: boolean | undefined
+  /** Последняя вкладка группы, за которой идёт другая: зазор до соседней группы справа. */
+  groupEnd?: boolean | undefined
   /** Вкладка позвала - светится цветом повода, пока её не откроют. */
   call?: ClosableTabCall | null | undefined
+  /**
+   * Когда вкладка позвала (мс): от него фаза света. Вкладки, позвавшие разом или
+   * проснувшиеся вместе, иначе пускали бы блик и искры в такт - мигали бы одним сигналом.
+   */
+  callSince?: number | undefined
   /** Свечение замирает (засыпание без человека рядом): цвет остаётся, движения нет. */
   calm?: boolean | undefined
   /** Вкладку несут рукой: поднята над соседями, без задержки за курсором. */
@@ -48,4 +54,9 @@ export type ClosableTabProps = {
   onContextMenu?: MouseEventHandler<HTMLDivElement> | undefined
   onActivate: () => void
   onClose: () => void
+}
+
+export type CallLightProps = {
+  call: ClosableTabCall | null
+  since: number | undefined
 }

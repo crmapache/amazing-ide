@@ -1,4 +1,5 @@
 import { memo, useMemo, useState } from 'react'
+import clsx from 'clsx'
 import { Copy, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useSmoothText, RevealProvider } from 'smooth-stream-text/react'
@@ -7,11 +8,14 @@ import { IconButton } from '@amazing-ide/ui/IconButton'
 
 import { useCopy } from '../clipboard.hooks'
 import { useFeedScope } from '../feed-scope.context'
+import { usePin } from '../pins.store'
 import { RevealContext } from '../reveal.context'
 import { FindingsCard } from '../FindingsCard/FindingsCard'
 import { readReview } from '../FindingsCard/FindingsCard.utils'
 import { Markdown } from '../Markdown/Markdown'
+import { MessageMenu } from '../MessageMenu/MessageMenu'
 import { PinButton } from '../PinButton/PinButton'
+import { PinItem } from '../PinItem/PinItem'
 import { REVEAL_LIMIT } from './AssistantMessage.constants'
 import { useRevealOptions } from './AssistantMessage.hooks'
 import styles from './AssistantMessage.module.scss'
@@ -20,7 +24,8 @@ import { replyClipboard } from './AssistantMessage.utils'
 
 /**
  * Ответ модели - карточка с рамкой (как в ACC): видно, где кончились шаги и начался
- * ответ. В углу всегда булавка и копия всего ответа. CLI шлёт текст рывками -
+ * ответ. В углу, как у своего сообщения, - копия всего ответа и три точки с булавкой, у
+ * закреплённого булавка горит и снаружи. CLI шлёт текст рывками -
  * smooth-stream-text выравнивает темп, а символы проступают волной; готовый ответ
  * (история, транскрипт) и очень длинный встают сразу.
  */
@@ -28,6 +33,7 @@ export const AssistantMessage = memo(({ item }: AssistantMessageProps) => {
   const { t } = useTranslation()
   const { conversationId } = useFeedScope()
   const { isCopied, copy } = useCopy()
+  const { isPinned } = usePin(conversationId, item.id)
   // Волна - только у ответа, который печатается на глазах: готовому из истории нечего проявлять.
   const [isLive] = useState(item.streaming)
   const { text } = useSmoothText(item.text, { done: !item.streaming })
@@ -42,7 +48,7 @@ export const AssistantMessage = memo(({ item }: AssistantMessageProps) => {
   const handleCopy = () => copy(replyClipboard(item.text))
 
   return (
-    <div className={styles.assistantMessage}>
+    <div className={clsx(styles.assistantMessage, isPinned && styles.pinned)}>
       <div className={styles.actions}>
         <PinButton conversationId={conversationId} itemId={item.id} />
         <IconButton
@@ -51,6 +57,9 @@ export const AssistantMessage = memo(({ item }: AssistantMessageProps) => {
           label={isCopied ? t('claudeCode.message.copied') : t('claudeCode.message.copyReply')}
           onClick={handleCopy}
         />
+        <MessageMenu>
+          <PinItem conversationId={conversationId} itemId={item.id} />
+        </MessageMenu>
       </div>
       {review ? (
         <>

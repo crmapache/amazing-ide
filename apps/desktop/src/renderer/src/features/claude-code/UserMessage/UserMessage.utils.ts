@@ -5,6 +5,16 @@ import { chipPicture } from '../picture.utils'
 
 const pad = (value: number): string => String(value).padStart(2, '0')
 
+// Пустая строка - одна или несколько подряд, в том числе из одних пробелов.
+const BLANK_LINES = /\n[^\S\n]*\n(?:[^\S\n]*\n)*/
+
+/**
+ * Кусок текста абзацами: граница - пустая строка. Одиночный перенос остаётся в абзаце,
+ * пустая строка уходит целиком - на её месте лента ставит короткий зазор, а не высоту
+ * целой строки.
+ */
+export const splitParagraphs = (text: string): string[] => text.split(BLANK_LINES)
+
 /** Время сообщения в шапке - ЧЧ:ММ по часам машины; 0 - время неизвестно, пусто. */
 export const formatClock = (time: number): string => {
   if (time <= 0) return ''

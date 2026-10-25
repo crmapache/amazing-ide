@@ -5,15 +5,14 @@ import { MenuItem } from '@amazing-ide/ui/MenuItem'
 
 import { useClaudeCodeStore } from '../claude-code.store'
 import { usePanelPrefs } from '../claude.queries'
-import type { MenuScreenProps } from '../claude.types'
 import { SETTINGS_ROWS, SETTINGS_VIEWS } from './SettingsList.constants'
 import { settingValue } from './SettingsList.utils'
 
 /**
  * Экран Settings бокового меню: настройки панели строками, у каждой - значение справа
- * и свой экран за ней. Настройки - на машину, источники слоёв Claude Code - на проект.
+ * и свой экран за ней. Все настройки - на машину.
  */
-export const SettingsList = ({ project }: MenuScreenProps) => {
+export const SettingsList = () => {
   const { t } = useTranslation()
   const prefs = usePanelPrefs()
   const pickMenu = useClaudeCodeStore((store) => store.pickMenu)
@@ -28,7 +27,7 @@ export const SettingsList = ({ project }: MenuScreenProps) => {
           iconTone="neutral"
           label={t(`claudeCode.settings.rows.${row.screen}.label`)}
           description={t(`claudeCode.settings.rows.${row.screen}.sub`)}
-          hint={settingValue(row.screen, prefs, project.rootPath, t) || undefined}
+          hint={settingValue(row.screen, prefs, t) || undefined}
           chevron
           onSelect={() => pickMenu(row.screen)}
         />

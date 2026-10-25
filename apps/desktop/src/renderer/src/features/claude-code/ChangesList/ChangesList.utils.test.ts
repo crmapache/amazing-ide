@@ -8,6 +8,7 @@ import {
   rowNote,
   announced,
   addedShown,
+  turnTotals,
   withoutStale,
   withoutToken,
   nextPressEvent,
@@ -78,5 +79,22 @@ describe('нажатия, ждущие ответа', () => {
     expect([...withoutStale(loud, 1000 + PRESS_PATIENCE_MS).keys()]).toEqual(['/p/b'])
     expect([...withoutToken(loud, 1).keys()]).toEqual(['/p/b'])
     expect(nextPressEvent(new Map(), 0)).toBeNull()
+  })
+})
+
+describe('итог хода в шапке списка', () => {
+  it('сумма строк как на строках: у созданного - только плюс, «±» не входит, откаченный входит', () => {
+    const totals = turnTotals([
+      change({ added: 10, removed: 4 }),
+      change({ added: 7, removed: 2, created: true }),
+      change({ added: 99, removed: 99, counted: false }),
+      change({ added: 1, removed: 3, reverted: true }),
+    ])
+
+    expect(totals).toEqual({ added: 16, removed: 7 })
+  })
+
+  it('пустой список - нули', () => {
+    expect(turnTotals([])).toEqual({ added: 0, removed: 0 })
   })
 })

@@ -1,5 +1,13 @@
+import type { ModelFamily } from './model-chip.types'
+
 /** Семьи моделей от длинного имени к короткому: opusplan раньше opus. */
-export const MODEL_FAMILIES = ['fable', 'opusplan', 'opus', 'sonnet', 'haiku']
+export const MODEL_FAMILIES: readonly ModelFamily[] = [
+  'fable',
+  'opusplan',
+  'opus',
+  'sonnet',
+  'haiku',
+]
 
 /**
  * Знак быстрого режима на MODEL и в меню: глиф, а не эмодзи (эмодзи красит себя сам, а

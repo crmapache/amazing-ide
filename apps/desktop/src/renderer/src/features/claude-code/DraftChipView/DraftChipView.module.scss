@@ -10,13 +10,20 @@
   align-items: center;
   gap: var(--space-0-5);
   max-width: 100%;
-  margin: 0 var(--space-0-5);
-  padding: 0 var(--space-0-5) 0 var(--space-1);
+
+  // Сверху и снизу поле отрицательное: плашка с рамкой выше строки текста, и без него
+  // строка с плашкой раздувалась бы, а текст прыгал вниз, стоило вставить вложение.
+  margin: calc(var(--space-0-5) * -1) var(--space-0-5);
+  padding: 0 var(--space-1);
   border-radius: var(--radius-sm);
   font-family: var(--font-code);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-normal);
-  vertical-align: baseline;
+
+  // По середине строчных букв соседнего текста, а не по базовой линии: первая в плашке -
+  // иконка, у неё базовой линии нет, и браузер берёт нижний край иконки. Плашка садилась
+  // на строку этим краем и стояла на пару пикселей выше слов вокруг.
+  vertical-align: middle;
   white-space: nowrap;
   user-select: none;
 
@@ -29,6 +36,12 @@
   &[data-kind='quote'],
   &[data-kind='paste'] {
     --chip-tone: var(--color-fg-muted);
+  }
+
+  // С кнопками справа поле - ровно тот зазор, что над и под кнопкой: подложка наведения
+  // встаёт внутрь рамки с одинаковым отступом со всех трёх сторон.
+  &:has(> .actions) {
+    padding-right: var(--space-0-5);
   }
 }
 
@@ -49,6 +62,17 @@
   @include truncate;
 }
 
+.actions {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-0-5);
+  margin-left: var(--space-0-5);
+}
+
+// Кнопка - квадрат на строку плашки без зазора сверху и снизу: подложка наведения не
+// упирается в рамку, а стоит внутри неё. Скругление - радиус плашки минус этот зазор,
+// углы кнопки и плашки идут параллельно. Значок тихий и светлеет под курсором.
 .action {
   @include button-reset;
   @include interactive-surface;
@@ -56,11 +80,21 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--size-control-xs);
-  height: var(--size-control-xs);
+  width: round(calc(1lh - var(--space-0-5) * 2), 1px);
+  height: round(calc(1lh - var(--space-0-5) * 2), 1px);
   border-radius: var(--radius-xs);
   color: inherit;
+  opacity: var(--opacity-muted);
   cursor: pointer;
+  transition:
+    background-color var(--duration-normal) var(--easing-standard),
+    opacity var(--duration-normal) var(--easing-standard);
+
+  @media (hover: hover) {
+    &:hover {
+      opacity: 1;
+    }
+  }
 }
 
 .actionIcon {

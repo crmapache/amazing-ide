@@ -14,8 +14,8 @@
   color: var(--color-fg);
   text-align: left;
 
+  // Пункт под стрелками - заливкой, как под курсором: кольца фокуса в IDE нет.
   &:focus-visible {
-    outline: none;
     background-color: var(--color-bg-active);
   }
 
@@ -69,6 +69,12 @@
 
   color: var(--color-fg-subtle);
   font-size: var(--font-size-xs);
+}
+
+// Объяснение читают целиком: переносится по словам, а не режется.
+.wrap {
+  line-height: var(--line-height-normal);
+  white-space: normal;
 }
 
 .hint {

@@ -7,11 +7,12 @@ import type { DropdownButtonProps } from './DropdownButton.types'
 
 /**
  * Тихая кнопка с текущим значением и стрелкой вниз: открывает список, из которого
- * выбирают (проект, ветка; в размере sm - модель и режим под полем ввода). Сам
- * список рисует тот, кто кнопку поставил.
+ * выбирают (проект, ветка; в размере sm - модель, усилие и режим под полем ввода). Сам
+ * список рисует тот, кто кнопку поставил. Длинное значение режется многоточием.
  */
 export const DropdownButton = ({
   label,
+  labelContent,
   leading,
   menuLabel,
   size = 'md',
@@ -25,7 +26,7 @@ export const DropdownButton = ({
     className={clsx(styles.dropdownButton, styles[size])}
     {...rest}>
     {leading}
-    <span className={styles.label}>{label}</span>
+    <span className={styles.label}>{labelContent ?? label}</span>
     <ChevronDown
       className={styles.chevron}
       size={CHEVRON_SIZE[size]}

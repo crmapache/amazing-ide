@@ -14,11 +14,6 @@
   color: var(--color-fg);
   text-align: left;
 
-  &:focus-visible {
-    outline: none;
-    box-shadow: var(--shadow-focus);
-  }
-
   &:disabled {
     color: var(--color-fg-disabled);
   }
@@ -49,7 +44,7 @@
   flex-shrink: 0;
   align-items: center;
   width: var(--size-switch-width);
-  height: var(--size-control-xs);
+  height: var(--size-switch-height);
   padding: var(--space-0-5);
   border: var(--border-width) solid var(--color-border-strong);
   border-radius: var(--radius-full);

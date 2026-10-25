@@ -6,7 +6,12 @@ import type { editor } from 'monaco-editor/editor/editor.api.js'
 import { documents } from '../documents'
 import { documentKey } from '../documents.utils'
 import type { EditorDocument } from '../editor-document'
-import { takeFocus, hideFindFromPalette, remeasureWhenLoaded } from '../editor-instance'
+import {
+  takeFocus,
+  followTextSize,
+  hideFindFromPalette,
+  remeasureWhenLoaded,
+} from '../editor-instance'
 import { editorOptions, scrollbarOptions } from '../editor-options'
 import { watchSelection } from '../editor-selection'
 import type { SelectionWatch } from '../editor-selection'
@@ -52,6 +57,7 @@ const useMonacoEditor = (shown: RefObject<EditorDocument | null>, isShown: RefOb
     instance.onDidBlurEditorText(() => void shown.current?.save())
     remeasureWhenLoaded()
 
+    const unfollowTextSize = followTextSize(instance)
     const selection = watchSelection(
       instance,
       () => shown.current,
@@ -62,6 +68,7 @@ const useMonacoEditor = (shown: RefObject<EditorDocument | null>, isShown: RefOb
 
     return () => {
       scrollbars.disconnect()
+      unfollowTextSize()
       selection.dispose()
       selectionRef.current = null
       if (shown.current) shown.current.viewState = instance.saveViewState()

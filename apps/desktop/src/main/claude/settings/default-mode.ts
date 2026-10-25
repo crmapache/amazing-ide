@@ -1,6 +1,5 @@
 import type { PermissionMode } from '@shared/claude'
 import { PERMISSION_MODES } from '@shared/claude'
-import type { SettingSources } from '@shared/claude-prefs'
 
 import type { LayerSettings, SettingsLayer } from './setting-layers'
 import { isRecord, layerFiles, readLayers } from './setting-layers'
@@ -77,15 +76,11 @@ const modeSettingsOf = ({ layer, settings }: LayerSettings): ModeSettings | null
 }
 
 /**
- * Настройки режима из слоёв, которые проект читает при этих источниках, - от главных к
- * младшим. Нет файла, битый файл, нет блока permissions - слоя просто нет.
+ * Настройки режима из слоёв, которые проект читает, - от главных к младшим. Нет файла,
+ * битый файл, нет блока permissions - слоя просто нет.
  */
-const readModeSettings = async (
-  projectPath: string,
-  claudeHome: string,
-  sources: SettingSources,
-): Promise<ModeSettings[]> =>
-  (await readLayers(await layerFiles(projectPath, claudeHome, sources)))
+const readModeSettings = async (projectPath: string, claudeHome: string): Promise<ModeSettings[]> =>
+  (await readLayers(await layerFiles(projectPath, claudeHome)))
     .map(modeSettingsOf)
     .filter((item): item is ModeSettings => item !== null)
 
@@ -93,17 +88,11 @@ const readModeSettings = async (
 export const defaultPermissionMode = async (
   projectPath: string,
   claudeHome: string,
-  sources: SettingSources = 'all',
-): Promise<PermissionMode> =>
-  pickDefaultMode(await readModeSettings(projectPath, claudeHome, sources))
+): Promise<PermissionMode> => pickDefaultMode(await readModeSettings(projectPath, claudeHome))
 
 /** Запретил ли режим без вопросов хоть один слой, который проект читает. */
-export const isBypassDisabled = async (
-  projectPath: string,
-  claudeHome: string,
-  sources: SettingSources,
-): Promise<boolean> =>
-  (await readModeSettings(projectPath, claudeHome, sources)).some((item) => item.bypassDisabled)
+export const isBypassDisabled = async (projectPath: string, claudeHome: string): Promise<boolean> =>
+  (await readModeSettings(projectPath, claudeHome)).some((item) => item.bypassDisabled)
 
 /**
  * Режим, закреплённый для новых вкладок (Settings → New chats), - если проект его

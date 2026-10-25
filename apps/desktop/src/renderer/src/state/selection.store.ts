@@ -52,7 +52,8 @@ type SelectionStore = {
    * показывает вид «файл».
    */
   selectSerial: number
-  selectFile: (projectId: string, relativePath: string, place?: FilePlace) => void
+  /** Открыть файл вкладкой: путь от корня или абсолютный путь файла вне проекта. */
+  selectFile: (projectId: string, path: string, place?: FilePlace) => void
   /** Разница файла с последним коммитом - во вкладке разницы проекта (она одна). */
   openDiff: (projectId: string, relativePath: string) => void
   /** Закрыть вкладки по ключам: путь файла или ключ разницы (diffTabKey). */
@@ -79,11 +80,11 @@ export const useSelectionStore = create<SelectionStore>()(
       heldByProject: {},
       selectSerial: 0,
       // Выбор без места (клик в дереве, во вкладке) сбрасывает место прошлого выбора.
-      selectFile: (projectId, relativePath, place) =>
+      selectFile: (projectId, path, place) =>
         set((state) => ({
           tabsByProject: {
             ...state.tabsByProject,
-            [projectId]: openTab(state.tabsByProject[projectId] ?? NO_TABS, relativePath, {
+            [projectId]: openTab(state.tabsByProject[projectId] ?? NO_TABS, path, {
               limit: EDITOR_TABS_LIMIT,
               held: new Set(state.heldByProject[projectId]),
             }),

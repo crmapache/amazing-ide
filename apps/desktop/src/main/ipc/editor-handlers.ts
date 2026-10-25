@@ -3,8 +3,8 @@ import { app } from 'electron'
 import type { EditorInvokeContract } from '@shared/ipc/editor.contract'
 
 import { readImageFile } from '../fs/image-file'
-import { readTextFile } from '../fs/text-file'
-import { writeTextFile } from '../fs/text-write'
+import { readTextFile, readOutsideTextFile } from '../fs/text-file'
+import { writeTextFile, writeOutsideTextFile } from '../fs/text-write'
 import { readWebImage } from '../preview/web-image'
 import { fetchWebImage } from '../preview/web-image-session'
 import { editorSaved, allowUnsavedQuit } from '../window/editor-save'
@@ -29,30 +29,64 @@ const versionOrNull = (value: unknown, name: string): string | null => {
   return value
 }
 
+/**
+ * Чей файл просит окно: проекта (путь от корня) или вне проекта (абсолютный путь). Ровно
+ * одно из двух; проект - только открытый, и у файла вне проекта тоже.
+ */
+const fileTarget = (
+  workspace: WorkspaceService,
+  {
+    projectId,
+    relativePath,
+    absolutePath,
+  }: Partial<Record<'projectId' | 'relativePath' | 'absolutePath', unknown>>,
+): { rootPath: string; relativePath: string } | { absolutePath: string } => {
+  const rootPath = projectRootOf(workspace, projectId)
+
+  if (absolutePath !== undefined && relativePath !== undefined) {
+    throw new Error('Ожидался один путь: от корня или абсолютный')
+  }
+
+  if (absolutePath !== undefined) {
+    assertString(absolutePath, 'absolutePath')
+
+    return { absolutePath }
+  }
+
+  assertString(relativePath, 'relativePath')
+
+  return { rootPath, relativePath }
+}
+
 /** Каналы редактора: проект - только открытый, поля - нужного типа, дальше - main/fs. */
 export const createEditorHandlers = (
   workspace: WorkspaceService,
 ): Pick<InvokeHandlers, EditorChannels> => ({
-  'fs:readFile': ({ projectId, relativePath, known }) => {
-    assertString(relativePath, 'relativePath')
+  'fs:readFile': (request) => {
+    const target = fileTarget(workspace, request)
+    const known = versionOrNull(request.known, 'known')
 
-    return readTextFile(
-      projectRootOf(workspace, projectId),
-      relativePath,
-      versionOrNull(known, 'known'),
-    )
+    return 'absolutePath' in target
+      ? readOutsideTextFile(target.absolutePath, known)
+      : readTextFile(target.rootPath, target.relativePath, known)
   },
-  'fs:writeFile': ({ projectId, relativePath, text, bom, expected, base, outside }) => {
-    assertString(relativePath, 'relativePath')
+  'fs:writeFile': (request) => {
+    const target = fileTarget(workspace, request)
+    const { text, bom, expected, base, outside } = request
+
     assertString(text, 'text')
 
-    return writeTextFile(projectRootOf(workspace, projectId), relativePath, {
+    const write = {
       text,
       bom: assertBoolean(bom, 'bom'),
       expected: versionOrNull(expected, 'expected'),
       base: versionOrNull(base, 'base'),
       outside: outside === undefined ? false : assertBoolean(outside, 'outside'),
-    })
+    }
+
+    return 'absolutePath' in target
+      ? writeOutsideTextFile(target.absolutePath, write)
+      : writeTextFile(target.rootPath, target.relativePath, write)
   },
   'fs:readImage': ({ projectId, relativePath, known }) => {
     assertString(relativePath, 'relativePath')

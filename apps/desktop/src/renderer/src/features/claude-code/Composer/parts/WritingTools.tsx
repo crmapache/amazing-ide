@@ -1,9 +1,10 @@
 import type { MouseEvent } from 'react'
-import { Slash, Search, Paperclip } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { IconButton } from '@amazing-ide/ui/IconButton'
 
+import { SLASH_GLYPH, PAPERCLIP_GLYPH } from '../Composer.constants'
 import styles from '../Composer.module.scss'
 import type { WritingToolsProps } from '../Composer.types'
 import { fitStepMark } from '../../composer-fit.hooks'
@@ -31,7 +32,7 @@ export const WritingTools = ({
     <div className={styles.toolGroups}>
       <div className={styles.toolGroup}>
         <IconButton
-          icon={Paperclip}
+          icon={PAPERCLIP_GLYPH}
           size="sm"
           label={t('claudeCode.composer.attach')}
           onClick={onAttach}
@@ -39,7 +40,7 @@ export const WritingTools = ({
         {isShown('slash') && (
           <IconButton
             {...fitStepMark('slash')}
-            icon={Slash}
+            icon={SLASH_GLYPH}
             size="sm"
             label={t('claudeCode.composer.slash')}
             disabled={!canSlash}

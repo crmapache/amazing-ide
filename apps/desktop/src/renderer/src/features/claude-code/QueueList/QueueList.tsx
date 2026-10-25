@@ -7,10 +7,9 @@ import type { DraftChip } from '@shared/claude-draft'
 import { chipLabel } from '../chips.utils'
 import { useClaudeActions } from '../claude-actions.hooks'
 import { ROW_ICON_SIZE, ROW_ICON_STROKE } from '../claude.constants'
-import { usePanelPrefs } from '../claude.queries'
+import { SEND_KEY_HINT } from '../composer.constants'
 import { useComposerStore } from '../composer.store'
 import type { PictureSource } from '../picture.types'
-import { sendKeyKeys } from '../send-key.utils'
 import { PictureLightbox } from '../PictureLightbox/PictureLightbox'
 import { useTakeOut, useQueueDrag } from './QueueList.hooks'
 import styles from './QueueList.module.scss'
@@ -27,7 +26,6 @@ import { QueueRow } from './parts/QueueRow'
 export const QueueList = ({ conversation }: QueueListProps) => {
   const { t } = useTranslation()
   const { removeQueued, sendQueued } = useClaudeActions()
-  const { sendKey } = usePanelPrefs()
   const editing = useComposerStore((store) => store.queueEdits[conversation.id])
   const { drag, grab, rowRef } = useQueueDrag(conversation)
   const takeOut = useTakeOut(conversation)
@@ -50,7 +48,7 @@ export const QueueList = ({ conversation }: QueueListProps) => {
       <CornerUpLeft size={ROW_ICON_SIZE} strokeWidth={ROW_ICON_STROKE} aria-hidden />
       <span className={styles.editingText}>
         {t('claudeCode.queue.editing', {
-          key: sendKeyKeys(sendKey).join(' '),
+          key: SEND_KEY_HINT,
           button: t('claudeCode.composer.queue'),
         })}
       </span>

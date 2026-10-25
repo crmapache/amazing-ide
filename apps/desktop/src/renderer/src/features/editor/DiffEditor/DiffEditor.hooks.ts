@@ -8,7 +8,12 @@ import { focusOnRevert } from '../diff-revert'
 import { useDiffViewStore } from '../diff-view.store'
 import { putText } from '../document-model'
 import { documents } from '../documents'
-import { takeFocus, hideFindFromPalette, remeasureWhenLoaded } from '../editor-instance'
+import {
+  takeFocus,
+  followTextSize,
+  hideFindFromPalette,
+  remeasureWhenLoaded,
+} from '../editor-instance'
 import { diffViewOptions, scrollbarOptions, diffEditorOptions } from '../editor-options'
 import { watchSelection } from '../editor-selection'
 import type { SelectionWatch } from '../editor-selection'
@@ -69,6 +74,7 @@ const useMonacoDiff = (isShown: RefObject<boolean>) => {
     selectionRef.current = selection
 
     const view = useDiffViewStore.subscribe((state) => diff.updateOptions(diffViewOptions(state)))
+    const unfollowTextSize = followTextSize(diff)
     // Модель уходит, пока стоит в разнице (документ файла закрыли): сначала отпустить пару -
     // иначе Monaco считает это ошибкой. Сервис моделей узнаёт об уходе раньше самой разницы.
     const disposing = monaco.editor.onWillDisposeModel((model) => {
@@ -81,6 +87,7 @@ const useMonacoDiff = (isShown: RefObject<boolean>) => {
       scrollbars.disconnect()
       selection.dispose()
       view()
+      unfollowTextSize()
       disposing.dispose()
       diff.setModel(null)
       diff.dispose()

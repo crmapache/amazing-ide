@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '@amazing-ide/ui/Button'
 import { Dialog } from '@amazing-ide/ui/Dialog'
+import type { DialogBackdrop } from '@amazing-ide/ui/Dialog.types'
 import { DropdownButton } from '@amazing-ide/ui/DropdownButton'
 import { Lightbox } from '@amazing-ide/ui/Lightbox'
 import { Menu } from '@amazing-ide/ui/Menu'
@@ -20,17 +21,17 @@ import { Specimen } from '../../Specimen/Specimen'
 
 /**
  * Раздел «Оверлеи»: уведомления трёх видов, живая всплывающая панель с меню и
- * модальный диалог. Всё настоящее - открывается, закрывается по Esc и клику мимо.
+ * модальный диалог - с затемнением окна и без. Всё настоящее - открывается, закрывается по Esc и клику мимо.
  */
 export const OverlaysSection = () => {
   const { t } = useTranslation('showcase')
   const popover = usePopover()
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [dialogBackdrop, setDialogBackdrop] = useState<DialogBackdrop | null>(null)
   const [isLightboxOpen, setIsLightboxOpen] = useState(false)
   const [isMissingOpen, setIsMissingOpen] = useState(false)
   const [branch, setBranch] = useState('')
 
-  const closeDialog = () => setIsDialogOpen(false)
+  const closeDialog = () => setDialogBackdrop(null)
 
   const laterButton = (
     <Button variant="ghost" size="sm">
@@ -88,12 +89,16 @@ export const OverlaysSection = () => {
       </Specimen>
 
       <Specimen label={t('specimens.dialog')}>
-        <Button variant="secondary" onClick={() => setIsDialogOpen(true)}>
+        <Button variant="secondary" onClick={() => setDialogBackdrop('dim')}>
           {t('samples.openDialog')}
         </Button>
+        <Button variant="secondary" onClick={() => setDialogBackdrop('clear')}>
+          {t('samples.openClearDialog')}
+        </Button>
         <Dialog
-          open={isDialogOpen}
+          open={dialogBackdrop !== null}
           title={t('samples.dialogTitle')}
+          backdrop={dialogBackdrop ?? 'dim'}
           actions={
             <>
               <Button variant="ghost" onClick={closeDialog}>

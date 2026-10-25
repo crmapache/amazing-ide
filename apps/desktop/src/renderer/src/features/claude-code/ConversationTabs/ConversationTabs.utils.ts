@@ -3,10 +3,10 @@ import type { TFunction } from 'i18next'
 import type { Conversation, ClosedConversation } from '@shared/claude'
 import type { SoundEvent } from '@shared/claude-prefs'
 
-import type { ClosableTabCall, ClosableTabTone } from '@amazing-ide/ui/ClosableTab.types'
+import type { ClosableTabCall } from '@amazing-ide/ui/ClosableTab.types'
 
-import { CALL_TONES, SWAP_GAP_PX, GROUP_TONE_COUNT } from './ConversationTabs.constants'
-import type { Box, Shot, TabRect } from './ConversationTabs.types'
+import { CALL_TONES, SWAP_GAP_PX } from './ConversationTabs.constants'
+import type { Box, Shot, TabRect, StripTab } from './ConversationTabs.types'
 
 /** Имя вкладки на полосе: своё, «Fork of …» у нерождённого форка, иначе «New chat». */
 export const tabName = (
@@ -21,24 +21,13 @@ export const tabName = (
     : t('claudeCode.newChat'))
 
 /**
- * Цвет группы - по её id, а не по номеру вкладки: цвет не съезжает, когда рядом
- * открывают и закрывают другие. Простое умножение плохо мешает похожие строки, поэтому
- * финальное перемешивание MurmurHash3: малая разница на входе - другой цвет на выходе.
+ * Закрывает ли вкладка группу, за которой идёт другая: за ней зазор до соседней группы. У
+ * последней вкладки полосы его нет - там место под «+».
  */
-export const groupTone = (groupId: string): ClosableTabTone => {
-  let hash = 0
+export const endsGroup = (tabs: readonly Pick<StripTab, 'groupId'>[], index: number): boolean => {
+  const next = tabs[index + 1]
 
-  for (let index = 0; index < groupId.length; index += 1) {
-    hash = Math.imul(hash ^ groupId.charCodeAt(index), 0x01000193)
-  }
-
-  hash ^= hash >>> 16
-  hash = Math.imul(hash, 0x85ebca6b)
-  hash ^= hash >>> 13
-  hash = Math.imul(hash, 0xc2b2ae35)
-  hash ^= hash >>> 16
-
-  return (Math.abs(hash) % GROUP_TONE_COUNT) as ClosableTabTone
+  return next !== undefined && next.groupId !== tabs[index]?.groupId
 }
 
 /** Цвет повода, которым светится позвавшая вкладка: успех, внимание, ошибка. */

@@ -12,6 +12,15 @@ export type FeedRowViewProps = {
   row: FeedRow
 }
 
+/**
+ * Как строка отступает от соседей: блок (сообщение, ответ, карточка) - на общем расстоянии
+ * ленты, строка журнала (вызовы, агенты, мысли, итог хода) - тесно, как пункт списка.
+ */
+export type RowRhythm = 'line' | 'block'
+
+/** Строка статуса: слова и цифры рядом с ними (пусто - цифр нет). */
+export type StatusParts = { label: string; detail: string }
+
 export type WorkingLineProps = {
   conversation: Conversation
   items: readonly FeedItem[]
@@ -25,5 +34,4 @@ export type JumpButtonProps = {
 
 export type EarlierMarkerProps = {
   onLoad: () => void
-  isLoading: boolean
 }

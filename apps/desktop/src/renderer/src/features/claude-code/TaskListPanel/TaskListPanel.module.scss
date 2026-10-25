@@ -1,8 +1,7 @@
 @use '@amazing-ide/ui/mixins' as *;
-@include spinning-keyframes;
 
-// Задачи - тихая плитка: идущая задача оранжевая и крутится, сделанная - зелёная
-// галочка и зачёркнутый текст, ждущая - пустой кружок.
+// Задачи - тихая плитка: у идущей задачи бежит знак работы (Spinner) и текст светлее,
+// сделанная - зелёная галочка и зачёркнутый текст, ждущая - пустой кружок.
 .taskListPanel {
   display: flex;
   flex-direction: column;
@@ -57,10 +56,19 @@
   line-height: var(--line-height-snug);
 }
 
+// Значок - по центру первой строки текста, а не всей задачи: длинная задача переносится,
+// и знак у её середины потерял бы строку, к которой относится. Коробка высотой в строку
+// ставит знак по центру сама, без сдвига на глаз.
 .taskIcon {
+  display: flex;
   flex-shrink: 0;
-  margin-top: var(--space-0-5);
+  align-items: center;
+  height: calc(var(--font-size-sm) * var(--line-height-snug));
   color: var(--color-fg-disabled);
+
+  svg {
+    display: block;
+  }
 }
 
 .subject {
@@ -70,12 +78,6 @@
 
 .inProgress {
   color: var(--color-fg-strong);
-
-  .taskIcon {
-    @include spinning;
-
-    color: var(--color-accent);
-  }
 }
 
 .completed {

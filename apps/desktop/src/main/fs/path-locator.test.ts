@@ -76,6 +76,7 @@ describe('locatePath', () => {
     expect(await locate(join(outside, 'notes.md'))).toEqual({
       kind: 'outsideFile',
       absolutePath: join(outside, 'notes.md'),
+      editable: true,
     })
     expect(await locate('~/.claude')).toEqual({
       kind: 'outsideFolder',
@@ -84,6 +85,23 @@ describe('locatePath', () => {
     expect(await locate('~/.claude/settings.json')).toEqual({
       kind: 'outsideFile',
       absolutePath: join(home, '.claude', 'settings.json'),
+      editable: true,
+    })
+  })
+
+  it('вне проекта: текст - редактору, картинка - своей программе; путь в NFC', async () => {
+    const nfd = 'заметки'.normalize('NFD')
+
+    await writeFile(join(outside, 'logo.png'), Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x00, 0x0d]))
+    await writeFile(join(outside, 'latin1.txt'), Buffer.from([0x63, 0x61, 0x66, 0xe9, 0x21]))
+    await writeFile(join(outside, `${nfd}.md`), '# да')
+
+    expect(await locate(join(outside, 'logo.png'))).toMatchObject({ editable: false })
+    expect(await locate(join(outside, 'latin1.txt'))).toMatchObject({ editable: false })
+    expect(await locate(join(outside, `${nfd}.md`))).toEqual({
+      kind: 'outsideFile',
+      absolutePath: join(outside, 'заметки.md'.normalize('NFC')),
+      editable: true,
     })
   })
 

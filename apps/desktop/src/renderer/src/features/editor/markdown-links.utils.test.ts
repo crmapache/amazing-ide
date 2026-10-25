@@ -18,6 +18,13 @@ describe('resolveFromFile', () => {
     expect(resolveFromFile('docs/a.md', '/README.md')).toBe('README.md')
     expect(resolveFromFile('docs/a.md', '../../secret.md')).toBeNull()
   })
+
+  it('у файла вне проекта - абсолютный путь, наверх - не выше корня диска', () => {
+    expect(resolveFromFile('/Users/max/notes/a.md', 'b.md')).toBe('/Users/max/notes/b.md')
+    expect(resolveFromFile('/Users/max/notes/a.md', '../x.md')).toBe('/Users/max/x.md')
+    expect(resolveFromFile('/Users/max/notes/a.md', '/etc/hosts')).toBe('/etc/hosts')
+    expect(resolveFromFile('/a.md', '../b.md')).toBeNull()
+  })
 })
 
 describe('linkTarget', () => {

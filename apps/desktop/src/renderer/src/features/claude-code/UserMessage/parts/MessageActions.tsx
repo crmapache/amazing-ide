@@ -3,6 +3,7 @@ import { Copy, Check, Undo2, History } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { IconButton } from '@amazing-ide/ui/IconButton'
+import { MenuItem } from '@amazing-ide/ui/MenuItem'
 
 import styles from '../UserMessage.module.scss'
 import type { MessageActionsProps } from '../UserMessage.types'
@@ -12,13 +13,16 @@ import { useFeedScope } from '../../feed-scope.context'
 import { applyDraft } from '../../field-bus'
 import { useReuseDraft } from '../../message.hooks'
 import { lostImages, messageClipboard } from '../../message.utils'
+import { MessageMenu } from '../../MessageMenu/MessageMenu'
 import { PinButton } from '../../PinButton/PinButton'
+import { PinItem } from '../../PinItem/PinItem'
 
 /**
- * Кнопки своего сообщения - всегда видны, бледные, в порядке ACC: закрепить, копировать
- * (с путями вложений), вернуть в поле, откатить. Откат последний: он забирает. Что
- * картинка не вернётся в поле, подсказка говорит до нажатия; написанное посреди хода
- * откатить нельзя - кнопка мертва и говорит, к чему откатываться.
+ * Угол своего сообщения, как в ACC: горящая булавка (только у закреплённого), копия (с
+ * путями вложений) и три точки. В меню - вернуть в поле, закрепить, откатить; откат
+ * последний: он забирает. Что картинка не вернётся в поле, вторая строка пункта говорит до
+ * нажатия; написанное посреди хода откатить нельзя - пункт погашен и говорит, к чему
+ * откатываться.
  */
 export const MessageActions = ({ item, draft }: MessageActionsProps) => {
   const { t } = useTranslation()
@@ -47,25 +51,30 @@ export const MessageActions = ({ item, draft }: MessageActionsProps) => {
         label={isCopied ? t('claudeCode.message.copied') : t('claudeCode.message.copy')}
         onClick={handleCopy}
       />
-      <IconButton
-        icon={Undo2}
-        size="sm"
-        label={
-          lost > 0
-            ? t('claudeCode.message.reuseLostImages', { count: lost })
-            : t('claudeCode.message.reuse')
-        }
-        onClick={handleReuse}
-      />
-      <IconButton
-        icon={History}
-        size="sm"
-        label={
-          item.steering ? t('claudeCode.message.rewindSteering') : t('claudeCode.message.rewind')
-        }
-        aria-disabled={item.steering || undefined}
-        onClick={handleRewind}
-      />
+      <MessageMenu>
+        <MenuItem
+          icon={Undo2}
+          label={t('claudeCode.message.reuse')}
+          description={
+            lost > 0 ? t('claudeCode.message.reuseLostImages', { count: lost }) : undefined
+          }
+          wrapDescription
+          onSelect={handleReuse}
+        />
+        <PinItem conversationId={conversationId} itemId={item.id} />
+        <MenuItem
+          icon={History}
+          label={t('claudeCode.message.rewind')}
+          description={
+            item.steering
+              ? t('claudeCode.message.rewindSteering')
+              : t('claudeCode.message.rewindSub')
+          }
+          wrapDescription
+          disabled={item.steering}
+          onSelect={handleRewind}
+        />
+      </MessageMenu>
     </div>
   )
 }

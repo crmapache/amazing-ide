@@ -32,16 +32,10 @@ export type TurnCloserHost = {
 export class TurnCloser {
   /** Цена сессии из прошлого `result`: CLI присылает её нарастающим итогом. */
   private sessionCost = 0
-  private costSum = 0
   /** Кто остановил идущий ход; null - его не останавливали. */
   private stop: StopReason | null = null
 
   constructor(private readonly host: TurnCloserHost) {}
-
-  /** Сколько стоили все ходы, собранные этим сборщиком. */
-  get totalCostUsd(): number {
-    return this.costSum
-  }
 
   /** Новый процесс CLI: его `total_cost_usd` начинается с нуля. */
   startProcess(): void {
@@ -55,13 +49,13 @@ export class TurnCloser {
   }
 
   /**
-   * Конец хода по `result`. Пустой «нулевой» ход, который CLI присылает после старта
-   * с --resume, в ленту не идёт. Подпись времени - у хода, которым работа встала, время
-   * всего запроса без пауз; у промежуточного (ждём фоновых агентов) - цифра CLI за ход.
+   * Конец хода по `result`. Рукопожатие свежего процесса сюда не доходит - его отсеивает
+   * разговор (conversation/turn-command.ts), а итог локальной команды (/compact, /clear) -
+   * такой же ход: со своей ценой и временем. Подпись времени - у хода, которым работа
+   * встала, время всего запроса без пауз; у промежуточного (ждём фоновых агентов) - цифра
+   * CLI за ход.
    */
   finish(result: CliMessage, interrupted: boolean): void {
-    if (numberField(result, 'num_turns') === 0 && !stringField(result, 'result')) return
-
     const { host } = this
     const at = host.now()
     const total = numberField(result, 'total_cost_usd')
@@ -72,7 +66,6 @@ export class TurnCloser {
     host.service.closeRetryFor(result, at)
     host.service.noteFast(result)
     this.sessionCost = total
-    this.costSum += costUsd
     // Фоновые субагенты переживают конец хода: они отчитаются уведомлением.
     this.closeOpenWork(interrupted ? 'stopped' : 'turnEnded', false, at)
 
@@ -93,6 +86,18 @@ export class TurnCloser {
       interrupted,
       ...(forAccount && { forAccount: true }),
     })
+  }
+
+  /**
+   * Ход кончился, а `result` не пришёл: CLI отметил его команду законченной. Незаконченное
+   * закрыто; подписи с ценой и временем нет - цифр CLI не дал.
+   */
+  close(interrupted: boolean): void {
+    const at = this.host.now()
+
+    this.stop = null
+    this.host.service.closeRetry(interrupted ? 'stopped' : 'failed', at)
+    this.closeOpenWork(interrupted ? 'stopped' : 'turnEnded', false, at)
   }
 
   /**

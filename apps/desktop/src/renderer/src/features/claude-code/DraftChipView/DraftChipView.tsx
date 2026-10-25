@@ -50,25 +50,29 @@ export const DraftChipView = ({
       ) : (
         body
       )}
-      {onExpand && (
-        <button
-          type="button"
-          className={styles.action}
-          aria-label={t('claudeCode.chips.expand')}
-          onMouseDown={keepCaret}
-          onClick={onExpand}>
-          <PencilLine className={styles.actionIcon} aria-hidden />
-        </button>
-      )}
-      {onRemove && (
-        <button
-          type="button"
-          className={styles.action}
-          aria-label={t('claudeCode.chips.remove', { name: label })}
-          onMouseDown={keepCaret}
-          onClick={onRemove}>
-          <X className={styles.actionIcon} aria-hidden />
-        </button>
+      {(onExpand || onRemove) && (
+        <span className={styles.actions}>
+          {onExpand && (
+            <button
+              type="button"
+              className={styles.action}
+              aria-label={t('claudeCode.chips.expand')}
+              onMouseDown={keepCaret}
+              onClick={onExpand}>
+              <PencilLine className={styles.actionIcon} aria-hidden />
+            </button>
+          )}
+          {onRemove && (
+            <button
+              type="button"
+              className={styles.action}
+              aria-label={t('claudeCode.chips.remove', { name: label })}
+              onMouseDown={keepCaret}
+              onClick={onRemove}>
+              <X className={styles.actionIcon} aria-hidden />
+            </button>
+          )}
+        </span>
       )}
     </span>
   )

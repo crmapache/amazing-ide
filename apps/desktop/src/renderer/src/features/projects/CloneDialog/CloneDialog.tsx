@@ -4,7 +4,7 @@ import { Button } from '@amazing-ide/ui/Button'
 import { Dialog } from '@amazing-ide/ui/Dialog'
 import { TextField } from '@amazing-ide/ui/TextField'
 
-import { displayPath } from '../projects.utils'
+import { displayPath } from '../../../lib/path.utils'
 import { useAppInfo } from '../../../state/app-info.queries'
 import { useCloneForm } from './CloneDialog.hooks'
 import styles from './CloneDialog.module.scss'

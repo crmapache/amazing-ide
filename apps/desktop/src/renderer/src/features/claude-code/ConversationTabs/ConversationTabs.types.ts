@@ -3,7 +3,7 @@ import type { MouseEvent } from 'react'
 import type { Conversation } from '@shared/claude'
 import type { Project } from '@shared/workspace'
 
-import type { ClosableTabCall } from '@amazing-ide/ui/ClosableTab.types'
+import type { TabCall } from '../claude.types'
 
 export type ConversationTabsProps = {
   project: Project
@@ -64,11 +64,14 @@ export type DragView = {
 export type ConversationTabProps = {
   conversation: Conversation
   isActive: boolean
-  /** Первая вкладка группы: зазор от соседней группы и ручка всей группы. */
+  /** Первая вкладка группы: ручка всей группы. */
   startsGroup: boolean
+  /** Последняя вкладка группы, за которой идёт другая: за ней зазор до соседней группы. */
+  endsGroup: boolean
   /** Сколько вкладок в группе: в группе из двух форк тащит всю группу. */
   groupSize: number
-  call: ClosableTabCall | null
+  /** Зов вкладки: повод красит свет, момент задаёт его фазу. */
+  call: TabCall | null
   calm: boolean
   dragView: DragView
   register: (id: string, node: HTMLDivElement | null) => void

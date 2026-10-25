@@ -7,7 +7,7 @@ import { invoke } from '../../lib/ipc'
 import { languageOfPath } from '../../lib/syntax-languages.utils'
 import type { FilePlace } from '../../state/selection.store'
 import { putText, holdsText, createDocumentModel } from './document-model'
-import { documentKey } from './documents.utils'
+import { documentKey, fileRequest } from './documents.utils'
 import { AUTOSAVE_DELAY_MS } from './editor.constants'
 import type { DocumentNotice, DocumentStatus } from './editor.types'
 
@@ -177,15 +177,13 @@ export class EditorDocument {
   }
 
   private read(known: FileVersion | null): Promise<FileRead> {
-    return invoke('fs:readFile', {
-      projectId: this.projectId,
-      relativePath: this.path,
-      known,
-    }).catch((error: unknown) => {
-      console.warn(`[editor] ${this.path} не прочитался:`, error)
+    return invoke('fs:readFile', { ...fileRequest(this.projectId, this.path), known }).catch(
+      (error: unknown) => {
+        console.warn(`[editor] ${this.path} не прочитался:`, error)
 
-      return UNREADABLE
-    })
+        return UNREADABLE
+      },
+    )
   }
 
   /** Прочитанное с диска без своих правок: показать как есть. */
@@ -274,8 +272,7 @@ export class EditorDocument {
     this.writeSerial += 1
 
     const saving = invoke('fs:writeFile', {
-      projectId: this.projectId,
-      relativePath: this.path,
+      ...fileRequest(this.projectId, this.path),
       text: model.getValue(),
       bom: this.bom,
       expected: mode === 'overwrite' ? null : this.version,

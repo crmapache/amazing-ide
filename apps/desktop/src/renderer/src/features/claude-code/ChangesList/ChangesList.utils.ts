@@ -76,3 +76,20 @@ export const rowNote = (
 /** Плюс строки: у созданного - сколько строк в файле вышло (добавленное минус снятое правками). */
 export const addedShown = (change: FileChange): number =>
   change.created ? Math.max(change.added - change.removed, 0) : change.added
+
+/**
+ * Строки всего хода плюсом и минусом - сумма того, что говорят строки, поэтому шапка не
+ * спорит со списком под ней (откаченные тоже: список - запись того, что ход сделал). Файл,
+ * который посчитать нечем («±»), в сумму не входит.
+ */
+export const turnTotals = (changes: readonly FileChange[]): { added: number; removed: number } =>
+  changes.reduce(
+    (sum, change) =>
+      change.counted
+        ? {
+            added: sum.added + addedShown(change),
+            removed: sum.removed + (change.created ? 0 : change.removed),
+          }
+        : sum,
+    { added: 0, removed: 0 },
+  )

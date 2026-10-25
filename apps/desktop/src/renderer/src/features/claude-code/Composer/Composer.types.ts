@@ -26,13 +26,6 @@ export type SuggestListProps = {
   onHover: (index: number) => void
 }
 
-export type ContextBarProps = {
-  conversation: Conversation | null
-  /** Settings → Indicators: полоса и подпись «ctx 48%» прячутся по отдельности. */
-  showBar: boolean
-  showLabel: boolean
-}
-
 export type FieldChipsProps = {
   registry: ChipRegistry
   fieldRef: RefObject<HTMLDivElement | null>
@@ -56,6 +49,8 @@ export type WritingToolsProps = {
   dropped: ReadonlySet<FitStep>
 }
 
+export type ContextMeterProps = { conversation: Conversation }
+
 /** Подпись кнопки, которая на узкой панели сужается до первой буквы. */
 export type FitLabelProps = { text: string }
 
@@ -70,8 +65,4 @@ export type SendButtonsProps = {
   keyQueues: boolean
   onSend: () => void
   onQueue: () => void
-}
-
-export type CompactSelectorsProps = {
-  conversation: Conversation
 }

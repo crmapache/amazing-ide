@@ -1,9 +1,12 @@
 @use '@amazing-ide/ui/mixins' as *;
 @include breathing-keyframes;
 
-// Обёртка чипа не меняет раскладку текста: чип стоит в строке, как стоял.
+// Обёртка чипа не меняет раскладку текста: чип стоит в строке, как стоял. Чип - флекс, и
+// обёртка внутри него всё равно блочная, а в блоке строка держит запас под нижние
+// выносные: плашка с картинкой выходила на два пикселя выше остальных, а подпись в ней
+// сидела выше середины. flex такого запаса не оставляет.
 .anchor {
-  display: inline;
+  display: flex;
   cursor: pointer;
 }
 
@@ -60,7 +63,7 @@
 .name {
   padding: 0 var(--space-0-5);
   font-family: var(--font-code);
-  font-size: var(--font-size-2xs);
+  font-size: var(--font-size-xs);
   overflow-wrap: anywhere;
 }
 
@@ -68,7 +71,7 @@
   padding: 0 var(--space-0-5);
   color: var(--color-fg-muted);
   font-family: var(--font-code);
-  font-size: var(--font-size-2xs);
+  font-size: var(--font-size-xs);
   white-space: nowrap;
 }
 

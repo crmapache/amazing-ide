@@ -7,7 +7,7 @@ import {
   placeOn,
   beforeOf,
   callTone,
-  groupTone,
+  endsGroup,
   tabBeside,
 } from './ConversationTabs.utils'
 
@@ -21,12 +21,10 @@ const rect = (key: string, left: number, top = 0, unit: string | undefined = key
 })
 
 describe('полоса вкладок разговоров', () => {
-  it('цвет группы - по id, один и тот же, в пределах шести', () => {
-    const tone = groupTone('3f2a-group')
+  it('зазор группы - за последней вкладкой группы, но не за последней на полосе', () => {
+    const tabs = [{ groupId: 'a' }, { groupId: 'a' }, { groupId: 'b' }, { groupId: 'c' }]
 
-    expect(groupTone('3f2a-group')).toBe(tone)
-    expect(tone).toBeGreaterThanOrEqual(0)
-    expect(tone).toBeLessThan(6)
+    expect(tabs.map((_, index) => endsGroup(tabs, index))).toEqual([false, true, true, false])
   })
 
   it('повод звука - в три цвета света', () => {

@@ -1,8 +1,34 @@
-import { PrefSwitchScreen } from '../PrefSwitchScreen/PrefSwitchScreen'
+import { useTranslation } from 'react-i18next'
+
+import { Card } from '@amazing-ide/ui/Card'
+import { Switch } from '@amazing-ide/ui/Switch'
+
+import { useClaudeActions } from '../claude-actions.hooks'
+import { usePanelPrefs } from '../claude.queries'
+import { PanelScreen } from '../PanelScreen/PanelScreen'
+import styles from './ShareEditorScreen.module.scss'
 
 /**
- * Settings → Open file and selection: уходит ли с сообщением открытый файл (и
- * выделенные строки, когда появится редактор). Тот же выключатель - в меню чипа файла
- * под полем; там же одно сообщение можно отправить наперекор.
+ * Settings → Open file and selection: уходит ли с сообщением открытый файл и выделенные
+ * строки. Тот же выключатель - в меню чипа файла под полем; там же одно сообщение можно
+ * отправить наперекор.
  */
-export const ShareEditorScreen = () => <PrefSwitchScreen pref="shareEditor" />
+export const ShareEditorScreen = () => {
+  const { t } = useTranslation()
+  const { shareEditor } = usePanelPrefs()
+  const { setPrefs } = useClaudeActions()
+
+  return (
+    <PanelScreen title={t('claudeCode.menu.titles.shareEditor.title')}>
+      <Card>
+        <Switch
+          label={t('claudeCode.shareEditor.label')}
+          description={t('claudeCode.shareEditor.hint')}
+          checked={shareEditor}
+          onChange={(value) => void setPrefs({ shareEditor: value })}
+        />
+      </Card>
+      <p className={styles.note}>{t('claudeCode.shareEditor.note')}</p>
+    </PanelScreen>
+  )
+}

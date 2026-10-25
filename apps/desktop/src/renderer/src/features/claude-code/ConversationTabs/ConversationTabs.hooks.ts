@@ -1,9 +1,9 @@
 import type { MouseEvent as ReactMouseEvent } from 'react'
 import { useRef, useState, useCallback, useLayoutEffect } from 'react'
 
-import { LANDING_MS, SWAP_GAP_PX, DRAG_THRESHOLD_PX } from './ConversationTabs.constants'
+import { ADD_KEY, LANDING_MS, SWAP_GAP_PX, DRAG_THRESHOLD_PX } from './ConversationTabs.constants'
 import type { Drag, Point, TabRect, DragView, StripTab } from './ConversationTabs.types'
-import { rowFor, shotOf, placeOn, beforeOf } from './ConversationTabs.utils'
+import { rowFor, shotOf, placeOn, beforeOf, endsGroup } from './ConversationTabs.utils'
 
 type Node = { conversation: StripTab; node: HTMLDivElement }
 
@@ -22,13 +22,17 @@ const unitOf = (conversation: StripTab, drag: Drag): string | undefined => {
   return conversation.groupId === drag.groupId ? conversation.id : undefined
 }
 
-const layoutOf = (nodes: readonly Node[]) =>
-  new Map(
-    nodes.map(({ conversation, node }) => [
-      conversation.id,
-      { x: node.offsetLeft, y: node.offsetTop },
-    ]),
-  )
+const nodeTab = ({ conversation }: Node): StripTab => conversation
+
+/** Где стоят вкладки и «+» (под ADD_KEY): он не вкладка, но едет с рядом так же. */
+const layoutOf = (nodes: readonly Node[], add: HTMLElement | null) =>
+  new Map([
+    ...nodes.map(
+      ({ conversation, node }) =>
+        [conversation.id, { x: node.offsetLeft, y: node.offsetTop }] as const,
+    ),
+    ...(add ? [[ADD_KEY, { x: add.offsetLeft, y: add.offsetTop }] as const] : []),
+  ])
 
 /** Узлы полосы в порядке разговоров: тот, что ещё не смонтирован, пропускается. */
 const orderedNodes = (
@@ -41,12 +45,19 @@ const orderedNodes = (
     return node ? [{ conversation, node }] : []
   })
 
-/** Вернуть полосе порядок разметки: снять order и переданный край первой вкладки. */
-const unhold = (nodes: ReadonlyMap<string, HTMLDivElement>) => {
+/**
+ * Вернуть полосе порядок разметки: снять order, переставленный зазор групп и место под «+»
+ * у последней.
+ */
+const unhold = (nodes: ReadonlyMap<string, HTMLDivElement>, add: HTMLElement | null) => {
   for (const node of nodes.values()) {
     node.style.order = ''
-    node.style.marginInlineStart = ''
+    delete node.dataset['groupEnd']
+    delete node.dataset['tail']
+    delete node.dataset['untail']
   }
+
+  if (add) add.style.order = ''
 }
 
 /** Сколько вкладка сейчас сдвинута от своего места - у браузера, с учётом идущего перехода. */
@@ -69,6 +80,7 @@ const liveShift = (node: HTMLElement): Point => {
  */
 export const useTabDrag = (conversations: readonly StripTab[], reorder: Reorder) => {
   const stripRef = useRef<HTMLDivElement>(null)
+  const addRef = useRef<HTMLSpanElement>(null)
   const nodes = useRef(new Map<string, HTMLDivElement>())
   const latest = useRef({ conversations, reorder })
   const dragged = useRef(false)
@@ -86,7 +98,7 @@ export const useTabDrag = (conversations: readonly StripTab[], reorder: Reorder)
     if (!held.current) return
 
     held.current = false
-    unhold(nodes.current)
+    unhold(nodes.current, addRef.current)
   }, [signature])
 
   // Приземление: с того места, где вкладка была нарисована в миг отпускания, - в новое.
@@ -97,8 +109,17 @@ export const useTabDrag = (conversations: readonly StripTab[], reorder: Reorder)
 
     landing.current = null
 
-    for (const { conversation, node } of orderedNodes(conversations, nodes.current)) {
-      const from = was.get(conversation.id)
+    const add = addRef.current
+    const landed = [
+      ...orderedNodes(conversations, nodes.current).map(({ conversation, node }) => ({
+        key: conversation.id,
+        node,
+      })),
+      ...(add ? [{ key: ADD_KEY, node: add }] : []),
+    ]
+
+    for (const { key, node } of landed) {
+      const from = was.get(key)
       const dx = from ? from.x - node.offsetLeft : 0
       const dy = from ? from.y - node.offsetTop : 0
 
@@ -142,20 +163,39 @@ export const useTabDrag = (conversations: readonly StripTab[], reorder: Reorder)
       node.style.order = String(order)
     })
 
-    // Ровный край у первой вкладки правило :first-child даёт по разметке, а order разметку
-    // не трогает: край отдаётся той, что встанет первой, а зазор - первой по разметке.
-    const leader = sequence[0]?.node
-    const marked = all[0]?.node
+    const add = addRef.current
 
-    if (leader && marked && leader !== marked) {
-      leader.style.marginInlineStart = '0px'
-      marked.style.marginInlineStart = 'var(--space-1-5)'
+    if (add) add.style.order = String(sequence.length)
+
+    // Место под «+» держит последняя вкладка, а :last-child - по разметке: роль отдаётся
+    // той, что встанет последней, и снимается с последней по разметке (стили - data-tail).
+    const tail = sequence.at(-1)?.node
+    const markedTail = all.at(-1)?.node
+
+    if (tail && markedTail && tail !== markedTail) {
+      tail.dataset['tail'] = ''
+      markedTail.dataset['untail'] = ''
     }
 
-    const projected = layoutOf(sequence)
+    // Зазор групп стоит по разметке (groupEnd), а order её не трогает: вкладка, которая в
+    // новом порядке закроет группу или перестанет её закрывать, получает его через
+    // data-group-end. Последней он не нужен - её место под «+» держит data-tail.
+    const markedTabs = all.map(nodeTab)
+    const projectedTabs = sequence.map(nodeTab)
+    const markedEnds = new Set(
+      all.filter((_, index) => endsGroup(markedTabs, index)).map(({ node }) => node),
+    )
+
+    sequence.slice(0, -1).forEach(({ node }, index) => {
+      const ends = endsGroup(projectedTabs, index)
+
+      if (ends !== markedEnds.has(node)) node.dataset['groupEnd'] = ends ? 'on' : 'off'
+    })
+
+    const projected = layoutOf(sequence, add)
     const projectedHeight = strip.offsetHeight
 
-    if (!keep) unhold(nodes.current)
+    if (!keep) unhold(nodes.current, add)
 
     strip.style.minHeight = asked
 
@@ -203,7 +243,7 @@ export const useTabDrag = (conversations: readonly StripTab[], reorder: Reorder)
       shot,
       from,
       carried,
-      laid: layoutOf(all),
+      laid: layoutOf(all, addRef.current),
       rowTop: grip.top,
       highest: (shot.lines[0] ?? grip.top) - grip.top,
       lowest: (shot.lines.at(-1) ?? grip.top) - grip.top,
@@ -297,10 +337,16 @@ export const useTabDrag = (conversations: readonly StripTab[], reorder: Reorder)
   const drop = (drag: Drag, from: number, place: number, units: readonly string[]) => {
     const rendered = new Map<string, Point & { shifted: boolean }>()
 
-    for (const { conversation, node } of ordered()) {
+    const add = addRef.current
+    const shown = [
+      ...ordered().map(({ conversation, node }) => ({ key: conversation.id, node })),
+      ...(add ? [{ key: ADD_KEY, node: add }] : []),
+    ]
+
+    for (const { key, node } of shown) {
       const live = liveShift(node)
 
-      rendered.set(conversation.id, {
+      rendered.set(key, {
         x: node.offsetLeft + live.x,
         y: node.offsetTop + live.y,
         shifted: Boolean(live.x || live.y),
@@ -323,10 +369,10 @@ export const useTabDrag = (conversations: readonly StripTab[], reorder: Reorder)
       // Главный процесс порядок не поменял - вернуть полосу как была.
       if (held.current && (!ids || ids.join() === orderBefore)) {
         held.current = false
-        unhold(nodes.current)
+        unhold(nodes.current, addRef.current)
       }
     })
   }
 
-  return { stripRef, register, view, onPress, wasDragged: () => dragged.current }
+  return { stripRef, addRef, register, view, onPress, wasDragged: () => dragged.current }
 }

@@ -17,11 +17,6 @@
   &:disabled {
     cursor: default;
   }
-
-  &:focus-visible {
-    outline: var(--focus-ring-width) solid var(--color-focus);
-    outline-offset: calc(var(--focus-ring-width) * -1);
-  }
 }
 
 .sm {

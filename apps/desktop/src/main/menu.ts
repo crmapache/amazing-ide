@@ -1,5 +1,7 @@
-import { Menu, BrowserWindow } from 'electron'
+import { app, Menu, BrowserWindow } from 'electron'
 import type { MenuItemConstructorOptions } from 'electron'
+
+import type { WindowCommand } from '@shared/window'
 
 import { broadcast } from './ipc/broadcast'
 import { isPanelFocused } from './claude/tabs/panel-focus'
@@ -27,15 +29,55 @@ const reloadUnlessPanel = () => {
   if (!isPanelFocused()) BrowserWindow.getFocusedWindow()?.webContents.reload()
 }
 
+/** Команда окну целиком (window:command): настройки и размер текста - не дело одного вида. */
+const toWindow = (command: WindowCommand) => () => broadcast('window:command', command)
+
+/** Меню программы - стандартное macOS, плюс Settings… (⌘,): настройки IDE открывает окно. */
+const appMenu: MenuItemConstructorOptions = {
+  label: app.name,
+  submenu: [
+    { role: 'about' },
+    { type: 'separator' },
+    { label: 'Settings…', accelerator: 'CmdOrCtrl+,', click: toWindow('openSettings') },
+    { type: 'separator' },
+    { role: 'services' },
+    { type: 'separator' },
+    { role: 'hide' },
+    { role: 'hideOthers' },
+    { role: 'unhide' },
+    { type: 'separator' },
+    { role: 'quit' },
+  ],
+}
+
+/**
+ * Размер текста вместо масштаба страницы (ADR 0024): ⌘+, ⌘- и ⌘0 двигают тот же размер,
+ * что ползунок в настройках. Масштаб страницы растил бы и иконки с отступами, и у IDE
+ * было бы два разных «крупнее». ⌘= - та же клавиша без Shift: «+» нарисован на ней, и
+ * жмут её чаще всего без Shift.
+ */
+const textSizeItems: MenuItemConstructorOptions[] = [
+  { label: 'Reset Text Size', accelerator: 'CmdOrCtrl+0', click: toWindow('textSizeReset') },
+  { label: 'Increase Text Size', accelerator: 'CmdOrCtrl+Plus', click: toWindow('textSizeUp') },
+  {
+    label: 'Increase Text Size',
+    accelerator: 'CmdOrCtrl+=',
+    click: toWindow('textSizeUp'),
+    visible: false,
+    acceleratorWorksWhenHidden: true,
+  },
+  { label: 'Decrease Text Size', accelerator: 'CmdOrCtrl+-', click: toWindow('textSizeDown') },
+]
+
 /**
  * Меню приложения. Стандартные разделы macOS (правка, вид, окно) дают системные
  * сочетания: копирование, вставку, полноэкранный режим. Свои пункты - только то,
- * что относится ко всей IDE, а не к одному виду. Закрытие и перезагрузка - свои, а не
- * роли: их клавиши значат другое (closeTab, reloadUnlessPanel).
+ * что относится ко всей IDE, а не к одному виду. Закрытие, перезагрузка и масштаб - свои, а
+ * не роли: их клавиши значат другое (closeTab, reloadUnlessPanel, textSizeItems).
  */
 export const installApplicationMenu = ({ openProject }: MenuActions) => {
   const template: MenuItemConstructorOptions[] = [
-    { role: 'appMenu' },
+    appMenu,
     {
       label: 'File',
       submenu: [
@@ -52,9 +94,7 @@ export const installApplicationMenu = ({ openProject }: MenuActions) => {
         { role: 'forceReload' },
         { role: 'toggleDevTools' },
         { type: 'separator' },
-        { role: 'resetZoom' },
-        { role: 'zoomIn' },
-        { role: 'zoomOut' },
+        ...textSizeItems,
         { type: 'separator' },
         { role: 'togglefullscreen' },
       ],

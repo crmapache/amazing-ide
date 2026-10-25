@@ -5,8 +5,21 @@ import { fastModeShown } from '@shared/claude-fast-mode'
 
 import { fastChipHint } from './fast-mode.utils'
 import { MODEL_FAMILIES } from './model-chip.constants'
-import type { ModelChip } from './model-chip.types'
+import type { ModelChip, ModelFamily } from './model-chip.types'
 import type { PickableModel } from './models.types'
+
+/** Идентификатор без регистра и метки окна: «claude-opus-5[1m]» - «claude-opus-5». */
+const bareModel = (model: string): string => model.toLowerCase().replace(/\[.*\]$/, '')
+
+/**
+ * Семья модели по идентификатору («opus», «claude-opus-4-8», «sonnet[1m]»). Своя модель
+ * через прокси и модель чужого провайдера семьи не имеют - undefined.
+ */
+export const modelFamily = (model: string): ModelFamily | undefined => {
+  const bare = bareModel(model)
+
+  return MODEL_FAMILIES.find((name) => bare.includes(name))
+}
 
 /**
  * Имя модели для людей из полного идентификатора: «claude-opus-4-8» - «Opus 4.8»,
@@ -17,8 +30,8 @@ export const modelCaption = (model: string, models: readonly PickableModel[]): s
 
   if (known) return known.displayName
 
-  const bare = model.toLowerCase().replace(/\[.*\]$/, '')
-  const family = MODEL_FAMILIES.find((name) => bare.includes(name))
+  const bare = bareModel(model)
+  const family = modelFamily(model)
 
   if (!family) return model
 

@@ -26,11 +26,5 @@ export const projectTone = (name: string): AvatarTone => {
   return AVATAR_TONES[hash % AVATAR_TONES.length] ?? 0
 }
 
-/** Путь для показа: домашняя папка - через ~, как в WebStorm и терминале. */
-export const displayPath = (path: string, homeDir: string | undefined): string =>
-  homeDir && (path === homeDir || path.startsWith(`${homeDir}/`))
-    ? `~${path.slice(homeDir.length)}`
-    : path
-
 /** Папка, в которой лежит путь: рядом с активным проектом кладут клон. */
 export const parentFolder = (path: string): string => path.slice(0, path.lastIndexOf('/')) || '/'

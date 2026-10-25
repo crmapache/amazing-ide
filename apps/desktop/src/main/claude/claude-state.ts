@@ -43,7 +43,15 @@ type StoredTabFields = {
   outcome?: TurnOutcome | undefined
   /** Быстрый режим ездит с разговором (а новая вкладка стартует без него). */
   fastMode?: boolean | undefined
+  /**
+   * Контекст на последнем известном шаге: вернувшаяся вкладка с длинным разговором не
+   * стоит на «ctx 0%», пока процесс не поднят. Без окна цифры не пишутся.
+   */
+  context?: StoredContext | undefined
 }
+
+/** Занятое и окно контекста на диске. */
+type StoredContext = { tokens: number; window: number }
 
 export type StoredClaude = {
   /** В порядке полосы вкладок. */
@@ -55,6 +63,8 @@ export type StoredClaude = {
   trustedProjects: string[]
   /** Настройки панели (экран Settings). */
   prefs: PanelPrefs
+  /** Имена команд, которые CLI назвал последними, - по папке проекта (cli/project-commands.ts). */
+  commandsByProject: Record<string, string[]>
 }
 
 const text = (value: unknown) => (typeof value === 'string' ? value : '')
@@ -71,7 +81,10 @@ export const freshConversation = (stored: StoredConversation): Conversation => (
   backgroundWork: false,
   status: 'idle',
   activeModel: null,
-  usage: { contextTokens: 0, contextWindow: 0, costUsd: 0 },
+  usage: {
+    contextTokens: stored.context?.tokens ?? 0,
+    contextWindow: stored.context?.window ?? 0,
+  },
   pending: null,
   pendingCount: 0,
   turnStartedAt: null,
@@ -97,6 +110,9 @@ export const toStored = (conversation: Conversation): StoredConversation => ({
   fork: conversation.fork,
   updatedAt: conversation.updatedAt,
   ...(conversation.fastMode && { fastMode: true }),
+  ...(conversation.usage.contextWindow > 0 && {
+    context: { tokens: conversation.usage.contextTokens, window: conversation.usage.contextWindow },
+  }),
 })
 
 const parseFork = (value: unknown): ForkOrigin | null => {
@@ -167,7 +183,21 @@ const parseTabFields = (record: Record<string, unknown>) => ({
   depth: Number.isInteger(record['depth']) ? Math.max(0, record['depth'] as number) : undefined,
   outcome: typeof record['outcome'] === 'string' ? toOutcome(record['outcome']) : undefined,
   fastMode: record['fastMode'] === true || undefined,
+  context: parseContext(record['context']),
 })
+
+const count = (value: unknown) =>
+  typeof value === 'number' && Number.isFinite(value) && value > 0 ? Math.round(value) : 0
+
+/** Цифры контекста с диска: без окна они ничего не говорят - их нет. */
+const parseContext = (value: unknown): StoredContext | undefined => {
+  if (typeof value !== 'object' || value === null) return undefined
+
+  const record = value as Record<string, unknown>
+  const window = count(record['window'])
+
+  return window > 0 ? { tokens: count(record['tokens']), window } : undefined
+}
 
 const toOutcome = (value: string): TurnOutcome => (value === 'none' ? 'none' : 'done')
 
@@ -202,15 +232,23 @@ export const parseStoredClaude = (value: unknown): StoredClaude => {
     activeByProject,
     trustedProjects,
     prefs: parsePanelPrefs(record['prefs']),
+    commandsByProject: parseCommandNames(record['commandsByProject']),
   }
 }
 
-/**
- * С чем сервис стартует. Выключено «Tabs on start» - вкладки разговоров и закрытые не
- * возвращаются: новая сессия IDE начинается с чистой полосы (черновики стирает окно).
- * Сами разговоры не пропадают - они в истории CLI.
- */
-export const startingState = (stored: StoredClaude): StoredClaude =>
-  stored.prefs.restoreTabs
-    ? stored
-    : { ...stored, conversations: [], closed: [], activeByProject: {} }
+/** Имена команд по папке проекта: чужое и битое - мимо, папка - только абсолютный путь. */
+const parseCommandNames = (value: unknown): Record<string, string[]> => {
+  if (typeof value !== 'object' || value === null) return {}
+
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>)
+      .filter(
+        (entry): entry is [string, unknown[]] =>
+          entry[0].startsWith('/') && Array.isArray(entry[1]),
+      )
+      .map(([path, names]) => [
+        path,
+        names.filter((name): name is string => typeof name === 'string' && name.length > 0),
+      ]),
+  )
+}
